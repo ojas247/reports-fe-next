@@ -1,0 +1,93 @@
+
+#searchBtn{
+    padding-top: 20px;
+}
+
+.searchRow{
+    padding-top: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  
+.searchToggle{
+    margin-top: 0px;
+    margin-right: 15px;
+  }
+  
+  .toggleButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .toggleButton.filter {
+    color: white;
+    padding-top: 10px;
+    background-color: rgb(188, 186, 186);
+    margin-top: 7px;
+    margin-left: 10px;
+    border-radius: 50px;
+  }
+  
+  .toggleButton.search {
+    color: white;
+    padding-top: 10px;
+    background-color: rgb(188, 186, 186);
+    margin-top: 7px;
+    margin-left: 10px;
+    border-radius: 50px;
+  }
+
+  /* Container for the search bar */
+  .searchContainerRpts {
+    display: flex;
+    padding: 0px 10px 10px 10px;
+    align-items: center;
+    justify-content: center;
+    margin: 0px auto;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  /* Container for input and button to align them */
+  .searchWrapperRpts {
+    position: relative;
+    width: 100%;
+  }
+
+  
+.noData{
+    padding-left: 7%;
+}
+
+.filterTags{
+    margin-left: 8%;
+}
+
+.resultContainer{
+    position: relative; 
+    display: grid;
+    grid-template-columns: 20% 80%;
+    min-height: 100vh;
+}
+
+.toggleLeftPanel{
+    position: sticky;
+    left: 8%;
+    margin-top: 10%;
+}
+
+@media screen and (max-width: 1200px) {
+    .toggleLeftPanel{
+        display:none;
+  }
+
+  .resultContainer{
+    grid-template-columns: 100%;
+  }
+}

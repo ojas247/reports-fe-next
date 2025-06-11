@@ -1,0 +1,55 @@
+.leftPaneSearchResultParent{
+    display: grid;
+    grid-template-columns: 100% ;
+    background-color: rgb(244 245 255);
+}
+
+.leftPaneHeaderBg{
+    color: #27406d;
+    font-weight: 600;
+    background-color: #dfe6fd;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.subheaderList{
+    list-style-type:circle;
+    padding-left: initial;
+}
+
+.subHeader{
+    background-color: rgb(244 245 255);
+    font-size: 14px;
+    padding-left: 35px;
+}
+
+.subHeader:hover{
+    background-color: rgb(255 255 255);
+    cursor: pointer;
+}
+
+.leftPaneHeaderBg{
+    display:flex;
+}
+
+.bi-arrow-bar-down{
+    color: #27406d;
+    font-size: 10px;
+}
+
+.iconContainer {
+    color:green;
+    padding-right: 2px;   
+    height: 10px; /* or any fixed height */
+    line-height: 0; /* Prevents text from vertically aligning */
+  }
+
+  .iconContainer i {
+    vertical-align: top; /* Aligns the icon to the top */
+    font-size: 12px; /* Adjust size as needed */
+  }
+
+  .sector-container{
+    font-size:12px;
+  }
+

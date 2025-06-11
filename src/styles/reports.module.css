@@ -1,0 +1,161 @@
+  
+  
+.searchRow{
+  padding-top: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.searchToggle{
+  margin-top: 0px;
+  margin-right: 15px;
+}
+
+.toggleButton {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggleButton.filter {
+  color: white;
+  padding-top: 10px;
+  background-color: rgb(188, 186, 186);
+  margin-top: 7px;
+  margin-left: 10px;
+  border-radius: 50px;
+}
+
+.toggleButton.search {
+  color: white;
+  padding-top: 10px;
+  background-color: rgb(188, 186, 186);
+  margin-top: 7px;
+  margin-left: 10px;
+  border-radius: 50px;
+}
+
+.bi-search, .bi-funnel{
+  color: #27406d;
+  /* weight:5px; */
+}
+
+.toggleImg {
+  margin-top: 2px;
+}
+
+  /* Container for the search bar */
+  .searchContainerRpts {
+    display: flex;
+    padding: 0px 10px 10px 10px;
+    align-items: center;
+    justify-content: center;
+    margin: 0px auto;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  /* Container for input and button to align them */
+  .searchWrapperRpts {
+    position: relative;
+    width: 100%;
+  }
+
+.homeFold1{
+    padding-left: 3%;
+  }
+  
+  .homeH1Title{
+    padding-left: 10%;
+    padding-top: 5%;
+    font-size: larger;
+    font-weight: 700;
+  }
+
+  .homeH2Title{
+    padding-left: 10%;
+    padding-top: 0%;
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+
+.containerCarouselBlog{
+    width: 100%;
+    display: flex;
+    padding-left: 5%;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+  }
+
+.blogCardCarouselScroll {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  width: 85%;         /* or any value less than 100% */
+  margin-left: 5%;     /* align to the left */
+  margin-right: auto; /* push away from the right */
+  gap: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  scroll-snap-type: x mandatory;
+  /* Hide scrollbar for aesthetics */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.blogCardCarouselScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.blogCard {
+  flex: 0 0 200px; /* Fixed width for each card */
+  scroll-snap-align: start;
+  border-radius: 15px;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+}
+
+.blogCardImage {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+
+}
+
+.blogCardContent {
+  padding: 0px;
+}
+
+.blogCardContent h3 {
+  font-size: 1.1em;
+  margin: 0;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.blogCardContent p {
+  font-size: 0.9em;
+  color: #555;
+  margin: 0 0 15px 0;
+  padding-top: 5px;
+  padding-left: 10px;
+}
+
+.blogCardDate {
+  font-size: 0.8em;
+  color: #888;
+}
+
+/* @media screen and (max-width: 600px) {
+
+
+} */

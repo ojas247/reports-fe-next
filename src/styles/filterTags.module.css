@@ -1,0 +1,26 @@
+.pillBtn {
+    display: inline-block;
+    border-radius: 20px; /* Adjust as needed */
+    color: #fff; /* Text color */
+    padding: 0px 10px; /* Adjust padding */
+    font-size: 14px; /* Adjust font size */
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Box shadow for 3D effect */
+    min-width: min-content;
+}
+
+.sectorBtn{
+    background-color: rgb(94, 93, 93);
+}
+
+.authorBtn{
+    background-color: rgb(126, 107, 107);
+}
+
+.yearBtn{
+    background-color: grey;
+}
+
+.tagBtn{
+    background-color: rgb(214, 159, 159);
+}

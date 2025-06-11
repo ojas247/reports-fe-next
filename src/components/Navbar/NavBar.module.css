@@ -1,0 +1,267 @@
+.NavBar {
+  display: grid;
+  grid-template-columns: 20% 80%;
+  background-color: white;
+  height: 90px;
+  text-align: center;
+  align-content: center;
+  padding-top: 10px;
+}
+
+.NavbarStd {
+  display: flex;
+  align-items: center;
+  padding-top: 10px;
+}
+
+.Home a{
+  color: black;
+  text-decoration: none;
+}
+
+
+.LogoImg {
+  height: 72px;
+  padding-top: 20px;
+  padding-left: 20px;
+}
+
+.ToggleImg {
+  height: 10px;
+  padding-left: 2px;
+}
+
+.Login {
+  text-align: center;
+}
+
+.Login a {
+  text-decoration: none;
+  color: black;
+}
+
+.Signup {
+  text-align: right;
+  padding-right: 20px;
+  align-items: center;
+  color: white;
+}
+
+.aLinkSP {
+  display: inline-block;
+  padding: 1px 15px 3px;
+  background-color: #63737A;
+  color: white;
+  text-decoration: none;
+  border-radius: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.dropdownImg {
+  width: 10px;
+  height: 10px;
+}
+
+/* Style the dropdown button */
+.dropbtn {
+  background-color: white;
+  color: black;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Style the dropdown content (hidden by default) */
+.dropdownContent {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 130px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  z-index: 1;
+}
+
+/* Style the links inside the dropdown */
+.dropdownContent a {
+  color: black;
+  padding: 5px 10px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdownContent a:hover {
+  background-color: #f1f1f1;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdownContent {
+  display: block;
+  right: 5%; 
+  top: 80%;
+}
+
+.dropdownContentItem{
+  padding-left: 10px;
+  display: flex;
+  align-items: center; 
+}
+
+.bi-pie-chart, .bi-layout-text-sidebar, .bi-clipboard-data {
+  color: #27406d;
+}
+
+.hamburger {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.navBtn {
+  visibility: hidden;
+}
+
+.LoginLogoutAuthenticated{
+  margin-left: auto;
+  padding-right: 30px;
+}
+
+.itemContainer{
+  padding-left: 40px;
+}
+
+.dropdown{
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.itemContainerPushRight, .LoginLogout{
+  margin-left: 70px;
+    padding-right: 70px;
+} 
+
+.Login a {
+  text-decoration: none;
+  color: black;
+}
+
+.profileCircle{
+  background-color: white;
+  color: black;
+  padding: 16px;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 1015px) {
+  .NavBar{
+    display: grid;
+    grid-template-columns: 50% 50%;
+  }
+  .NavbarStd {
+		position: fixed;
+		top: -125vh;
+		right: 0;
+		height: 100%;
+		width: 50%;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		justify-content: center;
+		gap: 0rem;
+		background-color: white;
+		transition: 1s;
+    z-index: 5;
+	}
+
+  .nav-btn {
+		visibility: visible;
+		opacity: 1;
+    padding-left: 70px;
+	}
+
+  .responsive_nav {
+		transform: translateY(100vh);
+	}
+
+  .Logo-img {
+    height: 52px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+  }
+
+  .item-container, .item-container-push-right, .LoginLogout-Authenticated{
+    display: flex;         /* Enables flexbox */
+    align-items: center;   /* Vertically center the content */
+    justify-content: flex-start; 
+    width: 100%;
+    height: 56px;
+    text-align: left;
+    padding-left:16px; 
+  }
+
+  /* Style the dropdown content (hidden by default) */
+.dropdownContent {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 130px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  z-index: 1;
+}
+
+/* Change color of dropdown links on hover */
+.dropdownContent a:hover {
+  background-color: #f1f1f1;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdownContent {
+  display: block;
+  right: 5px; 
+}
+
+
+.dropdownContentItem{
+  padding-left: 10px;
+  display: flex;
+  align-items: center; 
+}
+
+  .dropbtn{
+    padding: 0px;
+    padding-right: 5px;
+  }
+
+  .SignUp{
+    padding-top: 10px;
+  }
+
+  .LoginLogout{
+    display: flex;         /* Enables flexbox */
+    align-items: center;   /* Vertically center the content */
+    width: 100%;
+    height: 56px;
+    text-align: left;
+    margin-left: auto
+  }
+
+  .profileCircle{
+    background-color: white;
+    color: black;
+    padding: 0px;
+    font-size: 24px;
+    border: none;
+    cursor: pointer;
+  }
+}

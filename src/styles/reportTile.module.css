@@ -1,0 +1,49 @@
+  .card {
+    width: 70%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+  }
+  
+  .cardContent {
+    padding: 20px;
+  }
+  
+  .cardTitle {
+    margin-top: 0;
+    font-size:large;
+  }
+  
+  .card-parameters{
+    display: inline-flex;
+    width: 300px;
+    font-size: small;
+  }
+  
+  
+  
+  .cardTopRow{
+    display: grid;
+    grid-template-columns: 90% 10% ;
+  }
+
+  .rptTileIcon{
+    padding-right: 4px;
+  }
+  
+  .counter-tile{
+    font-size: 10px;
+    text-align: end;
+  }
+
+.ReportURL {
+    color: inherit; /* Set the color to inherit from its parent */
+    text-decoration: none; /* Remove underline */
+} 
+
+.ReportURL:hover {
+    color: rgb(182, 180, 180);
+}
+  
