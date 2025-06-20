@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import styles from '../../styles/reportTile.module.css';
+import styles from '../../styles/UtilityComps/reportTile.module.css';
 
 
 function ReportTile({ index, Tags, reportURL, reportAuthor, reportName, year, sector, sub1 }) {
@@ -20,25 +20,30 @@ function ReportTile({ index, Tags, reportURL, reportAuthor, reportName, year, se
             {index + 1}
           </div>
         </div>
-        <div className={styles.cardParameters}>
-          <div className={styles.rptTileIcon}><i class="bi bi-app"></i></div>
-          <div><b>Sector: </b>{sector} </div>
+        <div className={styles.cardParametersContainer}>
+          <div className={styles.cardParameters}>
+            <div className={styles.rptTileIcon}><i class="bi bi-app"></i></div>
+            <div><b>Sector: </b>{sector} </div>
+          </div>
+
+          <div className={styles.cardParameters}>
+            <div className={styles.rptTileIcon}><i class="bi bi-app-indicator"></i></div>
+            <div><b>Sub-Sector: </b>{sub1}</div>
+          </div>
         </div>
 
-        <div className={styles.cardParameters}>
-          <div className={styles.rptTileIcon}><i class="bi bi-app-indicator"></i></div>
-          <div><b>Sub-Sector: </b>{sub1}</div>
-        </div>
+        <div className={styles.cardParametersContainer}>
+          <div className={styles.cardParameters}>
+            <div className={styles.rptTileIcon}>
+              <i class="bi bi-calendar4-week"></i></div>
+            <div><b>Published Year: </b>{year} </div>
+          </div>
 
+          <div className={styles.cardParameters}>
+            <div className={styles.rptTileIcon}><i class="bi bi-pencil-square"></i></div>
+            <div><b>Publisher/Author: </b>{reportAuthor}</div>
+          </div>
 
-        <div className={styles.cardParameters}>
-          <div className={styles.rptTileIcon}><i class="bi bi-calendar4-week"></i></div>
-          <div><b>Published Year: </b>{year} </div>
-        </div>
-
-        <div className={styles.cardParameters}>
-          <div className={styles.rptTileIcon}><i class="bi bi-pencil-square"></i></div>
-          <div><b>Publisher/Author: </b>{reportAuthor}</div>
         </div>
 
         {/* <div className='card-text'>

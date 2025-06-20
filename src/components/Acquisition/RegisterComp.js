@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { pushGTMEvent, encryptPassword, CreateUserId } from '../../pages/api/UtilFunctions';
+import styles from "../../styles/Pages/login.module.css"
+
 
 const RegisterComp = () => {
   const [email, setEmail] = useState("example@mail.com");
@@ -52,6 +54,7 @@ const RegisterComp = () => {
             />
           </div>
           <div className="w-full md:w-6/12 lg:w-5/12 xl:w-4/12 px-4">
+          <p className={styles.LoginDEscTitle}>Register to Search Reports</p>
             <form onSubmit={handleSubmit}>
               {/* Email Field */}
               <div className="mb-4">
@@ -102,8 +105,8 @@ const RegisterComp = () => {
                 <button
                   type="submit"
                   onClick={handleSubmit}
-                  className="bg-blue-600 text-white px-10 py-2 rounded-lg hover:bg-blue-700 transition"
-                >
+                  className={styles.loginBtn}
+                   >
                   Register
                 </button>
                 <p className="text-sm font-semibold mt-2 pt-1 mb-0">

@@ -1,0 +1,211 @@
+/* Navbar.module.css */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.LogoImg {
+  height: 52px;
+  padding-top: 10px;
+  padding-left: 20px;
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.hamburgerBar {
+  width: 25px;
+  height: 3px;
+  background-color: #333;
+  transition: 0.3s ease-in-out;
+}
+
+.hide {
+  display: none; 
+}
+.show {
+  display: block;
+}
+
+.navMenu {
+  position: absolute;
+  top: 75px;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  transition: all 0.3s ease-in-out;
+  z-index: 100;
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin-left: 15px;
+}
+
+.navList li {
+  border-bottom: 1px ;
+  position: relative;
+}
+
+.navList li a,
+.dropbtn {
+  display: inline-flex;
+  text-decoration: none;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  align-items: center;
+}
+
+.toggleImg {
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.dropdown{
+  padding-top: 5px;
+
+}
+
+/* Dropdown content default hidden */
+.dropdownContent {
+  display: none;
+  flex-direction: column;
+  background-color: #f9f9f9; 
+}
+
+.dropdownContentItem {
+  display: inline-flex;
+  align-items: center;
+  flex-direction: row;
+  margin-left: 1rem;
+}
+
+/* Mobile dropdown toggle */
+.showDropdown {
+  display: flex;
+}
+
+.dropdownContent a {
+  gap: 1px;
+}
+
+.LoginSignup {
+  display: flex;
+  flex-direction: column;
+}
+
+.signupBtn {
+  color: #27406d;
+  font-weight:700;
+  width: 80px;
+  height: 25px;
+  border: none;
+  border-radius: 15px;
+}
+
+/* Desktop hover */
+@media (min-width: 768px) {
+  .hamburger {
+    display: none;
+  }
+
+  .navMenu {
+    position: static;
+    display: flex;
+    justify-content: flex-end;
+    box-shadow: none;
+    width: auto;
+  }
+
+  .navList {
+    margin-right: 10%;
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .navList li {
+    border: none;
+  }
+
+  .dropdown {
+    position: relative;
+  }
+
+  .dropdownContent {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    display: none;
+    background-color: white;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    min-width: 140px;
+    z-index: 999;
+    border-radius: 8px;
+  }
+
+  .dropdownContentProfile {
+    position: absolute;
+    top: 100%;
+    left: -100px;
+    display: none;
+    background-color: white;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    min-width: 140px;
+    z-index: 999;
+    border-radius: 8px;
+  }
+
+  .dropdown:hover .dropdownContent {
+    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-bottom: 3px;
+  }
+  .dropdown:hover .dropdownContentProfile {
+    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-bottom: 3px;
+  }
+
+  .signupBtn {
+      color: #27406d;
+      font-weight:700;
+      width: 80px;
+      height: 25px;
+      border: none;
+      padding-left: 10px;
+      border-radius: 15px;
+    }
+
+  .LoginSignup {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+}
+

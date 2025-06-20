@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
 const PRIVATE_KEY = process.env.NEXT_PUBLIC_privateKeyForEncryption;
 
@@ -83,5 +84,29 @@ export const checkAuthentication = async () => {
     return false; // Return false on error
   }
 }
+
+export function setSessionToken(token) {
+  const expiryTime = new Date().getTime() + 30 * 60 * 1000; // 30 minutes from now
+  const tokenData = {
+    value: token,
+    expiry: expiryTime,
+  };
+  sessionStorage.setItem("token", JSON.stringify(tokenData));
+}
+
+export function isSessionTokenValid() {
+  const tokenString = sessionStorage.getItem("token");
+  if (!tokenString) return false;
+
+  const tokenData = JSON.parse(tokenString);
+  if (new Date().getTime() > tokenData.expiry) {
+    sessionStorage.removeItem("token");
+    return false; // Token expired
+  }
+  return true; // Token is valid
+}
+
+
+
 
 

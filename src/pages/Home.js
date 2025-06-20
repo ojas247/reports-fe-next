@@ -1,11 +1,13 @@
 'use client';
 
 import Head from 'next/head';
-import NavBar from "../components/Navbar/NavBar";
+import NavBar from "../components/Functionalities/NavBar";
 import SearchBar from '../components/Functionalities/SearchBar';
 import Footer from '../components/Website/Footer';
 import { useState } from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import styles from "../styles/Pages/home.module.css";
+
 
 export default function HomePage() {
   const [expandedFAQs, setExpandedFAQs] = useState([true, true, true, true, true, true]);
@@ -104,8 +106,8 @@ export default function HomePage() {
         <NavBar />
       </div>
 
-      <div className="flex flex-col items-center max-w-screen-xl mx-auto px-4">
-        <div className="w-full max-w-md my-12">
+      <div className={styles.homeContainer}>
+        <div className={styles.homeSearchBar}>
           <SearchBar />
         </div>
 
@@ -113,7 +115,7 @@ export default function HomePage() {
 
         <div className="flex flex-col lg:flex-row justify-between items-center gap-12 py-16">
           <div className="lg:w-1/2 pl-4 lg:pl-40 pt-10">
-            <h1 className="text-4xl font-bold mb-4">Reports & Insights <br /> from over <b>8 years</b></h1>
+            <h1 className={styles.homeHeroText}>Reports & Insights <br /> from over <b>10 years</b></h1>
             <p>MARKET-REPORTS by SYNTHESIS is a community driven platform to help <br /> Investment Analysts & Funds gather market insights with ease.</p>
           </div>
           <div className="lg:w-1/2 flex justify-center">
@@ -121,9 +123,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="bg-indigo-50 w-full py-12 text-center">
-          <h3 className="text-2xl font-semibold mb-4">A Macro-Analytics Platform for Market Research</h3>
-          <div className="h-2 bg-indigo-300 w-1/2 mx-auto opacity-50 mb-8"></div>
+        <div className={styles.homeNumbersBackground}>
+          <h3 className={styles.homeNumbersText}>A Macro-Analytics Platform for Market Research</h3>
+          <div className={styles.homeNumbersUnderline}></div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 px-4">
             {[
               { number: 150, label: "Publications" },
@@ -132,7 +134,7 @@ export default function HomePage() {
               { number: 10, label: "Clients" }
             ].map(({ number, label }, i) => (
               <div key={i} className="text-center">
-                <div className="text-indigo-700 text-4xl font-bold">{number}<span className="text-2xl">+</span></div>
+                <div className={styles.homeFactsNumbers}>{number}<span className="text-2xl">+</span></div>
                 <p className="font-semibold">{label}</p>
               </div>
             ))}
@@ -167,14 +169,14 @@ export default function HomePage() {
 
         <div className="flex justify-center my-10">
           <a href="/Register">
-            <button className="bg-[#27406d] text-white text-lg font-medium px-12 py-3 rounded-full hover:border-2 hover:border-green-500">
+            <button className={styles.homeRegisterBtn}>
               Register with us?
             </button>
           </a>
         </div>
 
         <div className="w-full bg-gray-100 px-6 py-12 border-t border-gray-200">
-          <h2 className="text-2xl font-semibold mb-8 text-center">Frequently Asked Questions</h2>
+          <h2 className={styles.homeFAQText}>Frequently Asked Questions</h2>
           {[
             "What is Market-Reports?",
             "How can I access the reports?",

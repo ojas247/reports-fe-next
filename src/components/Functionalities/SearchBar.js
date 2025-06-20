@@ -5,7 +5,7 @@ import axios from 'axios';
 import styles from '../../styles/searchbar.module.css';
 import { useRouter } from 'next/router';
 import ShowSuggestions from "./ShowSuggestions";
-import { checkAuthentication } from '../../pages/api/UtilFunctions';
+import { isSessionTokenValid } from '../../pages/api/UtilFunctions';
 
 const SearchBar = () => {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
@@ -94,7 +94,7 @@ const SearchBar = () => {
 
         const fetchSuggestions = async () => {
             try {
-                const isAuthenticated = await checkAuthentication();
+                const isAuthenticated = await isSessionTokenValid();
                 console.log("isAuthenticated: ", isAuthenticated);
                 if (!isAuthenticated) {
                     router.push('/Login', { state: {} });
@@ -151,7 +151,7 @@ const SearchBar = () => {
                 type="text"
                 value={query}
                 onChange={handleInputChange}
-                placeholder="Search for Authors, Sectors, Sub-Sectors..."
+                placeholder="Search Authors, Sectors, Sub-Sectors..."
             />
             <button className={styles.searchButton}>Search</button>
 

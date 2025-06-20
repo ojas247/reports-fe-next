@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/router';
-import NavBar from "../components/Navbar/NavBar";
+import NavBar from "../components/Functionalities/NavBar";
 import Footer from "../components/Website/Footer";
 
 import { pushGTMEvent } from '../pages/api/UtilFunctions';

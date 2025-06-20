@@ -1,11 +1,14 @@
+'use client'
+
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
-import NavBar from "../components/Navbar/NavBar";
+import NavBar from "../components/Functionalities/NavBar";
 import Footer from "../components/Website/Footer";
 import { load } from '@cashfreepayments/cashfree-js';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import { pushGTMEvent } from '../pages/api/UtilFunctions';
+import { pushGTMEvent, isSessionTokenValid } from '../pages/api/UtilFunctions';
+import styles from "../styles/Pages/pricing.module.css";
 
 
 export default function Pricing() {
@@ -53,13 +56,13 @@ export default function Pricing() {
       }
     }
     fetchAndDecodeToken();
-    checkAuthentication();
+    // checkAuthentication();
   }, [])
 
 
   const handleClick = (price) => {
     console.log("price: ", price)
-    if (isAuthenticated) {
+    if (isSessionTokenValid()) {
       // Get UCC from sessionStorage or use a default value
       const ucc = sessionStorage.getItem('UCC') || 'anonymous_user';
 
@@ -129,44 +132,44 @@ export default function Pricing() {
 
   initializeSDK();
 
-  // Authentication
-  function checkAuthentication() {
-    const token = localStorage.getItem('token');
-    axios.get(`${backendAPI}/AuthCheck`,
-      {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        }
-      })
-      .then(res => {
-        console.log("authenticated?", res.data);
-        const authBoolean = res.data;
-        setIsAuthenticated(authBoolean);
-      })
-  }
+  // // Authentication
+  // function checkAuthentication() {
+  //   const token = localStorage.getItem('token');
+  //   axios.get(`${backendAPI}/AuthCheck`,
+  //     {
+  //       headers: {
+  //         "Authorization": `Bearer ${token}`,
+  //       }
+  //     })
+  //     .then(res => {
+  //       console.log("authenticated?", res.data);
+  //       const authBoolean = res.data;
+  //       setIsAuthenticated(authBoolean);
+  //     })
+  // }
 
   return (
     <>
       <NavBar />
-      <div className="text-center py-12 bg-gray-100">
-        <h1 className="text-4xl font-bold mb-4">Pricing Plans</h1>
-        <p className="text-gray-600 mb-10">MarketReports is a Brand Company owned by Synthesis</p>
+      <div className= {styles.pricingContainer}>
+        <h1 className= {styles.pricingTitle}>Pricing Plans</h1>
+        <p className= {styles.pricingDesc}>MarketReports is a Brand Company owned by Synthesis</p>
 
         <div className="flex flex-col lg:flex-row justify-center items-stretch gap-6">
           {/* Try it Out Plan */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 w-full max-w-xs shadow-md">
-            <h2 className="text-2xl font-semibold mb-2">Try it Out</h2>
-            <p className="text-3xl font-bold text-gray-800 my-4">
+            <h2 className= {styles.pricingName}>Try it Out</h2>
+            <p className="text-3xl text-gray-800 my-4">
               ₹ 20 <span className="text-sm text-gray-500">/day</span>
             </p>
-            <ul className="text-left space-y-2 mb-6">
+            <ul className= {styles.pricingListDetails}>
               <li className="border-b border-gray-200 pb-2">50 Searches per day</li>
               <li className="border-b border-gray-200 pb-2">10 download credits</li>
               <li className="border-b border-gray-200 pb-2">Email Support</li>
             </ul>
             <button
-              className="bg-blue-600 hover:bg-blue-800 text-white px-5 py-2 rounded"
-              onClick={() => handleClick({ id: 'basic', amount: 1 })}
+             className={styles.pricingBtn}
+             onClick={() => handleClick({ id: 'basic', amount: 1 })}
             >
               Get Started
             </button>
@@ -174,17 +177,17 @@ export default function Pricing() {
 
           {/* Standard Plan */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 w-full max-w-xs shadow-md">
-            <h2 className="text-2xl font-semibold mb-2">Standard</h2>
-            <p className="text-3xl font-bold text-gray-800 my-4">
+            <h2 className={styles.pricingName}>Standard</h2>
+            <p className="text-3xl text-gray-800 my-4">
               ₹ 199 <span className="text-sm text-gray-500">/month</span>
             </p>
-            <ul className="text-left space-y-2 mb-6">
+            <ul className= {styles.pricingListDetails}>
               <li className="border-b border-gray-200 pb-2">50 Searches per day</li>
               <li className="border-b border-gray-200 pb-2">200 download credits</li>
               <li className="border-b border-gray-200 pb-2">Priority Support</li>
             </ul>
             <button
-              className="bg-indigo-700 hover:bg-indigo-500 text-white px-5 py-2 rounded"
+              className={styles.pricingBtn}
               onClick={() => handleClick({ id: 'standard', amount: 3 })}
             >
               Good Choice
@@ -193,17 +196,17 @@ export default function Pricing() {
 
           {/* Enterprise Plan */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 w-full max-w-xs shadow-md">
-            <h2 className="text-2xl font-semibold mb-2">Enterprise</h2>
-            <p className="text-3xl font-bold text-gray-800 my-4">
+            <h2 className= {styles.pricingName}>Enterprise</h2>
+            <p className="text-3xl text-gray-800 my-4">
               ₹ 1000 <span className="text-sm text-gray-500">/year</span>
             </p>
-            <ul className="text-left space-y-2 mb-6">
+            <ul className= {styles.pricingListDetails}>
               <li className="border-b border-gray-200 pb-2">Unlimited Searches</li>
               <li className="border-b border-gray-200 pb-2">Unlimited downloads</li>
               <li className="border-b border-gray-200 pb-2">24/7 Support</li>
             </ul>
             <button
-              className="bg-blue-600 hover:bg-blue-800 text-white px-5 py-2 rounded"
+              className={styles.pricingBtn}
               onClick={() => handleClick({ id: 'pro', amount: 5 })}
             >
               Be a Pro

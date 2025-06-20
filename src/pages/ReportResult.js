@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import NavBar from "../components/Navbar/NavBar";
+import NavBar from "../components/Functionalities/NavBar";
 import ReportResultsComp from "../components/Functionalities/ReportResultsComp";
 import SearchFilters from '../components/Functionalities/SearchFilters';
 import FilterTags from '../components/UtilityComponents/FilterTags';
@@ -56,9 +56,9 @@ export default function ReportResult() {
             )}
           </div>
         </button>
-        {isToggled &&
+        {isToggled && appliedFilters !== null && (
           <SearchFilters onDataSend={getAppliedFiltersFromChild} />
-        }
+        )}
         {!isToggled &&
           <div className={styles.searchContainerRpts}>
             <div className={styles.searchWrapperRpts}>

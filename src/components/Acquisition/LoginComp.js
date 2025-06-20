@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import { pushGTMEvent, encryptPassword } from '../../pages/api/UtilFunctions';
+import { pushGTMEvent, encryptPassword, setSessionToken } from '../../pages/api/UtilFunctions';
+import styles from "../../styles/Pages/login.module.css"
 
 const LoginComp = ({ message }) => {
   const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
@@ -31,7 +32,8 @@ const LoginComp = ({ message }) => {
       .then((response) => {
         console.log("Token:  ", response.data);
         router.push('/', { state: { username } });
-        localStorage.setItem('token', response.data.jwt);
+        // localStorage.setItem('token', response.data.jwt);
+        setSessionToken(response.data.jwt);
         sessionStorage.setItem('UCC', response.data.clientCode);
 
         if (response.data === "Incorrect Credentials or Try Registering") {
@@ -76,7 +78,7 @@ const LoginComp = ({ message }) => {
       </div>
   
       {/* Form Section */}
-      <div className="w-full md:w-1/2 lg:w-2/5">
+      <div className="w-full md:w-1/2 lg:w-2/6">
         <form className="bg-white p-6 rounded shadow-md w-full">
           {/* Success message */}
           {message && (
@@ -85,7 +87,7 @@ const LoginComp = ({ message }) => {
             </div>
           )}
   
-          <p className="text-lg font-semibold mb-4">Login to Search Reports</p>
+          <p className={styles.LoginDEscTitle}>Login to Search Reports</p>
   
           {/* Authentication failure */}
           {authenticationFailed && (
@@ -133,7 +135,7 @@ const LoginComp = ({ message }) => {
           <div className="mt-6">
             <button
               type="button"
-              className="w-full bg-blue-600 text-white text-lg py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+              className={styles.loginBtn}
               onClick={handleLogin}
             >
               Login

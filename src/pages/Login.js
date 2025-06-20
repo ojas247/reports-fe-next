@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import NavBar from "../components/Navbar/NavBar";
+import NavBar from "../components/Functionalities/NavBar";
 import LoginComp from "../components/Acquisition/LoginComp";
 import Footer from "../components/Website/Footer";
 

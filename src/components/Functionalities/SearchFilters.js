@@ -67,7 +67,7 @@ const SearchFilters = (props) => {
   }
 
   const getTags = (data) => {
-    console.log("Coming from child Tags", data);
+    console.log("Coming from child Tags", data);  
     filter_options_json['tags'] = data;
   }
 
@@ -109,7 +109,7 @@ const SearchFilters = (props) => {
           />
         </div>
   
-        <div className="flex pt-[5px] px-3">
+        <div className="flex pt-[5px]">
           <button
             type="button"
             onClick={handleFilters}

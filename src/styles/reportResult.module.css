@@ -90,4 +90,22 @@
   .resultContainer{
     grid-template-columns: 100%;
   }
+
+  .toggleButton.filter {
+    color: white;
+    padding-top: 10px;
+    background-color: rgb(188, 186, 186);
+    margin-top: -1px;
+    margin-left: 10px;
+    border-radius: 50px;
+  }
+
+  .toggleButton.search {
+    color: white;
+    padding-top: 10px;
+    background-color: rgb(188, 186, 186);
+    margin-top: -5px;
+    margin-left: 10px;
+    border-radius: 50px;
+  }
 }

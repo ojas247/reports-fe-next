@@ -1,7 +1,9 @@
+'use client';
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useRouter } from 'next/router';
 import ReportTile from "../UtilityComponents/ReportTile";
+
 
 const ReportResultsComp = (props) => {
     const router = useRouter();
@@ -11,37 +13,37 @@ const ReportResultsComp = (props) => {
     const [loading, setLoading] = useState(false);
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
 
-    function SearchReportsList(token, filters) {
-        if (!token) {
-            router.push('/login');
-            return;
+    const SearchReportsList = async () => {
+        const tokenString = sessionStorage.getItem("token");
+        const tokenData = JSON.parse(tokenString);
+        let token = null;
+        if (tokenData !== null) {
+            token = tokenData.value;
+        } else {
+            router.push('/Login');
         }
-
         setLoading(true);
-        axios.post(`${backendAPI}/SearchReports`, filters, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-            }
-        })
-            .then(res => {
-                console.log("resData + ResultComp:", res.data);
-                const filteredReportsList = res.data;
-                setFilteredReportsList(filteredReportsList);
-
-                if (filteredReportsList.message === "Invalid Authorization") {
-                    router.push('/login');
+        try {
+            const response = await axios.post(`${backendAPI}/SearchReports`, filters, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
                 }
-                else if (filteredReportsList.message === "Update plan") {
-                    router.push('/pricing');
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching reports:", error);
-            })
-            .finally(() => {
-                setLoading(false);
             });
-    }
+            const filteredReportsList = response.data;
+            setFilteredReportsList(filteredReportsList);
+
+            if (filteredReportsList.message === "Invalid Authorization") {
+                router.push('/Login');
+            }
+            else if (filteredReportsList.message === "Update plan") {
+                router.push('/pricing');
+            }
+        } catch (error) {
+            console.error("Error fetching reports:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         setFilters(props.result);
@@ -53,14 +55,10 @@ const ReportResultsComp = (props) => {
             console.log("skip first run");
             return;
         }
-
-        // Only make API call if filters is not empty
-        if (filters && Object.keys(filters).length > 0) {
-            console.log("Making API call with filters:", filters);
-            const token = localStorage.getItem('token');
-            SearchReportsList(token, filters);
-        }
+        console.log("Making API call with filters:", filters);
+        SearchReportsList();
     }, [filters]);
+
 
     if (loading) {
         return <div>Loading reports...</div>;
@@ -72,13 +70,13 @@ const ReportResultsComp = (props) => {
                 No reports found. Please adjust your filters.
             </p>
             <div className="max-w-md w-full">
-                <img 
-                    src="https://storage.googleapis.com/marketreports/Brand/Website/detectiveSearching.jpg" 
+                <img
+                    src="https://storage.googleapis.com/marketreports/Brand/Website/detectiveSearching.jpg"
                     alt="No reports found"
-                    className="w-full h-auto rounded-lg shadow-lg mb-4" 
+                    className="w-full h-auto rounded-lg shadow-lg mb-4"
                 />
             </div>
-            
+
         </div>;
     }
 

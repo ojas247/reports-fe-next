@@ -90,3 +90,49 @@
 .suggestionsList li:hover {
   background: #f0f0f0;
 }
+
+
+@media (max-width: 768px) {
+  .searchButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    right: 1px; /* Adjust position on the right */
+    top: 50%;
+    transform: translateY(-50%); /* Center vertically */
+    padding: 10px 15px;
+    border: 2px solid #27406d;
+    border-radius: 25px;
+    background-color: #27406d;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+    height: 40px;
+  }
+
+  .searchBar {
+    font-size: 10px;
+    border: 2px solid #ccc;
+    border-radius: 25px;
+    width: 100%;
+    max-width: 400px; 
+    outline: none;
+    padding-right: 50px; 
+    box-sizing: border-box; 
+    height: 40px;
+  }
+
+  .searchContainer {
+    display: flex;
+    padding: 10px 10px 10px 0px;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto;
+    max-width: 500px;
+    width: 100%;
+  }
+}
+
+

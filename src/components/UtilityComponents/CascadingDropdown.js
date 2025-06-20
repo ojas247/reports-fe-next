@@ -36,7 +36,7 @@ const CascadingDropDown = ({ options, onSelect }) => {
 
   return (
     <>
-      <div className="flex flex-col gap-0 sm:flex-row sm:gap-0">
+      <div className="flex flex-col gap-1 sm:flex-row sm:gap-2">
         <Box 
           m={2}
           w={{ base: '100%', sm: '190px' }}
