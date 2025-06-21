@@ -67,7 +67,8 @@ export const encryptPassword = (password) => {
 // check authentication
 export const checkAuthentication = async () => {
   try {
-    const token = localStorage.getItem('token');
+    const tokenString = sessionStorage.getItem("token");
+    const token = JSON.parse(tokenString).value;
     // If no token, return false immediately
     if (!token) return false;
     

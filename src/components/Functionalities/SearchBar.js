@@ -5,7 +5,7 @@ import axios from 'axios';
 import styles from '../../styles/searchbar.module.css';
 import { useRouter } from 'next/router';
 import ShowSuggestions from "./ShowSuggestions";
-import { isSessionTokenValid } from '../../pages/api/UtilFunctions';
+import { isSessionTokenValid, checkAuthentication } from '../../pages/api/UtilFunctions';
 
 const SearchBar = () => {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
@@ -14,7 +14,6 @@ const SearchBar = () => {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const suggestionRef = useRef();
     const isFirstRender = useRef(true);
-    const [token, setToken] = useState(null);
     const router = useRouter();
 
 
@@ -76,11 +75,6 @@ const SearchBar = () => {
     }
 
     useEffect(() => {
-        const storedToken = localStorage.getItem('token');
-        setToken(storedToken);
-      }, []);
-
-    useEffect(() => {
         if (isFirstRender.current) {
             isFirstRender.current = false;
             return;
@@ -94,7 +88,10 @@ const SearchBar = () => {
 
         const fetchSuggestions = async () => {
             try {
-                const isAuthenticated = await isSessionTokenValid();
+                const tokenString = sessionStorage.getItem("token");
+                const token = JSON.parse(tokenString).value;
+
+                const isAuthenticated = await checkAuthentication();
                 console.log("isAuthenticated: ", isAuthenticated);
                 if (!isAuthenticated) {
                     router.push('/Login', { state: {} });
@@ -111,6 +108,7 @@ const SearchBar = () => {
                 );
                 setSuggestions(response.data); // Set the parsed JSON directly
                 setShowSuggestions(true);
+
                 if (response.data.message === "UpdatePlan") {
                     console.log("UpdatePlan: ", response.data.message);
                     // Show popup for plan update
@@ -121,12 +119,14 @@ const SearchBar = () => {
                     setShowSuggestions(false);
                     return;
                 }
-                console.log("Suggestions: ", response.data);
+                console.log("Suggestions: ", suggestions);
             } catch (error) {
                 console.error("Error fetching suggestions:", error);
             }
         };
         fetchSuggestions();
+        console.log("Sugg: ", suggestions);
+        console.log("Sugg Length: ", suggestions.length);
 
     }, [query]);
 
@@ -146,21 +146,21 @@ const SearchBar = () => {
 
     return (
         <div className={styles.searchContainer}>
-        <div className={styles.searchWrapper} ref={suggestionRef}>
-            <input className={styles.searchBar}
-                type="text"
-                value={query}
-                onChange={handleInputChange}
-                placeholder="Search Authors, Sectors, Sub-Sectors..."
-            />
-            <button className={styles.searchButton}>Search</button>
+            <div className={styles.searchWrapper} ref={suggestionRef}>
+                <input className={styles.searchBar}
+                    type="text"
+                    value={query}
+                    onChange={handleInputChange}
+                    placeholder="Search Authors, Sectors, Sub-Sectors..."
+                />
+                <button className={styles.searchButton}>Search</button>
 
-            {suggestions.length > 0 && showSuggestions &&
-                <ShowSuggestions suggestions={suggestions} suggestionClick={suggestionClick} />
-            }
+                {suggestions.length > 0 && showSuggestions && (
+                    <ShowSuggestions suggestions={suggestions} suggestionClick={suggestionClick} />
+                )}
+            </div>
         </div>
-    </div>
-      );
-    }
+    );
+}
 
 export default SearchBar;

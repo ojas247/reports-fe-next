@@ -30,9 +30,8 @@ const LoginComp = ({ message }) => {
       password: encryptedPassword
     })
       .then((response) => {
-        console.log("Token:  ", response.data);
+        // console.log("Token:  ", response.data);
         router.push('/', { state: { username } });
-        // localStorage.setItem('token', response.data.jwt);
         setSessionToken(response.data.jwt);
         sessionStorage.setItem('UCC', response.data.clientCode);
 

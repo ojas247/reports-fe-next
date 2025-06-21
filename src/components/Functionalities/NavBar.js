@@ -156,7 +156,7 @@ export default function Navbar() {
                   <a href="\Pricing" style={{ paddingLeft: '10px' }}>Upgrade</a>
                 </div>
                 <div className={styles.dropdownContentItem}>
-                  <i class="bi bi-box-arrow-right" style={{ color: 'midnightblue' }}></i>
+                  <i className="bi bi-box-arrow-right" style={{ color: 'midnightblue' }}></i>
                   <a href="\Login" style={{ paddingLeft: '10px' }}
                     onClick={(e) => {
                       e.preventDefault(); // Prevents default navigation so you can clear storage first
