@@ -107,7 +107,7 @@ const SearchBar = () => {
                     }
                 );
                 setSuggestions(response.data); // Set the parsed JSON directly
-                setShowSuggestions(true);
+                // setShowSuggestions(true);
 
                 if (response.data.message === "UpdatePlan") {
                     console.log("UpdatePlan: ", response.data.message);
@@ -143,6 +143,13 @@ const SearchBar = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
+    useEffect(() => {
+        console.log("Suggestions updated:", suggestions);
+        if (suggestions.length > 0) {
+            setShowSuggestions(true);
+        }
+      }, [suggestions]);
 
     return (
         <div className={styles.searchContainer}>

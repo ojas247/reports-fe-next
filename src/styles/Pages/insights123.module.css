@@ -1,0 +1,230 @@
+.articleContent h2{
+    font-size: 20px;
+    font-weight: 700;
+    color: #1d448b;
+}
+
+.articleContent h3{
+    font-size: 16px;
+    font-weight: 500;
+    color: rgb(31, 30, 30);
+}
+
+.insightsContainer{
+    margin: 0% 5% 2%;
+}
+
+.articleAuthorContainer{
+    width: 40%;
+    display: grid;
+    grid-template-columns: 20% 80%;
+    align-items: center;
+
+}
+
+.articleTitle{
+    padding-top: 2%;
+    padding-bottom: 2%;
+}
+
+.authorImgContainer{
+    width:fit-content
+}
+
+.articleBannerImg {
+    width: 100%;
+    height: 300px; /* Set the desired height */
+    overflow: hidden; /* Hide the overflow */
+    position: relative; /* Position relative for absolute positioning of the image */
+}
+
+.authorImg{
+    border-radius: 50%;
+    width: 90%;
+    height: 90%;
+}
+
+.articleImg {
+    width: 100%;
+    height: 100%;
+    border-radius: 30px;
+    object-fit: cover; /* Cover the container while maintaining aspect ratio */
+    position: absolute; /* Position the image absolutely within the container */
+    top: 0;
+    left: 0;
+}
+
+.authorDetails{
+    padding-left: 2%;
+}
+.authorName{
+    padding: 5% 0 0 0;
+    font-weight: bold;
+    margin-bottom: 0%;
+}
+
+.lastUpdate{
+    font-size: small;
+}
+
+.articleContent{
+    padding-top: 2%;
+    width:75%;
+}
+
+.articleContentContainer{
+    display: flex;
+    justify-content: center;
+    
+}
+
+.leadFormContainer {
+    width: 320px;
+    height: 400px;
+    padding: 24px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 24px;
+    margin-left: auto;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .leadFormContainer h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #1d448b;
+  }
+  
+  .leadFormContainer p {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 20px;
+  }
+  
+  .leadForm input[type="text"],
+  .leadForm input[type="password"],
+  .leadForm input[type="email"] {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+  }
+  
+  .phoneInput {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .phoneInput select {
+    padding: 12px 10px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    background: #fff;
+    font-size: 14px;
+  }
+  
+  .phoneInput input {
+    flex: 1;
+  }
+  
+  .leadForm button {
+    width: 100%;
+    padding: 14px;
+    background:  #839ef9;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.3s;
+  }
+  
+  .leadForm button:hover {
+    background: #43a047;
+  }
+  
+  .leadForm .icon {
+    font-size: 18px;
+  }
+
+  .youMayLike {
+    padding: 40px 20px;
+    background: #f8f9fa;
+    margin-top: 40px;
+}
+
+.youMayLike h2 {
+    font-size: 24px;
+    text-align: left;
+    margin-bottom: 30px;
+    color: #27406d;
+    font-weight: 700;
+}
+
+  .insightsRelatedArticles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+  
+.insightsArticleCard {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.insightsArticleCard:hover {
+  transform: translateY(-5px);
+}
+
+.insightsArticleCard a {
+  text-decoration: none;
+  color: inherit;
+}
+
+               
+.insightsArticleContent {
+  padding: 5px;
+}
+
+.insightsArticleContent h3 {
+  margin: 0 0 5px 5px;
+  font-size: 18px;
+  color: #27406d;
+}
+
+.insightsArticleCategory {
+  display: inline-block; 
+  border-radius: 50px;
+  background-color: #27406d;
+  color: white;
+  font-size: 10px;
+  margin: 5px 0;
+}
+
+.insightsArticleCategoryText {
+  padding: 1px 10px;
+}
+
+  @media (max-width: 1024px) {
+    .leadFormContainer {
+        display: none;
+    }
+  }

@@ -16,10 +16,11 @@ const Toggle = (props) => {
     const filter_options_json = {};
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        setAuthToken(token);
-        console.log("AuthToken:", token);
-    }, [AuthToken]);
+        const tokenString = sessionStorage.getItem("token");
+        const tokenData = JSON.parse(tokenString);
+        const token = tokenData.value;
+        setAuthToken(token); 
+    }, []);
 
 
     // Function to toggle the dropdown

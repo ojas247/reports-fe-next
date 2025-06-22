@@ -46,10 +46,12 @@ const ReportResultsComp = (props) => {
     };
 
     useEffect(() => {
+        console.log("RepoResultComp Props: ", props.result)
         setFilters(props.result);
-    }, [props.result]);
+    }, [props.result])
 
     useEffect(() => {
+        console.log("RepoResultComp Filters: ", filters)
         if (!hasMounted.current) {
             hasMounted.current = true;
             console.log("skip first run");

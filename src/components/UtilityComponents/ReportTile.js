@@ -22,12 +22,12 @@ function ReportTile({ index, Tags, reportURL, reportAuthor, reportName, year, se
         </div>
         <div className={styles.cardParametersContainer}>
           <div className={styles.cardParameters}>
-            <div className={styles.rptTileIcon}><i class="bi bi-app"></i></div>
+            <div className={styles.rptTileIcon}><i className="bi bi-app"></i></div>
             <div><b>Sector: </b>{sector} </div>
           </div>
 
           <div className={styles.cardParameters}>
-            <div className={styles.rptTileIcon}><i class="bi bi-app-indicator"></i></div>
+            <div className={styles.rptTileIcon}><i className="bi bi-app-indicator"></i></div>
             <div><b>Sub-Sector: </b>{sub1}</div>
           </div>
         </div>
@@ -35,12 +35,12 @@ function ReportTile({ index, Tags, reportURL, reportAuthor, reportName, year, se
         <div className={styles.cardParametersContainer}>
           <div className={styles.cardParameters}>
             <div className={styles.rptTileIcon}>
-              <i class="bi bi-calendar4-week"></i></div>
+              <i className="bi bi-calendar4-week"></i></div>
             <div><b>Published Year: </b>{year} </div>
           </div>
 
           <div className={styles.cardParameters}>
-            <div className={styles.rptTileIcon}><i class="bi bi-pencil-square"></i></div>
+            <div className={styles.rptTileIcon}><i className="bi bi-pencil-square"></i></div>
             <div><b>Publisher/Author: </b>{reportAuthor}</div>
           </div>
 
