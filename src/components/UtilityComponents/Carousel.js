@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-
+import Link from 'next/link';
+import Image from 'next/image';
 const Carousel = ({ cards = [] }) => {
     useEffect(() => {
         const prev = document.getElementById('prev-btn');
@@ -51,19 +52,19 @@ const Carousel = ({ cards = [] }) => {
                     className="max-w-[950px] w-[70vw] px-2.5 py-1 flex gap-12 overflow-x-auto scroll-smooth snap-x snap-mandatory transition-all duration-250 ease-in [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                 >
                     {cards.map((card, index) => (
-                        <a 
+                        <Link 
                             key={index}
                             href={card.pdfUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="snap-center"
                         >
-                            <img 
+                            <Image 
                                 className="min-w-[240px] h-[120px] bg-pink-600 rounded-lg"
                                 src={card.imageUrl}
                                 alt={card.title}
                             />
-                        </a>
+                        </Link>
                     ))}
                 </div>
 

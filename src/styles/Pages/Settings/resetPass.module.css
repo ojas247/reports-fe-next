@@ -1,0 +1,102 @@
+.resetWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    gap: 2rem;
+    padding: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .imageSection {
+    flex: 1 1 300px;
+    max-width: 500px;
+  }
+  
+  .imgFluid {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .formSection {
+    flex: 1 1 300px;
+    max-width: 400px;
+  }
+  
+  .loaderContainer {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 4px solid rgba(0, 0, 255, 0.2);
+    border-top-color: blue;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin: auto;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .inputGroup input {
+    padding: 0.75rem;
+    font-size: 1rem;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    opacity: 0.4;
+    margin-bottom: 1rem;
+  }
+  
+  .buttonGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .button {
+    background-color: #0d6efd;
+    color: white;
+    font-size: 1rem;
+    padding: 0.75rem 2.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .button:hover {
+    background-color: #0b5ed7;
+  }
+  
+  .loginText {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .loginLink {
+    color: #dc3545;
+    text-decoration: none;
+  }
+  
+  .success {
+    color: green;
+    margin-bottom: 1rem;
+  }
+  
+  .error {
+    color: red;
+    margin-bottom: 1rem;
+  }
+  

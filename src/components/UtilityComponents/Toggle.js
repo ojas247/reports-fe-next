@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import styles from '../../styles/toggle.module.css';
 import axios from 'axios';
 import { useRouter } from 'next/router';
+import { getSessionToken } from '../../pages/api/UtilFunctions';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Toggle = (props) => {
@@ -16,10 +17,11 @@ const Toggle = (props) => {
     const filter_options_json = {};
 
     useEffect(() => {
-        const tokenString = sessionStorage.getItem("token");
-        const tokenData = JSON.parse(tokenString);
-        const token = tokenData.value;
-        setAuthToken(token); 
+        const fetchToken = async () => {
+            const token = await getSessionToken();
+            setAuthToken(token); 
+        };
+        fetchToken();
     }, []);
 
 
@@ -68,7 +70,7 @@ const Toggle = (props) => {
                     <div>
                         <ul className={styles.subheaderList}>
                             {drowdownOptions.map(option => (
-                                <div className={styles.subHeader}>
+                                <div key={option.Key} className={styles.subHeader}>
                                     <li className={styles.liName}>
                                         <small onClick={() => searchReports(option.Kind, option.Key)}>{option.Key}</small>
                                     </li>

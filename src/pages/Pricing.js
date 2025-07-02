@@ -7,60 +7,64 @@ import Footer from "../components/Website/Footer";
 import { load } from '@cashfreepayments/cashfree-js';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import { pushGTMEvent, isSessionTokenValid } from '../pages/api/UtilFunctions';
+import { pushGTMEvent, isSessionTokenValid, getSessionToken } from '../pages/api/UtilFunctions';
 import styles from "../styles/Pages/pricing.module.css";
-
+import Link from 'next/link';
 
 export default function Pricing() {
   const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
   const frontendAPI = process.env.NEXT_PUBLIC_frontendAPI;
   const environment = process.env.NEXT_PUBLIC_environment;
   const [emailID, setEmailID] = useState("");
+  const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
   let cashfree;
-  const navigate = useRouter();
-
 
   const sessionToken = async () => {
     try {
-      const token = localStorage.getItem('token');
-      // Check if token exists and is not undefined or "undefined" string
-      return (token && token !== "undefined") ? token : null;
+      const token = await getSessionToken();
+      if (token) {
+        // Check if token exists and is not undefined or "undefined" string
+        return (token && token !== "undefined") ? token : null;
+      }
+      else {
+        router.push('/login');
+        return null;
+      }
     } catch (error) {
       console.error('Error fetching token:', error);
       return null;
     }
   }
 
-  useEffect(() => {
-    const fetchAndDecodeToken = async () => {
-      const token = await sessionToken();
-      if (token) {  // This will now only be true if token exists and is valid
-        try {
-          const decodedToken = jwtDecode(token);
-          if (decodedToken && decodedToken.sub) {  // Additional validation for token structure
-            const emailID = decodedToken.sub;
-            setEmailID(emailID);
-          } else {
-            console.warn('Invalid token structure: missing sub field');
-            setEmailID("");  // Reset email if token is invalid
-          }
-        } catch (error) {
-          console.error('Error decoding token:', error);
-          setEmailID("");  // Reset email if decoding fails
+
+  const fetchAndDecodeToken = async () => {
+    const token = await sessionToken();
+    console.log("ldskgjd: ", token)
+    if (token) {  // This will now only be true if token exists and is valid
+      try {
+        const decodedToken = jwtDecode(token);
+        if (decodedToken && decodedToken.sub) {  // Additional validation for token structure
+          const emailID = decodedToken.sub;
+          setEmailID(emailID);
+        } else {
+          console.warn('Invalid token structure: missing sub field');
+          setEmailID("");  // Reset email if token is invalid
         }
-      } else {
-        console.log('No valid token found');
-        setEmailID("");  // Reset email if no valid token
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        setEmailID("");  // Reset email if decoding fails
       }
+    } else {
+      console.log('No valid token found');
+      setEmailID("");  // Reset email if no valid token
     }
-    fetchAndDecodeToken();
-    // checkAuthentication();
-  }, [])
+  }
+ 
 
 
   const handleClick = (price) => {
+    fetchAndDecodeToken();
     console.log("price: ", price)
     if (isSessionTokenValid()) {
       // Get UCC from sessionStorage or use a default value
@@ -94,7 +98,7 @@ export default function Pricing() {
         .then(orderID => { // This .then() block receives orderID from the previous .then() block
           let checkoutOptions = {
             paymentSessionId: orderID,
-            returnUrl: `${frontendAPI}/PaymentSuccessPage?myorder=${orderID}`
+            returnUrl: `${frontendAPI}/PaymentSuccess?myorder=${orderID}`
           }
 
           cashfree.checkout(checkoutOptions).then(function (result) {
@@ -111,7 +115,7 @@ export default function Pricing() {
         });
     }
     else {
-      navigate('/Login'); // redirect to login first before going for plan purchase
+      router.push('/Login'); // redirect to login first before going for plan purchase
     }
   };
 
@@ -132,44 +136,28 @@ export default function Pricing() {
 
   initializeSDK();
 
-  // // Authentication
-  // function checkAuthentication() {
-  //   const token = localStorage.getItem('token');
-  //   axios.get(`${backendAPI}/AuthCheck`,
-  //     {
-  //       headers: {
-  //         "Authorization": `Bearer ${token}`,
-  //       }
-  //     })
-  //     .then(res => {
-  //       console.log("authenticated?", res.data);
-  //       const authBoolean = res.data;
-  //       setIsAuthenticated(authBoolean);
-  //     })
-  // }
-
   return (
     <>
       <NavBar />
-      <div className= {styles.pricingContainer}>
-        <h1 className= {styles.pricingTitle}>Pricing Plans</h1>
-        <p className= {styles.pricingDesc}>MarketReports is a Brand Company owned by Synthesis</p>
+      <div className={styles.pricingContainer}>
+        <h1 className={styles.pricingTitle}>Pricing Plans</h1>
+        <p className={styles.pricingDesc}>MarketReports is a Brand Company owned by Synthesis</p>
 
         <div className="flex flex-col lg:flex-row justify-center items-stretch gap-6">
           {/* Try it Out Plan */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 w-full max-w-xs shadow-md">
-            <h2 className= {styles.pricingName}>Try it Out</h2>
+            <h2 className={styles.pricingName}>Try it Out</h2>
             <p className="text-3xl text-gray-800 my-4">
               ₹ 20 <span className="text-sm text-gray-500">/day</span>
             </p>
-            <ul className= {styles.pricingListDetails}>
+            <ul className={styles.pricingListDetails}>
               <li className="border-b border-gray-200 pb-2">50 Searches per day</li>
               <li className="border-b border-gray-200 pb-2">10 download credits</li>
               <li className="border-b border-gray-200 pb-2">Email Support</li>
             </ul>
             <button
-             className={styles.pricingBtn}
-             onClick={() => handleClick({ id: 'basic', amount: 1 })}
+              className={styles.pricingBtn}
+              onClick={() => handleClick({ id: 'basic', amount: 1 })}
             >
               Get Started
             </button>
@@ -181,7 +169,7 @@ export default function Pricing() {
             <p className="text-3xl text-gray-800 my-4">
               ₹ 199 <span className="text-sm text-gray-500">/month</span>
             </p>
-            <ul className= {styles.pricingListDetails}>
+            <ul className={styles.pricingListDetails}>
               <li className="border-b border-gray-200 pb-2">50 Searches per day</li>
               <li className="border-b border-gray-200 pb-2">200 download credits</li>
               <li className="border-b border-gray-200 pb-2">Priority Support</li>
@@ -196,11 +184,11 @@ export default function Pricing() {
 
           {/* Enterprise Plan */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 w-full max-w-xs shadow-md">
-            <h2 className= {styles.pricingName}>Enterprise</h2>
+            <h2 className={styles.pricingName}>Enterprise</h2>
             <p className="text-3xl text-gray-800 my-4">
               ₹ 1000 <span className="text-sm text-gray-500">/year</span>
             </p>
-            <ul className= {styles.pricingListDetails}>
+            <ul className={styles.pricingListDetails}>
               <li className="border-b border-gray-200 pb-2">Unlimited Searches</li>
               <li className="border-b border-gray-200 pb-2">Unlimited downloads</li>
               <li className="border-b border-gray-200 pb-2">24/7 Support</li>

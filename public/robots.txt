@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /
+
+
+Allow: /Insights/
+Allow: /Home
+Sitemap: /insights-sitemap.xml

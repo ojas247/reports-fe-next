@@ -9,9 +9,9 @@ const FilterTags = (props) => {
   let tags = [];
 
   console.log("filterTagsdata: ", data);
-  if (data.year){ const years = data.year.map(item => item.value); }
-  if (data.author){ const authors = data.author.map(item => item.value); }
-  if (data.tags){ const tags = data.year.map(item => item.value); }
+  if (data.year){ years = data.year.map(item => item.value); }
+  if (data.author){ authors = data.author.map(item => item.value); }
+  if (data.tags){ tags = data.tags.map(item => item.value); }
 
 
   const sector = data.sector_filters?.sector ? data.sector_filters.sector : null;

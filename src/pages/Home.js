@@ -7,7 +7,8 @@ import Footer from '../components/Website/Footer';
 import { useState } from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import styles from "../styles/Pages/home.module.css";
-
+import Link from 'next/link';
+import Image from 'next/image';
 
 export default function HomePage() {
   const [expandedFAQs, setExpandedFAQs] = useState([true, true, true, true, true, true]);
@@ -111,7 +112,7 @@ export default function HomePage() {
           <SearchBar />
         </div>
 
-        <p className="text-3xl sm:text-4xl text-center text-[#27406d] mb-12">Search what you'd Research</p>
+        <p className="text-3xl sm:text-4xl text-center text-[#27406d] mb-12">Search what you&apos;d Research</p>
 
         <div className="flex flex-col lg:flex-row justify-between items-center gap-12 py-16">
           <div className="lg:w-1/2 pl-4 lg:pl-40 pt-10">
@@ -119,7 +120,7 @@ export default function HomePage() {
             <p>MARKET-REPORTS by SYNTHESIS is a community driven platform to help <br /> Investment Analysts & Funds gather market insights with ease.</p>
           </div>
           <div className="lg:w-1/2 flex justify-center">
-            <img src="/Assets/Images/HeroIllustration.svg" alt="MarketInsight" className="w-[350px] h-auto pt-5" />
+            <Image src="/Assets/Images/HeroIllustration.svg" alt="MarketInsight" className="w-[350px] h-auto pt-5" />
           </div>
         </div>
 
@@ -168,11 +169,11 @@ export default function HomePage() {
         </div>
 
         <div className="flex justify-center my-10">
-          <a href="/Register">
+          <Link href="/Register">
             <button className={styles.homeRegisterBtn}>
               Register with us?
             </button>
-          </a>
+          </Link>
         </div>
 
         <div className="w-full bg-gray-100 px-6 py-12 border-t border-gray-200">

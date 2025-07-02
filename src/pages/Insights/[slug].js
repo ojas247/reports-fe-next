@@ -9,20 +9,20 @@ import parse from 'html-react-parser';
 import { InstantSearch, SearchBox, Hits } from 'react-instantsearch';
 import { CreateUserId } from '../../pages/api/UtilFunctions';
 import { fetchDataFromGetApi } from '../../pages/api/Api';
-// import { encryptPassword } from '../../utils/encryption';
+import Link from 'next/link';
 import styles from '../../styles/Pages/insightSlug.module.css';
-
+import Image from 'next/image';
 
 export default function Insights({ blog_data }) {
     const frontendAPI = process.env.NEXT_PUBLIC_FRONTEND_API;
     const [found, setFound] = useState(null);
-    
+
     const [showPopup, setShowPopup] = useState(false); // for popup
     const [email, setEmail] = useState('');
     const [PasswordPop, setPasswordPop] = useState('');
     const [authenticationFailed, setAuthenticationFailed] = useState(false);
     const [suggestions, setSuggestions] = useState([]);
- 
+
     const type = "Article";
 
     const articleSchema = {
@@ -33,11 +33,11 @@ export default function Insights({ blog_data }) {
             "@type": "Person",
             "name": blog_data.authorName
         },
-        "datePublished":  blog_data.datePublished ,
+        "datePublished": blog_data.datePublished,
         "image": {
             "@type": "ImageObject",
             "width": 1000,
-            "url": blog_data.SEOImage 
+            "url": blog_data.SEOImage
         },
         "publisher": {
             "@id": "https://marketreports.in",
@@ -142,7 +142,7 @@ export default function Insights({ blog_data }) {
         let currentDate = new Date();
         let modifiedUpdatedDate = new Date();
         modifiedUpdatedDate.setDate(currentDate.getDate() - 7);
-       // setDateModified(modifiedUpdatedDate);
+        // setDateModified(modifiedUpdatedDate);
 
         async function fetchSuggestions() {
             const response = await fetchDataFromGetApi("youMayAlsoLike?url=" + blog_data.contentSlug);
@@ -228,15 +228,15 @@ export default function Insights({ blog_data }) {
                 </div>
 
                 <div className={styles.articleBannerImg}>
-                    <img className={styles.articleImg} fetchPriority="high"
-                        src={blog_data.bannerImage} alt="MarketReport on Industries" width="100%" height="300"></img>
+                    <Image className={styles.articleImg} fetchPriority="high"
+                        src={blog_data.bannerImage} alt="MarketReport on Industries" width="100%" height="300"></Image>
                 </div>
 
                 <div className={styles.articleAuthorContainer}>
-                    <img className={styles.authorImg} fetchPriority="high"
-                        src={blog_data.authorImage} alt="Blog Author"></img>
+                    <Image className={styles.authorImg} fetchPriority="high"
+                        src={blog_data.authorImage} alt="Blog Author"></Image>
                     <div className={styles.authorDetails}><p className={styles.authorName}>{blog_data.authorName}</p>
-                        <p className={styles.lastUpdate}>{blog_data.datePublished}</p></div>
+                        <p className={styles.lastUpdate}>{blog_data.lastUpdate}</p></div>
 
                 </div>
 
@@ -287,7 +287,7 @@ export default function Insights({ blog_data }) {
                         <div style={popupContentStyle}>
                             <button onClick={() => setShowPopup(false)} style={closeBtnStyle}> X </button>
                             <h2>Register & Subscribe</h2>
-                            <p>We charge so low, you wouldn't bother to pay</p>
+                            <p>We charge so low, you wouldn&apos;t bother to pay</p>
                             {/* <form onSubmit={handleSubmit}> */}
                             <form>
                                 <input
@@ -319,13 +319,13 @@ export default function Insights({ blog_data }) {
                 <div className={styles.insightsRelatedArticles}>
                     {suggestions.map((item, index) => (
                         <div key={index} className={styles.insightsArticleCard}>
-                            <a href={frontendAPI + `/Insights/${item.url}`}>
+                            <Link href={frontendAPI + `/Insights/${item.url}`}>
                                 <div className={styles.insightsArticleContent}>
                                     <h3>{item.title}</h3>
                                     <div className={styles.insightsArticleCategory}><div className={styles.insightsArticleCategoryText}>{item.category}</div></div>
 
                                 </div>
-                            </a>
+                            </Link>
                         </div>
                     ))}
                 </div>

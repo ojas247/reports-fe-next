@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import styles from '../../styles/UtilityComps/reportTile.module.css';
-
+import Link from 'next/link';
 
 function ReportTile({ index, Tags, reportURL, reportAuthor, reportName, year, sector, sub1 }) {
   const [truncated, setTruncated] = useState(true);
@@ -14,7 +14,7 @@ function ReportTile({ index, Tags, reportURL, reportAuthor, reportName, year, se
       <div className={styles.cardContent}>
         <div className={styles.cardTopRow}>
           <div className={styles.cardTitle}>
-            <p><b>Report Name: </b><a className="ReportURL" href={reportURL}>{reportName}  </a></p>
+            <p><b>Report Name: </b><Link className="ReportURL" href={reportURL}>{reportName}  </Link></p>
           </div>
           <div className={styles.counterTile}>
             {index + 1}

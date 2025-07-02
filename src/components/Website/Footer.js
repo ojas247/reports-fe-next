@@ -1,4 +1,4 @@
-
+import Link from 'next/link';
 
 function Footer() {
     return (
@@ -12,25 +12,25 @@ function Footer() {
     
           <div className="m-1 pl-1 text-center sm:text-left">
             <small>
-              <a className="no-underline text-black" href="/TandC">Terms & Conditions</a>
+              <Link className="no-underline text-black" href="/TandC">Terms & Conditions</Link>
             </small>
           </div>
     
           <div className="m-1 pl-1 text-center sm:text-left">
             <small>
-              <a className="no-underline text-black" href="/RefundPolicy">Refund Policy</a>
+              <Link className="no-underline text-black" href="/RefundPolicy">Refund Policy</Link>
             </small>
           </div>
     
           <div className="m-1 pl-1 text-left">
             <small>
-              <a className="no-underline text-black" href="/ContactUs">ContactUs</a>
+              <Link className="no-underline text-black" href="/ContactUs">ContactUs</Link>
             </small>
           </div>
     
           <div className="m-1 pl-1 text-left">
             <small>
-              <a className="no-underline text-black" href="/Privacy">Privacy</a>
+              <Link className="no-underline text-black" href="/Privacy">Privacy</Link>
             </small>
           </div>
         </div>

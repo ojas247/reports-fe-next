@@ -125,9 +125,6 @@ const SearchBar = () => {
             }
         };
         fetchSuggestions();
-        console.log("Sugg: ", suggestions);
-        console.log("Sugg Length: ", suggestions.length);
-
     }, [query]);
 
     const handleClickOutside = (event) => {

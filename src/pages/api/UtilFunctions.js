@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+
 const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
 const PRIVATE_KEY = process.env.NEXT_PUBLIC_privateKeyForEncryption;
 
@@ -93,6 +94,17 @@ export function setSessionToken(token) {
     expiry: expiryTime,
   };
   sessionStorage.setItem("token", JSON.stringify(tokenData));
+}
+
+export function getSessionToken() {
+  const tokenString = sessionStorage.getItem("token");
+  if (!tokenString) return null;
+  const tokenData = JSON.parse(tokenString);
+  if (new Date().getTime() > tokenData.expiry) {
+    sessionStorage.removeItem("token");
+    return null;
+  }
+  return tokenData.value;
 }
 
 export function isSessionTokenValid() {

@@ -5,27 +5,37 @@ import styles from '../styles/Pages/insights.module.css';
 import NavBar from '../components/Functionalities/NavBar';
 import Footer from '../components/Website/Footer';
 import algoliasearch from 'algoliasearch';
+import Image from 'next/image';
 
 export default function TestAlgoliaPage({ data }) {
     console.log(data.hits);
     const arrayBlogs = data.hits;
 
     return (
-        <div className='blog-categories-cont'>
-            {arrayBlogs.map((blog, index) => (
-                <div className='blog-category-box' key={index}>
-                    <Link href={`/Insights/${blog.contentSlug}`}>
-                        <div className='blog-tile-img'> <img src={blog.bannerImage} alt="Blog Banner" /></div>
-                        <div className='blog-cat-headline'><p>{blog.content.headline}</p></div>
-                        <div className='blog-name'>
-                            <ul className='blog-tile-pill1'>{blog.category}, </ul>
-                            <ul className='blog-tile-pill2'>{blog.lastUpdate} </ul>
-                        </div>
-                    </Link>
+        <>
+            <NavBar />
+            <div className={styles.mainContainerBlogs}>
+                <div className={styles.pageTitle}>
+                    <h3>Articles with our opinions, views and reports summaries</h3>
                 </div>
 
-            ))}
-        </div>
+                <div className={styles.blogCategoriesCont}>
+                    {arrayBlogs.map((blog, index) => (
+                        <div className={styles.blogCategoryBox} key={index}>
+                            <Link href={`/Insights/${blog.contentSlug}`}>
+                                <div className={styles.blogTileImg}> <Image src={blog.bannerImage} alt="Blog Banner" /></div>
+                                <div className={styles.blogCatHeadline}><p>{blog.content.headline}</p></div>
+                                <div className={styles.blogName}>
+                                    <ul className={styles.blogTilePill1}>{blog.category}, </ul>
+                                    <ul className={styles.blogTilePill2}>{blog.lastUpdate} </ul>
+                                </div>
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+            </div>
+            <Footer />
+        </>
     );
 }
 

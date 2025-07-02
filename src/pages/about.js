@@ -7,10 +7,11 @@ import SearchBar from '../components/Functionalities/SearchBar';
 import Carousel from '../components/UtilityComponents/Carousel';
 import Carousel1 from '../components/UtilityComponents/Carousel1';
 import styles from '../styles/Pages/about.module.css';
-import algoliasearch from 'algoliasearch';
+import algoliasearch from 'algoliasearch/lite';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import Image from 'next/image';
 
 function Reports() {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
@@ -210,7 +211,7 @@ function Reports() {
               {arrayBlogs.map((blog, index) => (
                 <div className={styles.blogCard} key={index}>
                   <div className={styles.blogCardContent}>
-                    <img src={blog.bannerImage} alt={blog.contentSlug} className={styles.blogCardImage} />
+                    <Image src={blog.bannerImage} alt={blog.contentSlug} className={styles.blogCardImage} />
                     <p>{blog.content.headline}</p>
                   </div>
                 </div>

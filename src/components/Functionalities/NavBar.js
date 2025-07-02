@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import styles from "../../styles/UtilityComps/navbar.module.css";
 import { isSessionTokenValid } from "../../pages/api/UtilFunctions";
-
+import Link from 'next/link';
+import Image from 'next/image';
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // false in production
   const [isOpen, setIsOpen] = useState(true);
@@ -40,9 +41,9 @@ export default function Navbar() {
   return (
     <header className={styles.header}>
       <div className={styles.logo}>
-        <a href="/">
-          <img className={styles.LogoImg} src="/Assets/Images/Logo-Trans.svg" alt="MarketInsight" />
-        </a>
+        <Link href="/">
+          <Image className={styles.LogoImg} src="/Assets/Images/Logo-Trans.svg" alt="MarketInsight" />
+        </Link>
       </div>
 
       {!isOpen && (
@@ -75,13 +76,13 @@ export default function Navbar() {
       >
         <ul className={styles.navList}>
           <li className={styles.dropdown}>
-            <a href="\Home">Home</a>
+            <Link href="/Home">Home</Link>
           </li>
 
           <li className={styles.dropdown}>
             <button className={styles.dropbtn} onClick={toggleServices1}>
               MarketResearch
-              <img className={styles.toggleImg} src="\Assets\Images\Toggle.svg" alt="MarketInsight" style={{ width: '0.5rem', height: '0.5rem' }} />
+              <Image className={styles.toggleImg} src="\Assets\Images\Toggle.svg" alt="MarketInsight" style={{ width: '0.5rem', height: '0.5rem' }} />
             </button>
             <div
               className={`${styles.dropdownContent} ${isServicesOpen1 ? styles.showDropdown : ""
@@ -89,12 +90,12 @@ export default function Navbar() {
             >
               <div className={styles.dropdownContentItem}>
                 <i className="bi bi-newspaper" style={{ color: 'midnightblue' }}></i>
-                <a href="\Reports" style={{ paddingLeft: '10px' }}>Reports</a>
+                <Link href="/Reports" style={{ paddingLeft: '10px' }}>Reports</Link>
               </div>
 
               <div className={styles.dropdownContentItem}>
                 <i className="bi bi-pie-chart" style={{ color: 'midnightblue' }}></i>
-                <a href="\Data-Search" style={{ paddingLeft: '10px' }}>Data</a>
+                <Link href="/Data-Search" style={{ paddingLeft: '10px' }}>Data</Link>
               </div>
 
             </div>
@@ -103,7 +104,7 @@ export default function Navbar() {
           <li className={styles.dropdown}>
             <button className={styles.dropbtn} onClick={toggleServices2}>
               Resources
-              <img className={styles.toggleImg} src="\Assets\Images\Toggle.svg" alt="MarketInsight" style={{ width: '0.5rem', height: '0.5rem' }} />
+              <Image className={styles.toggleImg} src="\Assets\Images\Toggle.svg" alt="MarketInsight" style={{ width: '0.5rem', height: '0.5rem' }} />
             </button>
             <div
               className={`${styles.dropdownContent} ${isServicesOpen2 ? styles.showDropdown : ""
@@ -111,17 +112,17 @@ export default function Navbar() {
             >
               <div className={styles.dropdownContentItem}>
                 <i className="bi bi-layout-text-sidebar" style={{ color: 'midnightblue' }}></i>
-                <a href="\Insights" style={{ paddingLeft: '10px' }}>Insights</a>
+                <Link href="/Insights" style={{ paddingLeft: '10px' }}>Insights</Link>
               </div>
               <div className={styles.dropdownContentItem}>
                 <i className="bi bi-clipboard-data" style={{ color: 'midnightblue' }}></i>
-                <a href="\#" style={{ paddingLeft: '10px' }}>Graphics</a>
+                <Link href="/#" style={{ paddingLeft: '10px' }}>Graphics</Link>
               </div>
             </div>
           </li>
 
           <li className={styles.dropdown}>
-            <a href="\Pricing">Pricing</a>
+            <Link href="/Pricing">Pricing</Link>
           </li>
 
 
@@ -129,11 +130,11 @@ export default function Navbar() {
             <ul className={styles.LoginSignup}>
 
               <li className={`${styles.dropdown} ${styles.signupBtn}`}>
-                <a href="\Register">Signup</a>
+                <Link href="/Register">Signup</Link>
               </li>
 
               <li className={styles.dropdown}>
-                <a href="\Login">Login</a>
+                <Link href="/Login">Login</Link>
               </li>
             </ul>
           )}
@@ -149,30 +150,24 @@ export default function Navbar() {
               >
                 <div className={styles.dropdownContentItem}>
                   <i className="bi bi-person-badge" style={{ color: 'midnightblue' }}></i>
-                  <a href="\Profile" style={{ paddingLeft: '10px' }}>Your Profile</a>
+                  <Link href="/Settings/Profile" style={{ paddingLeft: '10px' }}>Your Profile</Link>
                 </div>
                 <div className={styles.dropdownContentItem}>
                   <i className="bi bi-award" style={{ color: 'midnightblue' }}></i>
-                  <a href="\Pricing" style={{ paddingLeft: '10px' }}>Upgrade</a>
+                  <Link href="/Pricing" style={{ paddingLeft: '10px' }}>Upgrade</Link>
                 </div>
                 <div className={styles.dropdownContentItem}>
                   <i className="bi bi-box-arrow-right" style={{ color: 'midnightblue' }}></i>
-                  <a href="\Login" style={{ paddingLeft: '10px' }}
+                  <Link href="/Login" style={{ paddingLeft: '10px' }}
                     onClick={(e) => {
                       e.preventDefault(); // Prevents default navigation so you can clear storage first
                       sessionStorage.removeItem('token');
                       window.location.href = "/Login"; // Redirect manually
-                    }}>Logout</a>
+                    }}>Logout</Link>
                 </div>
               </div>
             </li>
           )}
-
-
-
-
-
-
 
         </ul>
       </nav>

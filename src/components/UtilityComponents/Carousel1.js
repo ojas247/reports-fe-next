@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-
+import Link from 'next/link';
+import Image from 'next/image';
 function Carousel1(props) {
     const img_url_map = props.img_url_map
     useEffect(() => {
@@ -96,8 +97,8 @@ function Carousel1(props) {
                 { src: "./Assets/Images/HomePage/Bloomberg.png", link: "https://storage.googleapis.com/marketreports/Reports/Annual%20Status%20of%20Education%20Report%202022.pdf", hdfc: false },
                 { src: "./Assets/Images/HomePage/cii.png", link: "https://storage.googleapis.com/marketreports/Reports/Annual%20Status%20of%20Education%20Report%202022.pdf", hdfc: false },
               ].map(({ src, link, hdfc }, index) => (
-                <a href={link} key={index}>
-                  <img
+                <Link href={link} key={index}>
+                  <Image
                     src={src}
                     alt={`item-${index}`}
                     style={{
@@ -107,7 +108,7 @@ function Carousel1(props) {
                       borderRadius: "8px",
                     }}
                   />
-                </a>
+                </Link>
               ))}
             </div>
       

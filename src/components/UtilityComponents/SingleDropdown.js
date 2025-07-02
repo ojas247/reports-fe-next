@@ -1,15 +1,15 @@
 // // 'use client';
 
 import { useState } from 'react';
+import Select from 'react-select';
 import { useColorModeValue } from '@chakra-ui/react';
 import {
-  Select,
+  // Select,
   Box,
   Text,
 } from '@chakra-ui/react';
 
 const SingleDropDown = (props) => {
-  const [value, setValue] = useState([]);
   const options = props.options.options_list;
   const placeholder = props.placeholder;
 
@@ -30,26 +30,31 @@ const SingleDropDown = (props) => {
     >
       {options ? (
         <Select
-          placeholder={placeholder}
-          onChange={(e) => {
-            const selectedOption = {
-              value: e.target.value,
-              label: e.target.value
-            };
-            handleSubmit(selectedOption);
+          options={options.map((option, index) => ({
+            value: option,
+            label: option
+          }))}
+          defaultValue="All" placeholder={placeholder}
+          onChange={(selectedOption) => {
+            //  OptionsValue(selectedOption);
+            handleSubmit(selectedOption); // Call handleSubmit on option selection
           }}
-          size="sm"
-          width="200px"
-          fontSize="12px"
-          borderColor="gray.300"
-          color="gray.500"
-        >
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </Select>
+          isMulti
+          isSearchable
+          noOptionsMessage={() => "More ComingSoon"}
+          styles={{
+            placeholder: (baseStyles, state) => ({
+              ...baseStyles,
+              color: "grey"
+            }),
+            clearIndicator: () => ({
+              color: "red"
+            }),
+            option: (base, state) => ({
+              ...base,
+              padding: "5px", // Adjust the padding to reduce the gap between text
+            })
+          }} />
       ) : (
         <Text>Loading...</Text>
       )}

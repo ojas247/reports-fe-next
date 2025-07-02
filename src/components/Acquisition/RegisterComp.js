@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { pushGTMEvent, encryptPassword, CreateUserId } from '../../pages/api/UtilFunctions';
 import styles from "../../styles/Pages/login.module.css"
-
+import Link from 'next/link';
+import Image from 'next/image';
 
 const RegisterComp = () => {
   const [email, setEmail] = useState("example@mail.com");
@@ -47,7 +48,7 @@ const RegisterComp = () => {
       <div className="w-full h-full">
         <div className="flex justify-center items-center h-full flex-wrap">
           <div className="w-full md:w-6/12 lg:w-5/12 xl:w-5/12 px-4">
-            <img
+            <Image
               src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw1.webp"
               className="w-full h-auto"
               alt=""
@@ -111,9 +112,9 @@ const RegisterComp = () => {
                 </button>
                 <p className="text-sm font-semibold mt-2 pt-1 mb-0">
                   Already have an account?{" "}
-                  <a href="/login" className="text-red-600 hover:underline">
+                  <Link href="/login" className="text-red-600 hover:underline">
                     Login
-                  </a>
+                  </Link>
                 </p>
               </div>
             </form>

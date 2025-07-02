@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function ShowSuggestions({ suggestions, suggestionClick }) {
   console.log("Check123: ", suggestions);
    
@@ -17,13 +19,13 @@ export default function ShowSuggestions({ suggestions, suggestionClick }) {
         {
           suggestions.map((value, index) => (
             <li className="sugg-line-item" key={index}> 🔎
-              <a href={value.value} onClick={(e) => {
+              <Link href={value.value} onClick={(e) => {
                 e.preventDefault(); // Prevent default link behavior for custom handling
                 //props.suggestionClick(value.value);
                  window.location.href = value.value; // Navigate to the URL
               }}>
                 {value.key}
-              </a>
+              </Link>
             </li>
           )
           )

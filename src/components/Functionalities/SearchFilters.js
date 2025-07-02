@@ -6,7 +6,7 @@ import SingleDropDown from "../UtilityComponents/SingleDropdown"
 import CascadingDropDown from "../UtilityComponents/CascadingDropdown"
 import { useRouter } from 'next/router';
 import { fetchSetorSubOptions, fetchAuthors, fetchYears, fetchTags } from '../../pages/api/Api';
-
+import Image from 'next/image';
 const SearchFilters = (props) => {
   const router = useRouter();
   const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
@@ -15,15 +15,15 @@ const SearchFilters = (props) => {
   console.log("Current route:", router.pathname);
   console.log("Props received:", props);
   
-  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [SecSubdata, setSecSubdata] = useState([]);
   const [Authordata, setAuthordata] = useState([]);
   const [Yeardata, setYeardata] = useState([]);
   const [Tagdata, setTagdata] = useState([]);
 
   useEffect(() => {
-    console.log("check123: ", props)
     async function getData() {
+      setLoading(true); // Start loader
       const OptionsSub1actualData = await fetchSetorSubOptions();
       setSecSubdata(OptionsSub1actualData);
 
@@ -35,14 +35,15 @@ const SearchFilters = (props) => {
 
       const OptionsTagData = await fetchTags();
       setTagdata(OptionsTagData);
+      setLoading(false); // Stop loader
     }
     getData()
   }, [])
 
-  if (SecSubdata.length === 0 || Yeardata.length === 0 || Authordata.length === 0) {
+  if (loading) {
     return (
-      <div style={{ marginLeft: "40%" }} >
-        <img src="./Assets/Gifs/loading.gif" alt="Loading..." width="100" height="80" />
+      <div style={{ width: "80%", marginLeft: "40%" }} >
+        <Image src="./Assets/Gifs/loading.gif" alt="Loading..." width="100" height="80" />
       </div>
     );
   }

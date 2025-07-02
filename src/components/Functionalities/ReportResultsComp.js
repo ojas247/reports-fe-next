@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useRouter } from 'next/router';
 import ReportTile from "../UtilityComponents/ReportTile";
+import Image from 'next/image';
 
 
 const ReportResultsComp = (props) => {
@@ -51,7 +52,11 @@ const ReportResultsComp = (props) => {
     }, [props.result])
 
     useEffect(() => {
-        console.log("RepoResultComp Filters: ", filters)
+        console.log("RepoResultComp Filters - LENGTH: ", filters.length)
+        if (filters === null || filters === undefined || filters.length === 0 ) {
+            console.log("filters is null or undefined, skipping API call");
+            return; // Exit early if filters is null or undefined
+          }
         if (!hasMounted.current) {
             hasMounted.current = true;
             console.log("skip first run");
@@ -59,7 +64,7 @@ const ReportResultsComp = (props) => {
         }
         console.log("Making API call with filters:", filters);
         SearchReportsList();
-    }, [filters]);
+    }, [filters, SearchReportsList]);
 
 
     if (loading) {
@@ -72,7 +77,7 @@ const ReportResultsComp = (props) => {
                 No reports found. Please adjust your filters.
             </p>
             <div className="max-w-md w-full">
-                <img
+                <Image
                     src="https://storage.googleapis.com/marketreports/Brand/Website/detectiveSearching.jpg"
                     alt="No reports found"
                     className="w-full h-auto rounded-lg shadow-lg mb-4"
@@ -85,7 +90,7 @@ const ReportResultsComp = (props) => {
     return (
         <>
             <ul>
-                {filteredReportsList.map((item, index) => (
+            {Array.isArray(filteredReportsList) && filteredReportsList.map((item, index) => (
                     <ReportTile
                         key={index}
                         reportName={item.ReportName}

@@ -1,0 +1,97 @@
+
+.formContainer {
+    max-width: 600px; /* Center the form on the page */
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+
+  .formTitle {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .fieldPub {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .fieldPub label {
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .fieldPub input[type="text"],
+  .fieldPub input[type="number"],
+  .fieldPub input[type="file"],
+  .fieldPub select {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .buttonGroup {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .resetBtn {
+    background-color: #f0ad4e;
+    color: white;
+  }
+  
+  .submitBtn {
+    background-color: #5cb85c;
+    color: white;
+  }
+  
+  .btn:hover {
+    opacity: 0.9;
+  }
+  
+  .loaderContainer {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .loaderContainer img {
+    display: block;
+    margin: 0 auto;
+  }
+  
+  .loaderContainer p {
+    font-weight: bold;
+    color: #333;
+    margin-top: 10px;
+  }
+  
+.submitBtn{
+    background-color: rgb(68, 68, 69);
+}
+
+.resetBtn{
+    background-color: rgb(153, 153, 153);
+}
+
+.responseContainer {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #797171;
+}
+

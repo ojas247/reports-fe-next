@@ -1,5 +1,6 @@
 import Toggle from './Toggle';
-import styles from '../../styles/toggleleftpanel.module.css';
+import styles from '../../styles/toggleLeftPanel.module.css';
+
 
 const ToggleLeftPanel = () => {
     const jsonData = {
