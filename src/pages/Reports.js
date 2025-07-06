@@ -12,7 +12,6 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import styles from '../styles/Pages/reports.module.css';
 
 export default function Reports() {
-  const router = useRouter();
   const hasMounted = useRef(false);
   const [loading, setLoading] = useState(true);
   const [appliedFilters, setAppliedFilters] = useState({});

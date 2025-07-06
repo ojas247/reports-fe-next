@@ -5,7 +5,10 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+# Copy source code
 COPY . .
+
+
 RUN npm run build
 
 # Step 2: Start app with production server

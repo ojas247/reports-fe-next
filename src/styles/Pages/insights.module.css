@@ -31,7 +31,7 @@
 .blogCatHeadline {
     padding-top: 2%;
     padding-left: 5%;
-    height: 68px;
+    height: 50px;
     text-decoration: none;
 }
 
@@ -64,6 +64,7 @@
     font-weight: 100;
     padding-left: 5%;
     padding-right: 5%;
+    padding-bottom: 3%;
 }
 
 .blogTilePill1 {

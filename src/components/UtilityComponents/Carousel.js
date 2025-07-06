@@ -63,6 +63,7 @@ const Carousel = ({ cards = [] }) => {
                                 className="min-w-[240px] h-[120px] bg-pink-600 rounded-lg"
                                 src={card.imageUrl}
                                 alt={card.title}
+                                fill
                             />
                         </Link>
                     ))}

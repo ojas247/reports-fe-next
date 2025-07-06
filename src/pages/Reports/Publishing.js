@@ -204,7 +204,7 @@ function ReportPublishingForm() {
         {/* Loader */}
         {loading && (
           <div className={styles.loaderContainer}>
-            <Image src="/Assets/Gifs/loading.gif" alt="Loading..." width="100" height="80" />
+            <Image src="/Assets/Gifs/loading.gif" alt="Loading..." width={100} height={80} />
             <p>Uploading Reports...</p>
           </div>
         )}

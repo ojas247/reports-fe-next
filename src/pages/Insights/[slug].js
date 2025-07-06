@@ -229,12 +229,12 @@ export default function Insights({ blog_data }) {
 
                 <div className={styles.articleBannerImg}>
                     <Image className={styles.articleImg} fetchPriority="high"
-                        src={blog_data.bannerImage} alt="MarketReport on Industries" width="100%" height="300"></Image>
+                        src={blog_data.bannerImage} alt="MarketReport on Industries" fill></Image>
                 </div>
 
                 <div className={styles.articleAuthorContainer}>
                     <Image className={styles.authorImg} fetchPriority="high"
-                        src={blog_data.authorImage} alt="Blog Author"></Image>
+                        src={blog_data.authorImage} alt="Blog Author" width={80} height={80} /> 
                     <div className={styles.authorDetails}><p className={styles.authorName}>{blog_data.authorName}</p>
                         <p className={styles.lastUpdate}>{blog_data.lastUpdate}</p></div>
 

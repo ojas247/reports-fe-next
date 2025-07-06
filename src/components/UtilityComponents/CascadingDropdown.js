@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Box, Grid, Select } from "@chakra-ui/react";
+import Select from 'react-select';
 
 const CascadingDropDown = ({ options, onSelect }) => {
   const { sectors, sub1 } = options;
@@ -37,15 +37,15 @@ const CascadingDropDown = ({ options, onSelect }) => {
   return (
     <>
       <div className="flex flex-col gap-1 sm:flex-row sm:gap-2">
-        <Box 
-          m={2}
-          w={{ base: '100%', sm: '190px' }}
-          fontSize="12px"
-          pl={{ base: 0, sm: '13px' }}
-          display={{ base: 'flex', sm: 'block' }}
-          flexDirection={{ base: 'column', sm: 'row' }}
-          minW={{ base: '100%', sm: '180px' }}
-        >
+        <div className="
+    m-2
+    w-full sm:w-[190px]
+    text-[12px]
+    pl-0 sm:pl-[13px]
+    flex sm:block
+    flex-col sm:flex-row
+    min-w-full sm:min-w-[180px]
+  ">
           <Select
             placeholder="Select a sector"
             value={selectedSector}
@@ -62,17 +62,16 @@ const CascadingDropDown = ({ options, onSelect }) => {
               </option>
             ))}
           </Select>
-        </Box>
+        </div>
 
-        <Box 
-          m={2}
-          w={{ base: '100%', sm: '190px' }}
-          fontSize="12px"
-          pl={{ base: 0, sm: '13px' }}
-          display={{ base: 'flex', sm: 'block' }}
-          flexDirection={{ base: 'column', sm: 'row' }}
-          minW={{ base: '100%', sm: '180px' }}
-        >
+        <div className="
+    m-2
+    w-full sm:w-[190px]
+    text-[12px]
+    pl-0 sm:pl-[13px]
+    flex sm:block
+    flex-col sm:flex-row
+    min-w-full sm:min-w-[180px]">
           <Select
             placeholder="Select a Sub-sector"
             value={selectedSub1}
@@ -93,7 +92,7 @@ const CascadingDropDown = ({ options, onSelect }) => {
               <option disabled>Select SubSector</option>
             )}
           </Select>
-        </Box>
+        </div>
       </div>
     </>
   );

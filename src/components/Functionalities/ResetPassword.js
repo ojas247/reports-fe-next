@@ -52,6 +52,7 @@ const ResetPassword = () => {
                             src="https://storage.googleapis.com/marketreports/Brand/ResetPassword.jpg"
                             className={styles.imgFluid}
                             alt="Reset Password"
+                            fill
                         />
                     </div>
 

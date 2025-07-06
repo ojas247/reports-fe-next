@@ -4,6 +4,7 @@ import styles from "../../styles/UtilityComps/navbar.module.css";
 import { isSessionTokenValid } from "../../pages/api/UtilFunctions";
 import Link from 'next/link';
 import Image from 'next/image';
+
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // false in production
   const [isOpen, setIsOpen] = useState(true);
@@ -42,7 +43,7 @@ export default function Navbar() {
     <header className={styles.header}>
       <div className={styles.logo}>
         <Link href="/">
-          <Image className={styles.LogoImg} src="/Assets/Images/Logo-Trans.svg" alt="MarketInsight" />
+          <Image className={styles.LogoImg} src="/Assets/Images/Logo-Trans.svg" alt="MarketInsight" width={180 } height={280}/>
         </Link>
       </div>
 
@@ -82,7 +83,7 @@ export default function Navbar() {
           <li className={styles.dropdown}>
             <button className={styles.dropbtn} onClick={toggleServices1}>
               MarketResearch
-              <Image className={styles.toggleImg} src="\Assets\Images\Toggle.svg" alt="MarketInsight" style={{ width: '0.5rem', height: '0.5rem' }} />
+              <Image className={styles.toggleImg} src="\Assets\Images\Toggle.svg" alt="MarketInsight"  width={8} height={8} />
             </button>
             <div
               className={`${styles.dropdownContent} ${isServicesOpen1 ? styles.showDropdown : ""
@@ -104,7 +105,7 @@ export default function Navbar() {
           <li className={styles.dropdown}>
             <button className={styles.dropbtn} onClick={toggleServices2}>
               Resources
-              <Image className={styles.toggleImg} src="\Assets\Images\Toggle.svg" alt="MarketInsight" style={{ width: '0.5rem', height: '0.5rem' }} />
+              <Image className={styles.toggleImg} src="\Assets\Images\Toggle.svg" alt="MarketInsight" width={8} height={8} />
             </button>
             <div
               className={`${styles.dropdownContent} ${isServicesOpen2 ? styles.showDropdown : ""

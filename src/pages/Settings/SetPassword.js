@@ -61,6 +61,7 @@ export default function SetPassword() {
                 src="https://storage.googleapis.com/marketreports/Brand/ResetPassword.jpg"
                 className={styles.image}
                 alt="Reset Password"
+                fill
               />
             </div>
 

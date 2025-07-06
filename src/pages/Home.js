@@ -120,7 +120,7 @@ export default function HomePage() {
             <p>MARKET-REPORTS by SYNTHESIS is a community driven platform to help <br /> Investment Analysts & Funds gather market insights with ease.</p>
           </div>
           <div className="lg:w-1/2 flex justify-center">
-            <Image src="/Assets/Images/HeroIllustration.svg" alt="MarketInsight" className="w-[350px] h-auto pt-5" />
+            <Image src="/Assets/Images/HeroIllustration.svg" alt="MarketInsight" className="w-[350px] h-auto pt-5" width={80} height={80}/>
           </div>
         </div>
 

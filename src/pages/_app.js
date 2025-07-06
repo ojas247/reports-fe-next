@@ -1,12 +1,16 @@
 import "../styles/globals.css";
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { ChakraProvider } from '@chakra-ui/react'
+import Head from 'next/head';
 
 export default function App({ Component, pageProps }) {
   return (
-    <ChakraProvider>
+    <>
+      <Head>
+        <link rel="icon" href="/Assets/Images/Logo.ico" />
+        <title>MarketInsights - Search for Industry and Market Reports</title>
+      </Head>
       <Component {...pageProps} />
-    </ChakraProvider>
+    </>
   );
 }
 

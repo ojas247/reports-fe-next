@@ -43,6 +43,7 @@ function PaymentSuccess() {
             src="https://img.icons8.com/color/96/000000/ok--v1.png"
             alt="Success Icon"
             className="mx-auto mb-4"
+            fill
           />
           <h1 className="text-2xl font-bold mb-2">Payment Successful!</h1>
           <p className="mb-2">Thank you for your purchase.</p>

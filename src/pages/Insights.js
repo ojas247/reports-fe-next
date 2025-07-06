@@ -23,8 +23,12 @@ export default function TestAlgoliaPage({ data }) {
                     {arrayBlogs.map((blog, index) => (
                         <div className={styles.blogCategoryBox} key={index}>
                             <Link href={`/Insights/${blog.contentSlug}`}>
-                                <div className={styles.blogTileImg}> <Image src={blog.bannerImage} alt="Blog Banner" /></div>
-                                <div className={styles.blogCatHeadline}><p>{blog.content.headline}</p></div>
+                                <div className={styles.blogTileImg}> <img src={blog.bannerImage} alt="Blog Banner"
+                                    style={{ width: "100%", height: "auto", objectFit: "cover" }} />
+                                </div>
+                                <div className={styles.blogCatHeadline}>
+                                <p>{blog.content.headline.slice(0, 50)}{blog.content.headline.length > 50 && '...'}</p>
+                                </div>
                                 <div className={styles.blogName}>
                                     <ul className={styles.blogTilePill1}>{blog.category}, </ul>
                                     <ul className={styles.blogTilePill2}>{blog.lastUpdate} </ul>

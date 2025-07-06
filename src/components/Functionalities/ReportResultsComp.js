@@ -64,7 +64,7 @@ const ReportResultsComp = (props) => {
         }
         console.log("Making API call with filters:", filters);
         SearchReportsList();
-    }, [filters, SearchReportsList]);
+    }, [filters]);
 
 
     if (loading) {
@@ -81,6 +81,8 @@ const ReportResultsComp = (props) => {
                     src="https://storage.googleapis.com/marketreports/Brand/Website/detectiveSearching.jpg"
                     alt="No reports found"
                     className="w-full h-auto rounded-lg shadow-lg mb-4"
+                    width={100}
+                    height={100}
                 />
             </div>
 

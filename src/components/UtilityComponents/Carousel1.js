@@ -101,10 +101,11 @@ function Carousel1(props) {
                   <Image
                     src={src}
                     alt={`item-${index}`}
+                    fill
                     style={{
                       scrollSnapAlign: "center",
-                      minWidth: hdfc ? "90px" : "80px",
-                      height: hdfc ? "80px" : "70px",
+                      // minWidth: hdfc ? "90px" : "80px",
+                      // height: hdfc ? "80px" : "70px",
                       borderRadius: "8px",
                     }}
                   />

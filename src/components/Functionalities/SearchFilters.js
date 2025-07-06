@@ -7,11 +7,12 @@ import CascadingDropDown from "../UtilityComponents/CascadingDropdown"
 import { useRouter } from 'next/router';
 import { fetchSetorSubOptions, fetchAuthors, fetchYears, fetchTags } from '../../pages/api/Api';
 import Image from 'next/image';
+
+
 const SearchFilters = (props) => {
   const router = useRouter();
   const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
   
-  console.log("SearchFilters rendering...");
   console.log("Current route:", router.pathname);
   console.log("Props received:", props);
   
@@ -43,7 +44,7 @@ const SearchFilters = (props) => {
   if (loading) {
     return (
       <div style={{ width: "80%", marginLeft: "40%" }} >
-        <Image src="./Assets/Gifs/loading.gif" alt="Loading..." width="100" height="80" />
+        <Image src="/Assets/Gifs/loading.gif" alt="Loading..." width={100} height={80} />
       </div>
     );
   }

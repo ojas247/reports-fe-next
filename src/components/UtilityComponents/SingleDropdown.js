@@ -2,12 +2,6 @@
 
 import { useState } from 'react';
 import Select from 'react-select';
-import { useColorModeValue } from '@chakra-ui/react';
-import {
-  // Select,
-  Box,
-  Text,
-} from '@chakra-ui/react';
 
 const SingleDropDown = (props) => {
   const options = props.options.options_list;
@@ -19,15 +13,15 @@ const SingleDropDown = (props) => {
 
 
   return (
-    <Box
-      m={2}
-      w={{ base: '100%', sm: '190px' }}
-      fontSize="12px"
-      pl={{ base: 0, sm: '13px' }}
-      display={{ base: 'flex', sm: 'block' }}
-      flexDirection={{ base: 'column', sm: 'row' }}
-      minW={{ base: '100%', sm: '180px' }}
-    >
+    <div
+    className="
+      m-2
+      w-full sm:w-[190px]
+      text-[12px]
+      pl-0 sm:pl-[13px]
+      flex sm:block
+      flex-col sm:flex-row
+      min-w-full sm:min-w-[180px]">
       {options ? (
         <Select
           options={options.map((option, index) => ({
@@ -56,9 +50,9 @@ const SingleDropDown = (props) => {
             })
           }} />
       ) : (
-        <Text>Loading...</Text>
+        <p>Loading...</p>
       )}
-    </Box>
+    </div>
   );
 };
 
