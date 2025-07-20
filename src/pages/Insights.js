@@ -8,7 +8,6 @@ import algoliasearch from 'algoliasearch';
 import Image from 'next/image';
 
 export default function TestAlgoliaPage({ data }) {
-    console.log(data.hits);
     const arrayBlogs = data.hits;
 
     return (
@@ -22,7 +21,7 @@ export default function TestAlgoliaPage({ data }) {
                 <div className={styles.blogCategoriesCont}>
                     {arrayBlogs.map((blog, index) => (
                         <div className={styles.blogCategoryBox} key={index}>
-                            <Link href={`/Insights/${blog.contentSlug}`}>
+                            <Link href={`/Insights/${blog.category}/${blog.contentSlug}`}>
                                 <div className={styles.blogTileImg}> <img src={blog.bannerImage} alt="Blog Banner"
                                     style={{ width: "100%", height: "auto", objectFit: "cover" }} />
                                 </div>
@@ -53,6 +52,7 @@ export async function getServerSideProps() {
     });
 
     const data = await res.json();
+    // const data = null;
 
     return {
         props: {

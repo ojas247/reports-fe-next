@@ -2,28 +2,52 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import NavBar from "../../components/Functionalities/NavBar";
-import Footer from "../../components/Website/Footer";
-import algoliasearch from 'algoliasearch';
+import NavBar from "../../../components/Functionalities/NavBar";
+import Footer from "../../../components/Website/Footer";
+import Breadcrumbs from '../../../components/UtilityComponents/Breadcrumbs';
+import RenderCSVgrid from '../../../components/UtilityComponents/RenderCSVgrid';
 import parse from 'html-react-parser';
-import { InstantSearch, SearchBox, Hits } from 'react-instantsearch';
-import { CreateUserId } from '../../pages/api/UtilFunctions';
-import { fetchDataFromGetApi } from '../../pages/api/Api';
+import { CreateUserId } from '../../../pages/api/UtilFunctions';
+import { fetchDataFromGetApi } from '../../../pages/api/Api';
 import Link from 'next/link';
-import styles from '../../styles/Pages/insightSlug.module.css';
+import styles from '../../../styles/Pages/insightSlug.module.css';
 import Image from 'next/image';
 
-export default function Insights({ blog_data }) {
-    const frontendAPI = process.env.NEXT_PUBLIC_FRONTEND_API;
+export default function Insights({ blog_data, category, YouMayAlsoLike, gridDescription, bucketUrl, headerRow, dataRows, dataHeading }) {
+    console.log("blog_data:", blog_data);
+    const frontendAPI = process.env.NEXT_PUBLIC_frontendAPI;
     const [found, setFound] = useState(null);
-
     const [showPopup, setShowPopup] = useState(false); // for popup
     const [email, setEmail] = useState('');
     const [PasswordPop, setPasswordPop] = useState('');
     const [authenticationFailed, setAuthenticationFailed] = useState(false);
     const [suggestions, setSuggestions] = useState([]);
-
     const type = "Article";
+
+    const breadcrumbItems = [
+        { label: 'Home', href: '/' },
+        { label: 'Insights', href: '/Insights' },
+        { label: category, href: '/InsightsT/' + category },
+        { label: blog_data.content.headline } // no href = current page
+    ];
+    const breadcrumbItemsList = [
+        {
+            name: 'Home',
+            url: frontendAPI,
+        },
+        {
+            name: 'Insights',
+            url: frontendAPI + '/Insights',
+        },
+        {
+            name: category,
+            url: frontendAPI + '/InsightsT/' + category,
+        },
+        {
+            name: blog_data.content.headline,
+            url: frontendAPI + '/InsightsT/' + category + '/' + blog_data.contentSlug,
+        },
+    ];
 
     const articleSchema = {
         "@context": "http://schema.org",
@@ -89,6 +113,18 @@ export default function Insights({ blog_data }) {
         "height": 300
     };
 
+    const breadcrumbSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: breadcrumbItemsList.map((item, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: item.name,
+            item: item.url,
+        })),
+    };
+
+
     const popupStyle = {
         position: 'fixed',
         top: 0,
@@ -137,18 +173,13 @@ export default function Insights({ blog_data }) {
     };
 
 
-    useEffect(() => {
-        let randomNum = Math.floor(Math.random() * (30 - 7)) + 7; //gives a random number b/w 7 and 30
-        let currentDate = new Date();
-        let modifiedUpdatedDate = new Date();
-        modifiedUpdatedDate.setDate(currentDate.getDate() - 7);
-        // setDateModified(modifiedUpdatedDate);
 
-        async function fetchSuggestions() {
-            const response = await fetchDataFromGetApi("youMayAlsoLike?url=" + blog_data.contentSlug);
-            setSuggestions(response.suggestions || []);
-        }
-        fetchSuggestions();
+    useEffect(() => {
+        // let randomNum = Math.floor(Math.random() * (30 - 7)) + 7; //gives a random number b/w 7 and 30
+        // let currentDate = new Date();
+        // let modifiedUpdatedDate = new Date();
+        // modifiedUpdatedDate.setDate(currentDate.getDate() - 7);
+        // setDateModified(modifiedUpdatedDate);
 
         const handleScroll = () => {
             // Check if the user has our cookiee in its browser
@@ -214,6 +245,9 @@ export default function Insights({ blog_data }) {
                     {JSON.stringify(articleSchema)}
                 </script>
                 <script type="application/ld+json">
+                    {JSON.stringify(breadcrumbSchema)}
+                </script>
+                <script type="application/ld+json">
                     {JSON.stringify(websiteSchema)}
                 </script>
                 <script type="application/ld+json">
@@ -224,7 +258,8 @@ export default function Insights({ blog_data }) {
             </Head>
             <NavBar />
             <div className={styles.insightsContainer}>
-                <div className={styles.articleTitle}> <h1>{blog_data.content.headline}</h1>
+                <Breadcrumbs items={breadcrumbItems} />
+                <div className={styles.articleTitle}> <h1>{blog_data.title}</h1>
                 </div>
 
                 <div className={styles.articleBannerImg}>
@@ -234,7 +269,7 @@ export default function Insights({ blog_data }) {
 
                 <div className={styles.articleAuthorContainer}>
                     <Image className={styles.authorImg} fetchPriority="high"
-                        src={blog_data.authorImage} alt="Blog Author" width={80} height={80} /> 
+                        src={blog_data.authorImage} alt="Blog Author" width={80} height={80} />
                     <div className={styles.authorDetails}><p className={styles.authorName}>{blog_data.authorName}</p>
                         <p className={styles.lastUpdate}>{blog_data.lastUpdate}</p></div>
 
@@ -244,6 +279,13 @@ export default function Insights({ blog_data }) {
                     <div className={styles.articleContent}>
                         {parse(blog_data.content.mainBody)
                         }
+
+                        {bucketUrl && dataHeading && gridDescription && (
+                            <div>
+                                <RenderCSVgrid headers={headerRow} rows={dataRows}
+                                    description={gridDescription} bucketUrl={bucketUrl} heading={dataHeading} />
+                            </div>
+                        )}
                     </div>
 
                     <div className={styles.leadFormContainer}>
@@ -317,7 +359,8 @@ export default function Insights({ blog_data }) {
             <div className={styles.youMayLike}>
                 <h2>Other Articles You May Like</h2>
                 <div className={styles.insightsRelatedArticles}>
-                    {suggestions.map((item, index) => (
+                    {/* {suggestions.map((item, index) => ( */}
+                    {YouMayAlsoLike.suggestions.map((item, index) => (
                         <div key={index} className={styles.insightsArticleCard}>
                             <Link href={frontendAPI + `/Insights/${item.url}`}>
                                 <div className={styles.insightsArticleContent}>
@@ -336,10 +379,8 @@ export default function Insights({ blog_data }) {
     )
 }
 
-/////////////////////////////////SERVER SIDE PROPS //////////////////////////////////
 export async function getServerSideProps(context) {
-    const { slug } = context.params;
-    console.log("SlugFetched:", slug);
+    const { category, slug } = context.params;
 
     const res = await fetch('https://0K9MUXZLQ5.algolia.net/1/indexes/market_content/' + slug, {
         headers: {
@@ -348,15 +389,52 @@ export async function getServerSideProps(context) {
         }
     });
 
+
+    const YouMayAlsoLike = await fetchDataFromGetApi("youMayAlsoLike?url=" + slug);
+    const GridDataInfo = await fetchDataFromGetApi("gridData?url=" + slug);
     const blog_data = await res.json();
+    let bucketUrl = GridDataInfo?.GridData?.[0]?.dataSetURLs;
+    let gridDescription = null;
+    let dataHeading = null;
+    let headerRow = null;
+    let dataRows = null;
+
+    if (bucketUrl) {
+        console.log("Validation Successful")
+        bucketUrl = GridDataInfo?.GridData?.[0]?.dataSetURLs;
+        gridDescription = GridDataInfo?.GridData?.[0]?.dataDescription;
+        dataHeading = GridDataInfo?.GridData?.[0]?.dataHeading;
+
+        // 2) Fetch and parse
+        const response = await fetch(bucketUrl);
+        if (!response.ok) {
+            console.error('Failed to fetch CSV:', response.status);
+            return { notFound: true };
+        }
+        const text = await response.text();
+        // const lines = text.trim().split('\n').map(l => l.split(','));
+        const lines = text
+            .trim()
+            .split('\n')
+            .map(line =>
+                line
+                    .split(',')
+                    .map(cell => cell.replace(/"/g, '')) // ← Remove all double quotes
+            );
+
+        // 3) Separate header row and data rows
+        [headerRow, ...dataRows] = lines;
+    }
 
     return {
         props: {
             blog_data,
+            category,
+            YouMayAlsoLike, gridDescription: gridDescription || null,
+            bucketUrl: bucketUrl || null,
+            headerRow: headerRow || [],
+            dataRows: dataRows || [],
+            dataHeading: dataHeading || null,
         },
     };
 }
-
-
-
-

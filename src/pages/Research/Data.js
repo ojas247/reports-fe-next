@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import NavBar from "../components/Functionalities/NavBar";
-import Footer from "../components/Website/Footer";
-import ReportResultsComp from "../components/Functionalities/ReportResultsComp";
-import SearchFilters from '../components/Functionalities/SearchFilters';
-import FilterTags from '../components/UtilityComponents/FilterTags';
-import ToggleLeftPanel from '../components/UtilityComponents/ToggleLeftPanel';
-import { checkAuthentication } from './api/UtilFunctions';
+import NavBar from "../../components/Functionalities/NavBar";
+import Footer from "../../components/Website/Footer";
+import ReportResultsComp from "../../components/Functionalities/ReportResultsComp";
+import SearchFilters from '../../components/Functionalities/SearchFilters';
+import FilterTags from '../../components/UtilityComponents/FilterTags';
+import ToggleLeftPanel from '../../components/UtilityComponents/ToggleLeftPanel';
+import { checkAuthentication } from '../api/UtilFunctions';
 import { useRouter } from 'next/router';
-import SearchBar from '../components/Functionalities/SearchBar';
+import SearchBar from '../../components/Functionalities/SearchBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import styles from '../styles/Pages/reports.module.css';
+import styles from '../../styles/Pages/reports.module.css';
 
 export default function Reports() {
   const hasMounted = useRef(false);
@@ -65,7 +65,7 @@ export default function Reports() {
         <div className={styles.toggleLeftPanel}>
           <ToggleLeftPanel />
         </div>       
-          <ReportResultsComp result={appliedFilters} />
+          <ReportResultsComp researchType="Data" result={appliedFilters} />
       </div>
       <Footer />
     </div>

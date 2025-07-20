@@ -9,6 +9,7 @@ import Image from 'next/image';
 const LoginComp = ({ message }) => {
   const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [authenticationFailed, setAuthenticationFailed] = useState(false);
@@ -25,6 +26,7 @@ const LoginComp = ({ message }) => {
   }
 
   const handleLogin = () => {
+    setLoading(true);
     // Encrypt the password before sending
     // const encryptedPassword = encryptPassword(password);
     const encryptedPassword = password;
@@ -34,7 +36,7 @@ const LoginComp = ({ message }) => {
       password: encryptedPassword
     })
       .then((response) => {
-        console.log("Token:  ", response.data.clientCode);
+        // console.log("Token:  ", response.data.clientCode);
         router.push('/', { state: { username } });
         setSessionToken(response.data.jwt);
         localStorage.setItem('UCC', response.data.clientCode);
@@ -63,8 +65,18 @@ const LoginComp = ({ message }) => {
       }, (error) => {
         console.log(error);
         setAuthenticationFailed(true);
+      })
+      .finally(() => {
+        setLoading(false);
       });
+  }
 
+  if (loading) {
+    return (
+      <div style={{ width: "80%", marginLeft: "40%" }} >
+        <Image src="/Assets/Gifs/loading.gif" alt="Loading..." width={100} height={80} />
+      </div>
+    );
   }
 
   return (
@@ -137,7 +149,7 @@ const LoginComp = ({ message }) => {
             </div>
 
             {/* Login button */}
-            <div className="mt-6">
+            <div className="mt-6 hover:cursor-pointer" >
               <button
                 type="button"
                 className={styles.loginBtn}

@@ -39,6 +39,7 @@
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
+    border-radius: 99px;
   }
   
   .btn {
@@ -49,14 +50,15 @@
     cursor: pointer;
   }
   
-  .resetBtn {
-    background-color: #f0ad4e;
-    color: white;
-  }
-  
-  .submitBtn {
+  .submitBtn .resetBtn {
     background-color: #5cb85c;
     color: white;
+    border-radius: 50%;
+  }
+
+  .submitBtn:hover, .resetBtn:hover {
+    
+    cursor: pointer;
   }
   
   .btn:hover {

@@ -7,6 +7,7 @@ import Image from 'next/image';
 
 
 const ReportResultsComp = (props) => {
+    const isEmpty = (obj) => !obj || Object.keys(obj).length === 0; // Utility function to check if an object is empty
     const router = useRouter();
     const hasMounted = useRef(false);
     const [filteredReportsList, setFilteredReportsList] = useState([]);
@@ -15,6 +16,10 @@ const ReportResultsComp = (props) => {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
 
     const SearchReportsList = async () => {
+        if (isEmpty(filters)) return;
+
+        console.log("Making API call with filters:", filters);
+        console.log(" length:", filters.length);
         const tokenString = sessionStorage.getItem("token");
         const tokenData = JSON.parse(tokenString);
         let token = null;
@@ -28,6 +33,7 @@ const ReportResultsComp = (props) => {
             const response = await axios.post(`${backendAPI}/SearchReports`, filters, {
                 headers: {
                     "Authorization": `Bearer ${token}`,
+                    "X-ResearchType": props.researchType
                 }
             });
             const filteredReportsList = response.data;
@@ -44,6 +50,7 @@ const ReportResultsComp = (props) => {
         } finally {
             setLoading(false);
         }
+
     };
 
     useEffect(() => {
@@ -52,17 +59,15 @@ const ReportResultsComp = (props) => {
     }, [props.result])
 
     useEffect(() => {
-        console.log("RepoResultComp Filters - LENGTH: ", filters.length)
-        if (filters === null || filters === undefined || filters.length === 0 ) {
-            console.log("filters is null or undefined, skipping API call");
-            return; // Exit early if filters is null or undefined
-          }
-        if (!hasMounted.current) {
-            hasMounted.current = true;
-            console.log("skip first run");
+        if (isEmpty(filters)) {
+            console.log("filters is empty or null, skipping API call");
             return;
         }
-        console.log("Making API call with filters:", filters);
+        // if (!hasMounted.current) {
+        //     hasMounted.current = true;
+        //     console.log("skip first run");
+        //     return;
+        // }
         SearchReportsList();
     }, [filters]);
 
@@ -92,8 +97,9 @@ const ReportResultsComp = (props) => {
     return (
         <>
             <ul>
-            {Array.isArray(filteredReportsList) && filteredReportsList.map((item, index) => (
+                {Array.isArray(filteredReportsList) && filteredReportsList.map((item, index) => (
                     <ReportTile
+                        researchType={props.researchType}
                         key={index}
                         reportName={item.ReportName}
                         index={index}

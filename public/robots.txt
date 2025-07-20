@@ -1,7 +1,12 @@
 User-agent: *
-Disallow: /
 
+Allow: /
 
-Allow: /Insights/
-Allow: /Home
-Sitemap: /insights-sitemap.xml
+Sitemap: https://marketreports.in/sitemap-index.xml
+Sitemap: https://marketreports.in/sitemap-insights-investments.xml
+Sitemap: https://marketreports.in/sitemap-insights-healthtech.xml
+Sitemap: https://marketreports.in/sitemap-insights-fintech.xml
+Sitemap: https://marketreports.in/sitemap-insights-deeptech.xml
+Sitemap: https://marketreports.in/sitemap-insights-d2c.xml
+Sitemap: https://marketreports.in/sitemap-insights-analytics.xml
+Sitemap: https://marketreports.in/sitemap-insights-agritech.xml

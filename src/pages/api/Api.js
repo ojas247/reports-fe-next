@@ -16,7 +16,7 @@ export async function fetchDataFromGetApi(urlSlug) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      console.log("response api.js:",data);
+     // console.log("response api.js:",data);
       return data;
     } catch (error) {
       console.error('Error:', error);

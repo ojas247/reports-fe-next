@@ -224,8 +224,19 @@
   padding: 1px 10px;
 }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 768px) {
     .leadFormContainer {
         display: none;
     }
+
+    .articleContentContainer{
+      display: flex;
+      justify-content: center;
+  }
+
+  .articleContent{
+    padding-top: 2%;
+    width:100%;
+    text-align: justify;
+}
   }

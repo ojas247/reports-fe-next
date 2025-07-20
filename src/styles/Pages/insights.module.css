@@ -24,7 +24,6 @@
     text-align: left;
     font-weight: 500;
     border-radius: 25px;
-
 }
 
 
@@ -44,7 +43,6 @@
     /* Hide the overflow */
     position: relative;
     /* Position relative for absolute positioning of the image */
-
 }
 
 .blogTileImg img {
@@ -99,4 +97,35 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     /* Optional: Box shadow for 3D effect */
     min-width: min-content;
+}
+
+
+@media (max-width: 768px) {
+    .blogCategoryBox {
+        width: 40%;
+        background-color: rgb(240, 240, 240);
+        margin: 1%;
+        text-align: left;
+        font-weight: 500;
+        border-radius: 25px;
+    }
+
+    .blogCatHeadline {
+        padding-top: 2%;
+        padding-left: 5%;
+        height: 50px;
+        text-decoration: none;
+        font-size: 12px;
+    }
+
+    .blogTileImg {
+        padding-left: 0%;
+        width: 100%;
+        height: 70px;
+        /* Set the desired height */
+        overflow: hidden;
+        /* Hide the overflow */
+        position: relative;
+        /* Position relative for absolute positioning of the image */
+    }
 }

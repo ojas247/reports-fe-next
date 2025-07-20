@@ -10,7 +10,13 @@ const DataGrid = dynamic(
   { ssr: false }
 );
 
-export default function CsvGridPage({ headers, rows, bucketUrl }) {
+export default function CsvGridPage(props) {
+  const headers = props.headers;
+  const rows = props.rows;
+  const bucketUrl = props.bucketUrl;
+  const description = props.description;
+  const heading = props.heading;
+
   // Client-side state for grid (starts from the SSR‑provided rows)
   const [gridRows, setGridRows] = useState(() =>
     rows.map(r =>
@@ -29,9 +35,10 @@ export default function CsvGridPage({ headers, rows, bucketUrl }) {
   }));
 
   return (
-    <div className="p-4 space-y-6">
-      <h1 className="text-2xl font-bold">CSV Data from GCS</h1>
-      <div className="flex p-2 m-0 justify-end">
+    <div className="p-4 space-y-0">
+      <h1 className="text-2xl font-bold">{heading}</h1>
+      <p className="text-m text-gray-800">{description}</p>
+      <div className="flex p-2 m-0 justify-end cursor-pointer">
         <i class="bi bi-cloud-download">
           <a href={bucketUrl} className="text-blue-600"></a>
         </i>
@@ -72,37 +79,3 @@ CsvGridPage.propTypes = {
   rows: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)).isRequired,
   bucketUrl: PropTypes.string.isRequired
 };
-
-export async function getServerSideProps() {
-  // 1) URL of your CSV in GCS
-  const bucketUrl =
-    'https://storage.googleapis.com/marketreports/Data/Datanameerfretest';
-
-  // 2) Fetch and parse
-  const res = await fetch(bucketUrl);
-  if (!res.ok) {
-    console.error('Failed to fetch CSV:', res.status);
-    return { notFound: true };
-  }
-  const text = await res.text();
-  // const lines = text.trim().split('\n').map(l => l.split(','));
-  const lines = text
-  .trim()
-  .split('\n')
-  .map(line =>
-    line
-      .split(',')
-      .map(cell => cell.replace(/"/g, '')) // ← Remove all double quotes
-  );
-
-  // 3) Separate header row and data rows
-  const [headerRow, ...dataRows] = lines;
-
-  return {
-    props: {
-      bucketUrl,
-      headers: headerRow,
-      rows: dataRows
-    }
-  };
-}

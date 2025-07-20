@@ -7,7 +7,7 @@ import Image from 'next/image';
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // false in production
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [isServicesOpen1, setIsServicesOpen1] = useState(false); // false in production
   const [isServicesOpen2, setIsServicesOpen2] = useState(false); // false in production
   const [isServicesOpen3, setIsServicesOpen3] = useState(false); // false in production
@@ -17,11 +17,6 @@ export default function Navbar() {
   const toggleServices2 = () => setIsServicesOpen2(!isServicesOpen2);
   const toggleServices3 = () => setIsServicesOpen3(!isServicesOpen3);
 
-  // // Authentication
-  // function checkAuthentication() {
-  //   const authBoolean = ;
-  //   setIsAuthenticated(authBoolean);
-  // }
 
   // 🛠️ Auto-close mobile nav when switching to desktop
   useEffect(() => {
@@ -91,12 +86,12 @@ export default function Navbar() {
             >
               <div className={styles.dropdownContentItem}>
                 <i className="bi bi-newspaper" style={{ color: 'midnightblue' }}></i>
-                <Link href="/Reports" style={{ paddingLeft: '10px' }}>Reports</Link>
+                <Link href="/Research/Reports" style={{ paddingLeft: '10px' }}>Reports</Link>
               </div>
 
               <div className={styles.dropdownContentItem}>
                 <i className="bi bi-pie-chart" style={{ color: 'midnightblue' }}></i>
-                <Link href="/Data-Search" style={{ paddingLeft: '10px' }}>Data</Link>
+                <Link href="/Research/Data" style={{ paddingLeft: '10px' }}>Data</Link>
               </div>
 
             </div>

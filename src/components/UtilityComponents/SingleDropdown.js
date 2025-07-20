@@ -5,6 +5,10 @@ import Select from 'react-select';
 
 const SingleDropDown = (props) => {
   const options = props.options.options_list;
+  // const formattedOptions = options.map((item) => ({
+  //   value: item,
+  //   label: item,
+  // }));
   const placeholder = props.placeholder;
 
   const handleSubmit = (e) => {
@@ -14,7 +18,7 @@ const SingleDropDown = (props) => {
 
   return (
     <div
-    className="
+      className="
       m-2
       w-full sm:w-[190px]
       text-[12px]
@@ -24,34 +28,21 @@ const SingleDropDown = (props) => {
       min-w-full sm:min-w-[180px]">
       {options ? (
         <Select
-          options={options.map((option, index) => ({
-            value: option,
-            label: option
-          }))}
-          defaultValue="All" placeholder={placeholder}
-          onChange={(selectedOption) => {
-            //  OptionsValue(selectedOption);
-            handleSubmit(selectedOption); // Call handleSubmit on option selection
-          }}
+        options={options.map((option, index) => ({
+          value: option, 
+          label: option  
+      }))}
           isMulti
-          isSearchable
-          noOptionsMessage={() => "More ComingSoon"}
-          styles={{
-            placeholder: (baseStyles, state) => ({
-              ...baseStyles,
-              color: "grey"
-            }),
-            clearIndicator: () => ({
-              color: "red"
-            }),
-            option: (base, state) => ({
-              ...base,
-              padding: "5px", // Adjust the padding to reduce the gap between text
-            })
-          }} />
+          placeholder="Select regions"
+          className="w-50 text-sm"
+          onChange={(selectedOptions) => {
+            handleSubmit(selectedOptions);
+          }}
+        />
       ) : (
         <p>Loading...</p>
       )}
+
     </div>
   );
 };

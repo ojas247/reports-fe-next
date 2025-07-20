@@ -96,7 +96,7 @@ function ReportPublishingForm() {
       console.log("Key/Val", key, value);
     });
 
-    axios.post(`${backendAPI}/Publishing`, formData, {
+    axios.post(`${backendAPI}/Publishing/Report`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       },

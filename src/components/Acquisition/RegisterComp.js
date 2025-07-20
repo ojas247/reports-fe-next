@@ -52,7 +52,8 @@ const RegisterComp = () => {
               src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw1.webp"
               className="w-full h-auto"
               alt=""
-              fill
+              width={500}
+              height={300}
             />
           </div>
           <div className="w-full md:w-6/12 lg:w-5/12 xl:w-4/12 px-4">
