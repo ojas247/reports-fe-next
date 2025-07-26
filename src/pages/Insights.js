@@ -7,7 +7,7 @@ import Footer from '../components/Website/Footer';
 import algoliasearch from 'algoliasearch';
 import Image from 'next/image';
 
-export default function TestAlgoliaPage({ data }) {
+export default function Insights({ data }) {
     const arrayBlogs = data.hits;
 
     return (

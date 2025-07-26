@@ -16,6 +16,7 @@ export default function CsvGridPage(props) {
   const bucketUrl = props.bucketUrl;
   const description = props.description;
   const heading = props.heading;
+  const units = props.units;
 
   // Client-side state for grid (starts from the SSR‑provided rows)
   const [gridRows, setGridRows] = useState(() =>
@@ -36,12 +37,12 @@ export default function CsvGridPage(props) {
 
   return (
     <div className="p-4 space-y-0">
-      <h1 className="text-2xl font-bold">{heading}</h1>
+      <h1 className="text-2xl font-bold text-blue-900">{heading}</h1>
       <p className="text-m text-gray-800">{description}</p>
-      <div className="flex p-2 m-0 justify-end cursor-pointer">
-        <i class="bi bi-cloud-download">
-          <a href={bucketUrl} className="text-blue-600"></a>
-        </i>
+      <div className="flex p-1 m-0 justify-end cursor-pointer">
+        <a href={bucketUrl} className="text-blue-600" target="_blank" rel="noopener noreferrer">
+          <i className="bi bi-cloud-download"></i>
+        </a>
       </div>
 
       {/* 1) SSR‑rendered HTML table */}
@@ -68,6 +69,7 @@ export default function CsvGridPage(props) {
             ))}
           </tbody>
         </table>
+        <div className="text-[10px] text-gray-800">{units && `Units: ${units}`}</div>
       </div>
 
     </div>

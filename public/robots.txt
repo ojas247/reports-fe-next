@@ -10,3 +10,4 @@ Sitemap: https://marketreports.in/sitemap-insights-deeptech.xml
 Sitemap: https://marketreports.in/sitemap-insights-d2c.xml
 Sitemap: https://marketreports.in/sitemap-insights-analytics.xml
 Sitemap: https://marketreports.in/sitemap-insights-agritech.xml
+Sitemap: https://marketreports.in/sitemap-datasets.xml

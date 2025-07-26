@@ -15,7 +15,7 @@ function DataPublishingForm() {
   const [Authordata, setAuthordata] = useState([]);
   const [Tagsdata, setTagsdata] = useState([]);
   const [Yeardata, setYeardata] = useState([]);
-  const [gridCSVFile, setGridCSVFile] = useState(null); 
+  const [gridCSVFile, setGridCSVFile] = useState(null);
   const [formRegister, setRegister] = useState({
     sector: "",
     sub1: "",
@@ -23,7 +23,9 @@ function DataPublishingForm() {
     year: "",
     sourceURL: "",
     tag: [],
-    geo: ""
+    geo: "",
+    units: "",
+    dataDesc: ""
   });
 
   const GeoData = { "options_list": ["India", "Global", "MENA"] }
@@ -88,7 +90,7 @@ function DataPublishingForm() {
 
     Object.entries(formRegister).forEach(([key, value]) => {
       formData.append(key, value);
-      console.log("Key/Val Check123:", key, value);
+      // console.log("Key/Val Check123:", key, value);
     });
 
     axios.post(`${backendAPI}/Publishing/Data`, formData, {
@@ -180,7 +182,31 @@ function DataPublishingForm() {
             <SingleDropDown options={GeoData} onSelect={getGeo} />
           </div>
 
-          <SubmitGrid gridData={getGridData} dataName={dataName}/>
+           {/* About Dataset */}
+           <div className={styles.fieldPub}>
+            <label htmlFor="dataDesc">Overview of Data:</label>
+            <input
+              type="text"
+              name="dataDesc"
+              id="dataDesc"
+              defaultValue=""
+              onChange={assignFormData}
+            />
+          </div>
+
+          <SubmitGrid gridData={getGridData} dataName={dataName} />
+
+          {/* Units / Quantity */}
+          <div className={styles.fieldPub}>
+            <label htmlFor="units">Units:</label>
+            <input
+              type="text"
+              name="units"
+              id="units"
+              defaultValue="In Numbers"
+              onChange={assignFormData}
+            />
+          </div>
 
           {/* Reset and Submit Buttons */}
           <div className={styles.buttonGroup}>

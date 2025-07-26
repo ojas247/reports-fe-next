@@ -3,16 +3,20 @@ import { useState } from 'react';
 import styles from '../../styles/UtilityComps/reportTile.module.css';
 import Link from 'next/link';
 
-function ReportTile({ index, Tags, reportURL, reportAuthor, reportName, year, sector, sub1, researchType }) {
+function ReportTile({ index, Tags, reportURL, reportAuthor, reportName, year, sector, sub1, researchType, units, sourceURL }) {
   const [truncated, setTruncated] = useState(true);
   const longText = Tags;
   const reportType = researchType;
   let TileName = null;
+  let Units = null;
+  let SourceURL = null;
 
   if(reportType === "Reports"){
      TileName = "Report Name";
   }else if(reportType === "Data"){
-     TileName = "Data Name";
+     TileName = "Data Set";
+     Units = units;
+     SourceURL = sourceURL;
   }
 
   return (
@@ -51,8 +55,21 @@ function ReportTile({ index, Tags, reportURL, reportAuthor, reportName, year, se
             <div className={styles.rptTileIcon}><i className="bi bi-pencil-square"></i></div>
             <div><b>Publisher/Author: </b>{reportAuthor}</div>
           </div>
-
         </div>
+
+        {(units || sourceURL) && (
+        <div className={styles.cardParametersContainer}>
+          <div className={styles.cardParameters}>
+            <div className={styles.rptTileIcon}>
+            <i class="bi bi-speedometer2"></i></div>
+            <div><b>Units: </b>{units} </div>
+          </div>
+
+          <div className={styles.cardParameters}>
+            <div className={styles.rptTileIcon}><i class="bi bi-link-45deg"></i></div>
+            <div><b>Data Source: </b><Link href={sourceURL} className='text-blue-800'>Link</Link></div>
+          </div>
+        </div>)}
 
         {/* <div className='card-text'>
           Tags:

@@ -109,6 +109,8 @@ const ReportResultsComp = (props) => {
                         year={item.Year}
                         sector={item.Sector}
                         sub1={item.Sub1}
+                        units={item.Units}
+                        sourceURL={item.Source}
                     />
                 ))}
             </ul>

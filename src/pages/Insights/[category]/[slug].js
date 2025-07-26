@@ -12,8 +12,9 @@ import { fetchDataFromGetApi } from '../../../pages/api/Api';
 import Link from 'next/link';
 import styles from '../../../styles/Pages/insightSlug.module.css';
 import Image from 'next/image';
+import Papa from 'papaparse';
 
-export default function Insights({ blog_data, category, YouMayAlsoLike, gridDescription, bucketUrl, headerRow, dataRows, dataHeading }) {
+export default function Insights({ blog_data, category, YouMayAlsoLike, gridDescription, bucketUrl, headerRow, dataRows, dataHeading, units }) {
     console.log("blog_data:", blog_data);
     const frontendAPI = process.env.NEXT_PUBLIC_frontendAPI;
     const [found, setFound] = useState(null);
@@ -27,7 +28,7 @@ export default function Insights({ blog_data, category, YouMayAlsoLike, gridDesc
     const breadcrumbItems = [
         { label: 'Home', href: '/' },
         { label: 'Insights', href: '/Insights' },
-        { label: category, href: '/InsightsT/' + category },
+        { label: category, href: '/Insights/' + category },
         { label: blog_data.content.headline } // no href = current page
     ];
     const breadcrumbItemsList = [
@@ -41,11 +42,11 @@ export default function Insights({ blog_data, category, YouMayAlsoLike, gridDesc
         },
         {
             name: category,
-            url: frontendAPI + '/InsightsT/' + category,
+            url: frontendAPI + '/Insights/' + category,
         },
         {
             name: blog_data.content.headline,
-            url: frontendAPI + '/InsightsT/' + category + '/' + blog_data.contentSlug,
+            url: frontendAPI + '/Insights/' + category + '/' + blog_data.contentSlug,
         },
     ];
 
@@ -283,7 +284,7 @@ export default function Insights({ blog_data, category, YouMayAlsoLike, gridDesc
                         {bucketUrl && dataHeading && gridDescription && (
                             <div>
                                 <RenderCSVgrid headers={headerRow} rows={dataRows}
-                                    description={gridDescription} bucketUrl={bucketUrl} heading={dataHeading} />
+                                    description={gridDescription} bucketUrl={bucketUrl} heading={dataHeading} units={units} />
                             </div>
                         )}
                     </div>
@@ -398,12 +399,14 @@ export async function getServerSideProps(context) {
     let dataHeading = null;
     let headerRow = null;
     let dataRows = null;
-
+    let units = null;
+    
     if (bucketUrl) {
         console.log("Validation Successful")
         bucketUrl = GridDataInfo?.GridData?.[0]?.dataSetURLs;
         gridDescription = GridDataInfo?.GridData?.[0]?.dataDescription;
         dataHeading = GridDataInfo?.GridData?.[0]?.dataHeading;
+        units = GridDataInfo?.GridData?.[0]?.units;
 
         // 2) Fetch and parse
         const response = await fetch(bucketUrl);
@@ -412,18 +415,16 @@ export async function getServerSideProps(context) {
             return { notFound: true };
         }
         const text = await response.text();
-        // const lines = text.trim().split('\n').map(l => l.split(','));
-        const lines = text
-            .trim()
-            .split('\n')
-            .map(line =>
-                line
-                    .split(',')
-                    .map(cell => cell.replace(/"/g, '')) // ← Remove all double quotes
-            );
+
+         // Parse using PapaParse
+         const parsed = Papa.parse(text.trim(), {
+            header: false,
+            skipEmptyLines: true,
+        });
 
         // 3) Separate header row and data rows
-        [headerRow, ...dataRows] = lines;
+        [headerRow, ...dataRows] = parsed.data;
+    
     }
 
     return {
@@ -435,6 +436,7 @@ export async function getServerSideProps(context) {
             headerRow: headerRow || [],
             dataRows: dataRows || [],
             dataHeading: dataHeading || null,
+            units: units || null,
         },
     };
 }

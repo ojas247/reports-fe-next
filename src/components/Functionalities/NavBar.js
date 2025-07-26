@@ -112,7 +112,7 @@ export default function Navbar() {
               </div>
               <div className={styles.dropdownContentItem}>
                 <i className="bi bi-clipboard-data" style={{ color: 'midnightblue' }}></i>
-                <Link href="/#" style={{ paddingLeft: '10px' }}>Graphics</Link>
+                <Link href="/DataSets" style={{ paddingLeft: '10px' }}>DataSets</Link>
               </div>
             </div>
           </li>

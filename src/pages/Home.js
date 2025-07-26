@@ -33,7 +33,7 @@ export default function HomePage() {
       "name": "MarketReports-by SYNTHESIS",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://storage.googleapis.com/marketreports/Brand/Logo/Logo-Trans.svg",
+        "url": "https://storage.googleapis.com/marketreports/Brand/Logo/Logo.ico",
         "width": 600,
         "height": 60
       }
