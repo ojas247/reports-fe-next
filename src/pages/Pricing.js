@@ -28,7 +28,7 @@ export default function Pricing() {
         return (token && token !== "undefined") ? token : null;
       }
       else {
-        router.push('/login');
+        router.push('/Login');
         return null;
       }
     } catch (error) {

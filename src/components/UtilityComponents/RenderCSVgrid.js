@@ -39,6 +39,7 @@ export default function CsvGridPage(props) {
     <div className="p-4 space-y-0">
       <h1 className="text-2xl font-bold text-blue-900">{heading}</h1>
       <p className="text-m text-gray-800">{description}</p>
+
       <div className="flex p-1 m-0 justify-end cursor-pointer">
         <a href={bucketUrl} className="text-blue-600" target="_blank" rel="noopener noreferrer">
           <i className="bi bi-cloud-download"></i>
@@ -46,12 +47,15 @@ export default function CsvGridPage(props) {
       </div>
 
       {/* 1) SSR‑rendered HTML table */}
-      <div className="overflow-x-auto">
+      <div className="w-full overflow-x-auto">
         <table className="min-w-full border-collapse">
           <thead>
             <tr>
-              {headers.map(col => (
-                <th key={col} className="border px-2 py-1 bg-gray-100 text-left">
+              {headers.map((col) => (
+                <th
+                  key={col}
+                  className="border px-2 py-1 bg-gray-100 text-left whitespace-nowrap"
+                >
                   {col}
                 </th>
               ))}
@@ -61,7 +65,7 @@ export default function CsvGridPage(props) {
             {rows.map((row, ri) => (
               <tr key={ri} className="even:bg-gray-50">
                 {row.map((cell, ci) => (
-                  <td key={ci} className="border px-2 py-1">
+                  <td key={ci} className="border px-2 py-1 whitespace-nowrap">
                     {cell}
                   </td>
                 ))}
@@ -69,10 +73,11 @@ export default function CsvGridPage(props) {
             ))}
           </tbody>
         </table>
-        <div className="text-[10px] text-gray-800">{units && `Units: ${units}`}</div>
       </div>
 
+      <div className="text-[10px] text-gray-800">{units && `Units: ${units}`}</div>
     </div>
+
   );
 }
 

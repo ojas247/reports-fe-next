@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
+import Head from "next/head";
 import Navbar from "../../components/Functionalities/NavBar";
 import Footer from "../../components/Website/Footer";
 
-export default function DataCategoryPage({ data }) {
+export default function DataCategoryPage({ data, dataCategory }) {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
     const imageURLs = ['https://storage.googleapis.com/marketreports/Blogs/Banners/DeepTech1.jpg',
         'https://storage.googleapis.com/marketreports/Blogs/Banners/Trading.png'
@@ -12,10 +13,15 @@ export default function DataCategoryPage({ data }) {
 
     return (
         <>
+            <Head>
+                <meta name="description" content={`Downloadable csv datasets of various domains from the ${dataCategory} sector`}/>
+                <title>{`Downloadable csv datasets of ${dataCategory}`}</title>
+            </Head>
+
             <Navbar />
             <div className="bg-gray-100 p-4 min-h-screen">
                 <div className="container mx-auto px-4 py-8">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-6">Data Sets</h1>
+                    <h1 className="text-3xl font-bold text-gray-800 mb-6">DataSet Overview on {dataCategory}</h1>
                 </div>
                 <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
                     {data.map((item, index) => (
@@ -53,10 +59,11 @@ export default function DataCategoryPage({ data }) {
     )
 }
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context) {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
+    const { dataCategory } = context.params;
 
-    const res = await fetch(`${backendAPI}/get-dataset-objs?count=10&slug=&sector=`, {
+    const res = await fetch(`${backendAPI}/get-dataset-objs?count=&slug=&sector=${dataCategory}`, {
         cache: 'no-store',
         headers: {
             'content-type': 'application/json'
@@ -64,10 +71,11 @@ export async function getServerSideProps() {
     });
 
     const data = await res.json();
-    // const data = null;
+    console.log("CheckData: ", data);
 
     return {
         props: {
+            dataCategory,
             data,
         },
     };

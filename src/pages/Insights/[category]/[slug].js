@@ -394,6 +394,9 @@ export async function getServerSideProps(context) {
     const YouMayAlsoLike = await fetchDataFromGetApi("youMayAlsoLike?url=" + slug);
     const GridDataInfo = await fetchDataFromGetApi("gridData?url=" + slug);
     const blog_data = await res.json();
+
+    console.log("blog_data:", blog_data);
+    
     let bucketUrl = GridDataInfo?.GridData?.[0]?.dataSetURLs;
     let gridDescription = null;
     let dataHeading = null;

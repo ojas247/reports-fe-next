@@ -11,13 +11,12 @@ import styles from "../../../styles/Pages/dataSlug.module.css";
 import Papa from 'papaparse';
 
 
-export default function DataSets({ bucketUrl, gridDescription, dataHeading, units, headerRow, dataRows, dataCategory, author, year, sector, subcategory, YouMayAlsoLike, slug, SourceURL }) {
+export default function DataSets({ bucketUrl, gridDescription, dataHeading, units, headerRow, dataRows, dataCategory, author, year,
+    sector, subcategory, YouMayAlsoLike, slug, SourceURL, seoDesc }) {
     const frontendAPI = process.env.NEXT_PUBLIC_frontendAPI;
     const [email, setEmail] = useState('');
     const [PasswordPop, setPasswordPop] = useState('');
 
-    console.log("ABC")
-    console.log("YouMayAlsoLike: ", YouMayAlsoLike)
 
     const breadcrumbItems = [
         { label: 'Home', href: '/' },
@@ -89,16 +88,17 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
 
 
     return (
-        <><Head>
-            <meta name="description" content={gridDescription}></meta>
-            <title>{dataHeading}</title>
-            <script type="application/ld+json">
-                {JSON.stringify(dataSetSchema)}
-            </script>
-            <script type="application/ld+json">
-                {JSON.stringify(breadcrumbSchema)}
-            </script>
-        </Head>
+        <>
+            <Head>
+                <meta name="description" content={seoDesc}></meta>
+                <title>{dataHeading}</title>
+                <script type="application/ld+json">
+                    {JSON.stringify(dataSetSchema)}
+                </script>
+                <script type="application/ld+json">
+                    {JSON.stringify(breadcrumbSchema)}
+                </script>
+            </Head>
             <Navbar />
             <div className="bg-gray-100 p-4 min-h-screen">
                 <Breadcrumbs items={breadcrumbItems} />
@@ -106,13 +106,13 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
                 <div className="flex flex-row container mx-auto px-4 py-2">
 
 
+
                     {bucketUrl && dataHeading && gridDescription && (
-                        <div>
+                        <div className="max-w-[900px] overflow-x-auto">
                             <RenderCSVgrid headers={headerRow} rows={dataRows}
                                 description={gridDescription} bucketUrl={bucketUrl} heading={dataHeading} units={units} />
                         </div>
                     )}
-
 
 
                     <div className={styles.leadFormContainer}>
@@ -151,6 +151,27 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
 
                 </div>
 
+
+                <div className="max-w-[900px] w-full overflow-x-auto flex flex-col md:flex-row md:justify-center items-start md:items-center gap-2 px-2">
+                    <h4 className="text-base md:text-base text-gray-800 underline-offset-2">
+                        <i className="bi bi-pie-chart mr-1"></i>
+                        Data Set - {subcategory} |
+                    </h4>
+
+                    <h4 className="text-base md:text-base text-gray-800 underline-offset-2">
+                        <i className="bi bi-pencil-square mr-1"></i>
+                        Author/Publisher - {author} |
+                    </h4>
+
+                    <Link href={SourceURL}>
+                        <h4 className="text-base md:text-base text-gray-800 underline hover:text-blue-600">
+                            <i className="bi bi-link mr-1"></i>
+                            Source Data
+                        </h4>
+                    </Link>
+                </div>
+
+
                 <div className={styles.youMayLike}>
                     <h2>Other DataSets You May Like</h2>
                     <div className={styles.insightsRelatedArticles}>
@@ -181,7 +202,7 @@ export async function getServerSideProps(context) {
     const dataSetObj = await fetchDataFromGetApi("get-dataset-objs?count=&sector=&slug=" + data);
     const YouMayAlsoLike = await fetchDataFromGetApi("get-dataset-objs?count=5&slug=&sector=" + dataCategory);
 
-    console.log("YouMayAlsoLike: ", YouMayAlsoLike);
+    console.log("BucketURL123: ", dataSetObj?.[0]?.ReportUrl);
 
     const bucketUrl = dataSetObj?.[0]?.ReportUrl;
     const gridDescription = dataSetObj?.[0]?.description;
@@ -192,6 +213,7 @@ export async function getServerSideProps(context) {
     const subcategory = dataSetObj?.[0]?.Sub1;
     const units = dataSetObj?.[0]?.Units;
     const SourceURL = dataSetObj?.[0]?.SourceURL;
+    const seoDesc = dataSetObj?.[0]?.seoDesc;
     let headerRow = null;
     let dataRows = null;
 
@@ -241,7 +263,8 @@ export async function getServerSideProps(context) {
             sector: sector,
             subcategory: subcategory,
             YouMayAlsoLike: YouMayAlsoLike,
-            SourceURL: SourceURL
+            SourceURL: SourceURL,
+            seoDesc: seoDesc
         }
     }
 

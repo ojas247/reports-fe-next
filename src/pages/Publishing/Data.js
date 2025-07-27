@@ -25,7 +25,8 @@ function DataPublishingForm() {
     tag: [],
     geo: "",
     units: "",
-    dataDesc: ""
+    seoDesc: "",
+    
   });
 
   const GeoData = { "options_list": ["India", "Global", "MENA"] }
@@ -132,6 +133,18 @@ function DataPublishingForm() {
               name="dataName"
               id="dataName"
               defaultValue="dataName"
+              onChange={assignFormData}
+            />
+          </div>
+
+            {/* SEO Desc Name Field */}
+            <div className={styles.fieldPub}>
+            <label htmlFor="dataName">Description for SEO:</label>
+            <input
+              type="text"
+              name="seoDesc"
+              id="seoDesc"
+              defaultValue="seoDesc"
               onChange={assignFormData}
             />
           </div>
