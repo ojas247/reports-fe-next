@@ -3,6 +3,7 @@ import Link from "next/link";
 import Head from "next/head";
 import Navbar from "../../components/Functionalities/NavBar";
 import Footer from "../../components/Website/Footer";
+import fetchSetorSubOptions from "../../pages/api/Api";
 
 export default function DataCategoryPage({ data, dataCategory }) {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
@@ -35,6 +36,7 @@ export default function DataCategoryPage({ data, dataCategory }) {
                                     width={400} // set actual width
                                     height={192} // maintain 400x192 for ~16:9 ratio
                                     className="w-full h-48 object-cover rounded-t-2xl"
+                                    alt={item.DataName}
                                 />
                                 <div className="p-4">
                                     <h2 className="text-lg font-semibold text-gray-800 leading-snug">
@@ -69,6 +71,8 @@ export async function getServerSideProps(context) {
             'content-type': 'application/json'
         }
     });
+
+
 
     const data = await res.json();
     console.log("CheckData: ", data);

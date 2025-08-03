@@ -31,7 +31,8 @@ const SearchFilters = (props) => {
       const OptionsAuthorData = await fetchAuthors();
       setAuthordata(OptionsAuthorData);
 
-      const OptionsYearData = await fetchYears();
+      // const OptionsYearData = await fetchYears();
+      const OptionsYearData = {"options_list":[2022,2021,2018,2020,2024,2023]};
       setYeardata(OptionsYearData);
 
       const OptionsTagData = await fetchTags();

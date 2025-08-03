@@ -25,11 +25,15 @@ function DataPublishingForm() {
     tag: [],
     geo: "",
     units: "",
+    granularity: "",
     seoDesc: "",
-    
+    isTSData: "",
   });
 
   const GeoData = { "options_list": ["India", "Global", "MENA"] }
+  const GranularityData = { "options_list": ["Monthly", "Yearly"] }
+  const UnitsData = { "options_list": ["In Numbers", "Pct", "Kilometers", "INR Cr", "Paise", "INR", "Lacs", "thousands", "Million", "USD Mn", "thousand tons", "Mn tons"] }
+  const isTSData = { "options_list": ["Yes", "No"] }
   const [loading, setLoading] = useState(false);
 
 
@@ -67,6 +71,18 @@ function DataPublishingForm() {
 
   const getGeo = (data) => {
     setRegister({ ...formRegister, geo: data.map(item => item.value) });
+  }
+
+  const getGranularity = (data) => {
+    setRegister({ ...formRegister, granularity: data.map(item => item.value) });
+  }
+
+  const getUnits = (data) => {
+    setRegister({ ...formRegister, units: data.map(item => item.value) });
+  }
+
+  const getIsTS = (data) => {
+    setRegister({ ...formRegister, isTSData: data.map(item => item.value) });
   }
 
   const getSectorFilters = (data) => {
@@ -137,8 +153,8 @@ function DataPublishingForm() {
             />
           </div>
 
-            {/* SEO Desc Name Field */}
-            <div className={styles.fieldPub}>
+          {/* SEO Desc Name Field */}
+          <div className={styles.fieldPub}>
             <label htmlFor="dataName">Description for SEO:</label>
             <input
               type="text"
@@ -195,8 +211,8 @@ function DataPublishingForm() {
             <SingleDropDown options={GeoData} onSelect={getGeo} />
           </div>
 
-           {/* About Dataset */}
-           <div className={styles.fieldPub}>
+          {/* About Dataset */}
+          <div className={styles.fieldPub}>
             <label htmlFor="dataDesc">Overview of Data:</label>
             <input
               type="text"
@@ -212,13 +228,19 @@ function DataPublishingForm() {
           {/* Units / Quantity */}
           <div className={styles.fieldPub}>
             <label htmlFor="units">Units:</label>
-            <input
-              type="text"
-              name="units"
-              id="units"
-              defaultValue="In Numbers"
-              onChange={assignFormData}
-            />
+            <SingleDropDown options={UnitsData} onSelect={getUnits} />
+          </div>
+
+          {/* Granularity */}
+          <div className={styles.fieldPub}>
+            <label htmlFor="granularity">Granularity:</label>
+            <SingleDropDown options={GranularityData} onSelect={getGranularity} />
+          </div>
+
+          {/* Is Time Series */}
+          <div className={styles.fieldPub}>
+            <label htmlFor="isTSData">Is Time Series:</label>
+            <SingleDropDown options={isTSData} onSelect={getIsTS} />
           </div>
 
           {/* Reset and Submit Buttons */}

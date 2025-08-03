@@ -23,12 +23,13 @@ export default function DataSets({ data }) {
                             key={index}
                             className="break-inside-avoid rounded-2xl overflow-hidden shadow-md bg-white transition duration-300 hover:shadow-xl"
                         >
-                            <Link href={`/DataSets/${item.SlugURL}`}>
+                            <Link href={`/DataSets/${item.Sector}/${item.SlugURL}`}>
                                 <Image
                                     src={imageURLs[index % imageURLs.length]}
                                     width={400} // set actual width
                                     height={192} // maintain 400x192 for ~16:9 ratio
                                     className="w-full h-48 object-cover rounded-t-2xl"
+                                    alt={item.DataName}
                                 />
                                 <div className="p-4">
                                     <h2 className="text-lg font-semibold text-gray-800 leading-snug">

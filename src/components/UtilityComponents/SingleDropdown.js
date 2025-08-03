@@ -33,7 +33,7 @@ const SingleDropDown = (props) => {
           label: option  
       }))}
           isMulti
-          placeholder="Select regions"
+          placeholder={placeholder}
           className="w-50 text-sm"
           onChange={(selectedOptions) => {
             handleSubmit(selectedOptions);

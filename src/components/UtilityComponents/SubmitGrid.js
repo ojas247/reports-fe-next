@@ -101,13 +101,7 @@ export default function SubmitGrid(props) {
           </div>
         )}
       </div>
-      {/* <button
-        onClick={handleSubmit}
-        disabled={rows.length === 0 || columns.length === 0}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
-      >
-        Submit Data
-      </button> */}
+
     </div>
   );
 }

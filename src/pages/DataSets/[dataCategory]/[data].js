@@ -7,6 +7,7 @@ import Navbar from "../../../components/Functionalities/NavBar";
 import Footer from "../../../components/Website/Footer";
 import { fetchDataFromGetApi } from '../../api/Api';
 import RenderCSVgrid from "../../../components/UtilityComponents/RenderCSVgrid";
+import GenericCharts from "../../../components/UtilityComponents/SEODataSets/GenericCharts";
 import styles from "../../../styles/Pages/dataSlug.module.css";
 import Papa from 'papaparse';
 
@@ -114,7 +115,7 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
                         </div>
                     )}
 
-
+                   
                     <div className={styles.leadFormContainer}>
                         <h3>NEED HELP IN RESEARCH?</h3>
                         <p>Signup to get access to our market reports and insights.</p>
@@ -151,6 +152,13 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
 
                 </div>
 
+
+                {bucketUrl && dataHeading && gridDescription && (
+                        <div className="max-w-[900px] overflow-x-auto pl-8 pr-2 pt-2 pb-6">
+                            <GenericCharts headers={headerRow} rows={dataRows}
+                                description={gridDescription} bucketUrl={bucketUrl} heading={dataHeading} units={units} />
+                        </div>
+                    )}
 
                 <div className="max-w-[900px] w-full overflow-x-auto flex flex-col md:flex-row md:justify-center items-start md:items-center gap-2 px-2">
                     <h4 className="text-base md:text-base text-gray-800 underline-offset-2">

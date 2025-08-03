@@ -74,6 +74,22 @@ CsvGridPage.propTypes = {
 };
 
 export async function getServerSideProps() {
+
+  // Make API call to fetch data
+  const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
+  const apiResponse = await fetch(`${backendAPI}/api/data`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!apiResponse.ok) {
+    console.error('API call failed:', apiResponse.status);
+    return { notFound: true }; 
+  }
+
+  const apiData = await apiResponse.json();
   // 1) URL of your CSV in GCS
   const bucketUrl =
     'https://storage.googleapis.com/marketreports/Data/Datanameerfretest';

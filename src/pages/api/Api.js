@@ -48,7 +48,8 @@ export async function fetchDataFromGetApi(urlSlug) {
 
     export async function fetchSetorSubOptions() {
       try {
-        const response = await fetch(`${backendAPI}/UpdateEndpoint/sectorsOptions`, {
+        // const response = await fetch(`${backendAPI}/UpdateEndpoint/sectorsOptions`, {
+        const response = await fetch(`${backendAPI}/CRUD/get/Sectors`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -88,26 +89,27 @@ export async function fetchDataFromGetApi(urlSlug) {
     }
   }
 
-  export async function fetchYears() {
-    try {
-      const response = await fetch(`${backendAPI}/UpdateEndpoint/years`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+  // export async function fetchYears() {   // // commmented on 3rd Aug 2025
+  //   try {
+  //     // const response = await fetch(`${backendAPI}/UpdateEndpoint/years`, {
+  //     const response = await fetch(`${backendAPI}/CRUD/get/years`, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
        
-      });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      let data = await response.json();
-      console.log("response api.js:",data);
-      return data;
-    } catch (error) {
-      console.error('Error:', error);
-      throw error;
-    }
-  }
+  //     });
+  //     if (!response.ok) {
+  //       throw new Error('Network response was not ok');
+  //     }
+  //     let data = await response.json();
+  //     console.log("response api.js:",data);
+  //     return data;
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //     throw error;
+  //   }
+  // } 
 
   export async function fetchTags() {
     try {

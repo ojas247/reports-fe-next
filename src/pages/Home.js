@@ -9,9 +9,12 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import styles from "../styles/Pages/home.module.css";
 import Link from 'next/link';
 import Image from 'next/image';
+import { fetchDataFromGetApi } from '../pages/api/Api';
 
 export default function HomePage() {
   const [expandedFAQs, setExpandedFAQs] = useState([true, true, true, true, true, true]);
+
+  fetchDataFromGetApi("_ah/warmup");
 
   const toggleFAQ = (index) => {
     const newExpanded = [...expandedFAQs];

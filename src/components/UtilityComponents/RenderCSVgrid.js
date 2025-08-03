@@ -38,7 +38,14 @@ export default function CsvGridPage(props) {
   return (
     <div className="p-4 space-y-0">
       <h1 className="text-2xl font-bold text-blue-900">{heading}</h1>
-      <p className="text-m text-gray-800">{description}</p>
+      {description
+        .replace(/\\n/g, '\n') // Replace literal \n with actual newline
+        .split(/\r?\n/)
+        .map((line, idx) => (
+          <div key={idx} className="mb-1">
+            • {line.trim()}
+          </div>
+        ))}
 
       <div className="flex p-1 m-0 justify-end cursor-pointer">
         <a href={bucketUrl} className="text-blue-600" target="_blank" rel="noopener noreferrer">
