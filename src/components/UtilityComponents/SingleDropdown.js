@@ -11,6 +11,7 @@ const SingleDropDown = (props) => {
   // }));
   const placeholder = props.placeholder;
 
+
   const handleSubmit = (e) => {
     props.onSelect(e);
   };

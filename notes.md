@@ -15,3 +15,11 @@ gcloud builds submit --tag asia-east1-docker.pkg.dev/marketreports/next-reports-
 
 DEPLOYS TO RUN
 gcloud run deploy nextjs-frontend-app --image=asia-east1-docker.pkg.dev/marketreports/next-reports-frontend/nextjs-frontend-app --platform=managed --region=asia-east1 --allow-unauthenticated
+
+
+
+
+
+
+######################## HYPERLINKING ########################
+description = "Visit our platform at @link-start platform @link-end @url-start https://example.com @url-end\n This is second bullet point"

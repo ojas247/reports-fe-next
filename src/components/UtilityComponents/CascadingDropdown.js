@@ -6,6 +6,7 @@ const CascadingDropDown = ({ options, onSelect }) => {
   const [selectedSector, setSelectedSector] = useState('');
   const [selectedSub1, setSelectedSub1] = useState('');
 
+
   const handleSectorChange1 = (e) => {
     console.log(e.target.value);
     setSelectedSector(e.target.value);

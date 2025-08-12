@@ -13,7 +13,6 @@ const SearchFilters = (props) => {
   const router = useRouter();
   const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
   
-  console.log("Current route:", router.pathname);
   console.log("Props received:", props);
   
   const [loading, setLoading] = useState(true);

@@ -48,7 +48,8 @@ function DataPublishingForm() {
       const OptionsTagsData = await fetchTags();
       setTagsdata(OptionsTagsData);
 
-      const OptionsYearData = await fetchYears();
+      // const OptionsYearData = await fetchYears();
+      const OptionsYearData = {"options_list":[2022,2021,2018,2020,2024,2023]};
       setYeardata(OptionsYearData);
     }
     getData()
@@ -74,15 +75,15 @@ function DataPublishingForm() {
   }
 
   const getGranularity = (data) => {
-    setRegister({ ...formRegister, granularity: data.map(item => item.value) });
+    setRegister({ ...formRegister, granularity: data[0]?.value || "" });
   }
 
   const getUnits = (data) => {
-    setRegister({ ...formRegister, units: data.map(item => item.value) });
+    setRegister({ ...formRegister, units: data[0]?.value || "" });
   }
 
   const getIsTS = (data) => {
-    setRegister({ ...formRegister, isTSData: data.map(item => item.value) });
+    setRegister({ ...formRegister, isTSData: data[0]?.value || "" });
   }
 
   const getSectorFilters = (data) => {
