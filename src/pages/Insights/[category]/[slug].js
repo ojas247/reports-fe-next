@@ -284,7 +284,7 @@ export default function Insights({ blog_data, category, YouMayAlsoLike, gridDesc
                         {bucketUrl && dataHeading && gridDescription && (
                             <div>
                                 <RenderCSVgrid headers={headerRow} rows={dataRows}
-                                    description={gridDescription} bucketUrl={bucketUrl} heading={dataHeading} units={units} />
+                                    description={gridDescription} bucketUrl={bucketUrl} heading={dataHeading} units={units}  />
                             </div>
                         )}
                     </div>
@@ -410,7 +410,7 @@ export async function getServerSideProps(context) {
         gridDescription = GridDataInfo?.GridData?.[0]?.dataDescription;
         dataHeading = GridDataInfo?.GridData?.[0]?.dataHeading;
         units = GridDataInfo?.GridData?.[0]?.units;
-
+        
         // 2) Fetch and parse
         const response = await fetch(bucketUrl);
         if (!response.ok) {

@@ -1,30 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import SingleDropDown from "../../components/UtilityComponents/SingleDropdown";
-import CascadingDropDown from "../../components/UtilityComponents/CascadingDropdown";
-import { fetchSetorSubOptions, fetchAuthors, fetchYears, fetchTags } from "../api/Api.js";
+import SingleDropDown from "../../../components/UtilityComponents/SingleDropdown";
+import CascadingDropDown from "../../../components/UtilityComponents/CascadingDropdown";
+import { fetchSetorSubOptions, fetchAuthors, fetchYears, fetchTags } from "../../api/Api";
 import axios from 'axios';
 import styles from "../../styles/Pages/Admin/publishing.module.css";
 import Image from 'next/image';
+import SubmitGrid from '../../../components/UtilityComponents/SubmitGrid';
 
-function ReportPublishingForm() {
+function DataPublishingForm() {
   const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
   const [response, setResponse] = useState(null);
   const [SecSubdata, setSecSubdata] = useState([]);
+  const [dataName, setDataName] = useState("");
   const [Authordata, setAuthordata] = useState([]);
   const [Tagsdata, setTagsdata] = useState([]);
   const [Yeardata, setYeardata] = useState([]);
-  const [files, setFiles] = useState(null);
-  const [fileName, setFileName] = useState('');
+  const [gridCSVFile, setGridCSVFile] = useState(null);
   const [formRegister, setRegister] = useState({
-    reportName: "",
     sector: "",
     sub1: "",
     author: "",
     year: "",
-    sourceURL: ""
+    sourceURL: "",
+    tag: [],
+    geo: "",
+    units: "",
+    granularity: "",
+    seoDesc: "",
+    isTSData: "",
   });
 
   const GeoData = { "options_list": ["India", "Global", "MENA"] }
+  const GranularityData = { "options_list": ["Snapshot", "Monthly", "Yearly", "Quarterly", "Calendar Year"] }
+  const UnitsData = { "options_list": ["In Numbers", "%", "Kilometers", "INR Cr", "Paise", "INR", "Lacs", "thousands", "Million", "USD Mn", "thousand tons", "Mn tons"] }
+  const isTSData = { "options_list": ["Yes", "No"] }
   const [loading, setLoading] = useState(false);
 
 
@@ -39,7 +48,8 @@ function ReportPublishingForm() {
       const OptionsTagsData = await fetchTags();
       setTagsdata(OptionsTagsData);
 
-      const OptionsYearData = await fetchYears();
+      // const OptionsYearData = await fetchYears();
+      const OptionsYearData = {"options_list":[2022,2021,2018,2020,2024,2023]};
       setYeardata(OptionsYearData);
     }
     getData()
@@ -52,12 +62,6 @@ function ReportPublishingForm() {
 
   const author_placeholder = "Select Author"
 
-  const getFileDetails = (data) => {
-    const selectedFile = data.target.files[0];
-    setFiles(selectedFile);
-    setFileName(selectedFile.name); // Set the file name
-  }
-
   const getAuthor = (data) => {
     setRegister({ ...formRegister, author: data.map(item => item.value) });
   }
@@ -68,6 +72,18 @@ function ReportPublishingForm() {
 
   const getGeo = (data) => {
     setRegister({ ...formRegister, geo: data.map(item => item.value) });
+  }
+
+  const getGranularity = (data) => {
+    setRegister({ ...formRegister, granularity: data[0]?.value || "" });
+  }
+
+  const getUnits = (data) => {
+    setRegister({ ...formRegister, units: data[0]?.value || "" });
+  }
+
+  const getIsTS = (data) => {
+    setRegister({ ...formRegister, isTSData: data[0]?.value || "" });
   }
 
   const getSectorFilters = (data) => {
@@ -88,15 +104,14 @@ function ReportPublishingForm() {
     // Read the form data
     const form = e.target;
     const formData = new FormData();
-    formData.append('files', files); // Append the file
-    formData.append('fileName', fileName);
+    formData.append('gridData', gridCSVFile);
 
     Object.entries(formRegister).forEach(([key, value]) => {
       formData.append(key, value);
-      console.log("Key/Val", key, value);
+      // console.log("Key/Val Check123:", key, value);
     });
 
-    axios.post(`${backendAPI}/Publishing/Report`, formData, {
+    axios.post(`${backendAPI}/Publishing/Data`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       },
@@ -111,9 +126,14 @@ function ReportPublishingForm() {
 
   }
 
+  const getGridData = (gridData) => {
+    const file = gridData.get('file'); // 'file' is the key used in SubmitGrid
+    setGridCSVFile(file);
+  };
+
   return (
     <div className={styles.formContainer}>
-      <h1 className={styles.formTitle}>Publishing Reports</h1>
+      <h1 className={styles.formTitle}>Publishing Data</h1>
       <form method="post" onSubmit={handleSubmit} className={styles.formContainer}>
         {/* Sector Dropdown */}
         <div className={styles.formGroup}>
@@ -124,26 +144,25 @@ function ReportPublishingForm() {
 
           {/* Report Name Field */}
           <div className={styles.fieldPub}>
-            <label htmlFor="reportName">Report Name:</label>
+            <label htmlFor="dataName">Data Name:</label>
             <input
               type="text"
-              name="reportName"
-              id="reportName"
-              defaultValue="reportName"
+              name="dataName"
+              id="dataName"
+              defaultValue="dataName"
               onChange={assignFormData}
             />
           </div>
 
-          {/* File Upload Field */}
+          {/* SEO Desc Name Field */}
           <div className={styles.fieldPub}>
-            <label htmlFor="files">Upload PDF:</label>
+            <label htmlFor="dataName">Description for SEO:</label>
             <input
-              type="file"
-              name="files"
-              id="files"
-              accept="application/pdf"
-              required
-              onChange={getFileDetails}
+              type="text"
+              name="seoDesc"
+              id="seoDesc"
+              defaultValue="seoDesc"
+              onChange={assignFormData}
             />
           </div>
 
@@ -193,6 +212,38 @@ function ReportPublishingForm() {
             <SingleDropDown options={GeoData} onSelect={getGeo} />
           </div>
 
+          {/* About Dataset */}
+          <div className={styles.fieldPub}>
+            <label htmlFor="dataDesc">Overview of Data:</label>
+            <input
+              type="text"
+              name="dataDesc"
+              id="dataDesc"
+              defaultValue=""
+              onChange={assignFormData}
+            />
+          </div>
+
+          <SubmitGrid gridData={getGridData} dataName={dataName} />
+
+          {/* Units / Quantity */}
+          <div className={styles.fieldPub}>
+            <label htmlFor="units">Units:</label>
+            <SingleDropDown options={UnitsData} onSelect={getUnits} />
+          </div>
+
+          {/* Granularity */}
+          <div className={styles.fieldPub}>
+            <label htmlFor="granularity">Granularity:</label>
+            <SingleDropDown options={GranularityData} onSelect={getGranularity} />
+          </div>
+
+          {/* Is Time Series */}
+          <div className={styles.fieldPub}>
+            <label htmlFor="isTSData">Is Time Series:</label>
+            <SingleDropDown options={isTSData} onSelect={getIsTS} />
+          </div>
+
           {/* Reset and Submit Buttons */}
           <div className={styles.buttonGroup}>
             <button type="submit" className={styles.submitBtn}>Submit form</button>
@@ -220,4 +271,4 @@ function ReportPublishingForm() {
   );
 }
 
-export default ReportPublishingForm;
+export default DataPublishingForm;

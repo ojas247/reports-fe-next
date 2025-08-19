@@ -6,7 +6,7 @@ import 'handsontable/styles/ht-theme-main.min.css';
 import Handsontable from 'handsontable/base';
 import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react-wrapper';
-import fetchDataFromGetApi from '../pages/api/UtilFunctions';
+import fetchDataFromGetApi from '../../pages/api/UtilFunctions';
 import Papa from 'papaparse';
 
 
@@ -50,9 +50,9 @@ export default function IndiaStateMap({ ArrayofArray }) {
         // filters={true}
         licenseKey="non-commercial-and-evaluation" // for non-commercial use only
         //Events
-        afterChange={(changes, source) => {
-          console.log("Cell changed:", changes, "Source:", source);
-        }}
+        // afterChange={(changes, source) => {
+        //   console.log("Cell changed:", changes, "Source:", source);
+        // }}
       />
 
       <button
@@ -63,25 +63,4 @@ export default function IndiaStateMap({ ArrayofArray }) {
         💾 Save Changes
       </button>
     </>);
-}
-
-
-export async function getServerSideProps() {
-  const url = "https://storage.googleapis.com/marketreports/Data/Milk-Production-in-India-2024";
-  const res = await fetch(url);
-
-  const csvText = await res.text(); // read CSV as plain text
-
-  // Parse CSV → array of arrays
-  const parsed = Papa.parse(csvText, {
-    header: false,       // don't use first row as keys
-    skipEmptyLines: true
-  });
-
-  return {
-    props: {
-      ArrayofArray: parsed.data, // array of objects
-    },
-
-  }
 }

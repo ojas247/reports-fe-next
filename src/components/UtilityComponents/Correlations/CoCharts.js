@@ -15,11 +15,23 @@ export default function CoCharts({ apiData }) {
       style: { color: colors[index % colors.length] },
     },
     labels: {
-      format: `{value} ${unit}`,
+     // format: {value}, //${unit}, ////older version
       style: { color: colors[index % colors.length] },
+      formatter: function () {
+        let value = this.value;
+        if (value >= 10000000) {
+          return (value / 10000000).toFixed(1) + ' Cr';
+        } else if (value >= 100000) {
+          return (value / 100000).toFixed(1) + ' Lac';
+        } else if (value >= 1000) {
+          return (value / 1000).toFixed(1) + ' K';
+        }
+        return value;
+      }
     },
     opposite: index % 2 !== 0,
   }));
+  
 
   const series1 = apiData.map((item) => {
     const unitIndex = uniqueUnits.indexOf(item.units);

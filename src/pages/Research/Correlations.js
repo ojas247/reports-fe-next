@@ -8,7 +8,7 @@ import SingleDropDown from "./../../components/UtilityComponents/SingleDropdown"
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { fetchSetorSubOptions, fetchAuthors, fetchDataFromGetApi, fetchDataFromPostApi } from '../../pages/api/Api';
-import styles from '../../styles/searchFilters.module.css';
+import styles from '../../styles/Pages/reports.module.css';
 
 export default function Correlations() {
     const isFirstRun = useRef(true);
@@ -98,11 +98,12 @@ export default function Correlations() {
 
 
     return (
-        <>
+        <div className={styles.resultBodyContainer}>
             <Navbar />
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col">
-            
-                <div className="mb-4 flex flex-row">
+           
+                {/* <div className="mb-4 flex flex-row"> */}
+                <div>
                     <div>
                         <CascadingDropDown options={SecSubdata} onSelect={getSectorFilters} />
                     </div>
@@ -144,7 +145,7 @@ export default function Correlations() {
 
             </div>
             <Footer />
-        </>
+        </div>
 
     )
 }

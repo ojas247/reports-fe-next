@@ -23,3 +23,6 @@ gcloud run deploy nextjs-frontend-app --image=asia-east1-docker.pkg.dev/marketre
 
 ######################## HYPERLINKING ########################
 description = "Visit our platform at @link-start platform @link-end @url-start https://example.com @url-end\n This is second bullet point"
+
+To break link use \n
+To split para in desc1 an desc2 use \p

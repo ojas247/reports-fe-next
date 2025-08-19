@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import Head from "next/head";
 import Breadcrumbs from '../../../components/UtilityComponents/Breadcrumbs';
 import { useState } from "react";
@@ -10,13 +11,15 @@ import RenderCSVgrid from "../../../components/UtilityComponents/RenderCSVgrid";
 import GenericCharts from "../../../components/UtilityComponents/SEODataSets/GenericCharts";
 import styles from "../../../styles/Pages/dataSlug.module.css";
 import Papa from 'papaparse';
+import { CreateUserId } from '../../api/UtilFunctions'
 
 
 export default function DataSets({ bucketUrl, gridDescription, dataHeading, units, headerRow, dataRows, dataCategory, author, year,
-    sector, subcategory, YouMayAlsoLike, slug, SourceURL, seoDesc }) {
+    sector, subcategory, YouMayAlsoLike, slug, SourceURL, seoDesc, granularity }) {
     const frontendAPI = process.env.NEXT_PUBLIC_frontendAPI;
     const [email, setEmail] = useState('');
     const [PasswordPop, setPasswordPop] = useState('');
+    const router = useRouter();
 
 
     const breadcrumbItems = [
@@ -83,8 +86,12 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
     const handleRegister = (event) => {
         event.preventDefault();
         CreateUserId(email, PasswordPop);
-        navigate('/Login', { state: { "message": "User Created Successfully. Please Login to Continue." } });
-        setShowPopup(false); // Close the pop-up after submission
+
+        // Show alert
+        window.alert("Account created! Click OK and Login using your credentials.");
+        router.push({
+            pathname: '/Login',
+        });
     };
 
 
@@ -111,11 +118,11 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
                     {bucketUrl && dataHeading && gridDescription && (
                         <div className="max-w-[900px] overflow-x-auto">
                             <RenderCSVgrid headers={headerRow} rows={dataRows}
-                                description={gridDescription} bucketUrl={bucketUrl} heading={dataHeading} units={units} />
+                                description={gridDescription} bucketUrl={bucketUrl} heading={dataHeading} units={units} granularity={granularity} />
                         </div>
                     )}
 
-                   
+
                     <div className={styles.leadFormContainer}>
                         <h3>NEED HELP IN RESEARCH?</h3>
                         <p>Signup to get access to our market reports and insights.</p>
@@ -144,7 +151,7 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
                             />
 
                             <button type="submit" onClick={handleRegister}>
-                                Sign Up & Seach
+                                Sign Up & Search
                                 <span className={styles.icon}>🔍</span>
                             </button>
                         </form>
@@ -154,11 +161,11 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
 
 
                 {bucketUrl && dataHeading && gridDescription && (
-                        <div className="max-w-[900px] overflow-x-auto pl-8 pr-2 pt-2 pb-6">
-                            <GenericCharts headers={headerRow} rows={dataRows}
-                                description={gridDescription} bucketUrl={bucketUrl} heading={dataHeading} units={units} />
-                        </div>
-                    )}
+                    <div className="max-w-[900px] overflow-x-auto pl-8 pr-2 pt-2 pb-6">
+                        <GenericCharts headers={headerRow} rows={dataRows}
+                            description={gridDescription} bucketUrl={bucketUrl} heading={dataHeading} units={units} granularity={granularity} />
+                    </div>
+                )}
 
                 <div className="max-w-[900px] w-full overflow-x-auto flex flex-col md:flex-row md:justify-center items-start md:items-center gap-2 px-2">
                     <h4 className="text-base md:text-base text-gray-800 underline-offset-2">
@@ -222,6 +229,7 @@ export async function getServerSideProps(context) {
     const units = dataSetObj?.[0]?.Units;
     const SourceURL = dataSetObj?.[0]?.SourceURL;
     const seoDesc = dataSetObj?.[0]?.seoDesc;
+    const granularity = dataSetObj?.[0]?.granularity;
     let headerRow = null;
     let dataRows = null;
 
@@ -234,15 +242,6 @@ export async function getServerSideProps(context) {
             return { notFound: true };
         }
         const text = await response.text();
-        // const lines = text.trim().split('\n').map(l => l.split(','));
-        // const lines = text
-        //     .trim()
-        //     .split('\n')
-        //     .map(line =>
-        //         line
-        //             .split(',')
-        //             .map(cell => cell.replace(/"/g, '')) // ← Remove all double quotes
-        //     );
 
         // Parse using PapaParse
         const parsed = Papa.parse(text.trim(), {
@@ -272,7 +271,8 @@ export async function getServerSideProps(context) {
             subcategory: subcategory,
             YouMayAlsoLike: YouMayAlsoLike,
             SourceURL: SourceURL,
-            seoDesc: seoDesc
+            seoDesc: seoDesc,
+            granularity: granularity
         }
     }
 
