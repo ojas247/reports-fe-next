@@ -20,6 +20,7 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
     const [email, setEmail] = useState('');
     const [PasswordPop, setPasswordPop] = useState('');
     const router = useRouter();
+    const pageURL = frontendAPI + '/DataSets/' + sector + '/' + slug
 
 
     const breadcrumbItems = [
@@ -64,7 +65,7 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
         "@type": "Dataset",
         "name": dataHeading,
         "description": gridDescription,
-        "url": frontendAPI + '/DataSets/' + sector + '/' + slug,
+        "url":pageURL,
         "keywords": [dataCategory, dataHeading],
         "creator": {
             "@type": "Organization",
@@ -83,6 +84,40 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
         "datePublished": year
     }
 
+    const articleSchema = {
+        "@context": "http://schema.org",
+        "@type": "Article",
+        "headline": dataHeading,
+        "author": {
+            "@type": "Person",
+            "name": author
+        },
+        "datePublished": year,
+        "image": {
+            "@type": "ImageObject",
+            "width": 1000,
+            "url": ""
+        },
+        "publisher": {
+            "@id": "https://marketreports.in",
+            "@type": "Organization",
+            "name": "MarketReports-by SYNTHESIS",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://storage.googleapis.com/marketreports/Brand/Logo/Logo-Trans.svg",
+                "width": "600",
+                "height": "60"
+            }
+        },
+        "keywords": [dataCategory, dataHeading],
+        "mainEntityOfPage": "https://marketreports.in/DataSets",
+        "inLanguage": "EN",
+        "isAccessibleForFree": "true",
+        "datePublished": year,
+        "dateModified": year,
+        "description": gridDescription
+    };
+
     const handleRegister = (event) => {
         event.preventDefault();
         CreateUserId(email, PasswordPop);
@@ -100,6 +135,12 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
             <Head>
                 <meta name="description" content={seoDesc}></meta>
                 <title>{dataHeading}</title>
+                <link rel="canonical" href={pageURL} />
+                <meta name="robots" content="index, follow" />
+                
+                <script type="application/ld+json">
+                    {JSON.stringify(articleSchema)}
+                </script>
                 <script type="application/ld+json">
                     {JSON.stringify(dataSetSchema)}
                 </script>

@@ -3,7 +3,7 @@ import SingleDropDown from "../../../components/UtilityComponents/SingleDropdown
 import CascadingDropDown from "../../../components/UtilityComponents/CascadingDropdown";
 import { fetchSetorSubOptions, fetchAuthors, fetchYears, fetchTags } from "../../api/Api.js";
 import axios from 'axios';
-import styles from "../../styles/Pages/Admin/publishing.module.css";
+import styles from "../../../styles/Pages/Admin/publishing.module.css";
 import Image from 'next/image';
 
 function ReportPublishingForm() {

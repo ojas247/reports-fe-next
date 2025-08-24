@@ -12,23 +12,18 @@ import Papa from 'papaparse';
 
 registerAllModules();
 
-export default function IndiaStateMap({ ArrayofArray }) {
+export default function RenderEditableGrid({ ArrayofArray, onSave, onUpdate }) {
   const myTable = ArrayofArray;
   const hotRef = useRef(null);
 
-  const saveData = async (tableData) => {
-    try {
-      const res = await fetch("/api/saveTable", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(tableData),
-      });
-      if (res.ok) console.log("✅ Saved successfully");
-      else console.error("❌ Failed to save");
-    } catch (err) {
-      console.error("API error:", err);
-    }
+  const handleSave = async (e) => {
+    onSave(e);
   };
+
+  const handleUpdate = async (e) => {
+    onUpdate(e);
+  };
+
 
 
   return (
@@ -50,17 +45,19 @@ export default function IndiaStateMap({ ArrayofArray }) {
         // filters={true}
         licenseKey="non-commercial-and-evaluation" // for non-commercial use only
         //Events
-        // afterChange={(changes, source) => {
-        //   console.log("Cell changed:", changes, "Source:", source);
-        // }}
+        afterChange={(changes, source) => {
+          if (source === "loadData") return; // 👈 skip initial render
+          handleUpdate(changes)
+        }}
       />
 
       <button
         onClick={() =>
-          saveData(hotRef.current.hotInstance.getData())
+          handleSave(hotRef.current.hotInstance.getData())
         }
+        className="text-sm"
       >
-        💾 Save Changes
+        💾 Save Table
       </button>
     </>);
 }

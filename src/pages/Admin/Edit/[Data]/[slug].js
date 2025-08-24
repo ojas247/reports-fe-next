@@ -1,67 +1,140 @@
-
-import { fetchDataFromGetApi } from '../../../api/Api';
-import { useState } from 'react';
+import { fetchDataFromGetApi, fetchDataFromPostApi } from '../../../api/Api';
+import { useEffect, useState } from 'react';
 import RenderEditableGrid from '../../../../components/UtilityComponents/RenderEditableGrid'
 import Papa from 'papaparse';
 
 export default function DataEdits(propObj) {
     const dataObj = propObj.propObj.dataObj[0]
-    // const dataSetCSVurl = dataObj.ReportUrl
-    console.log("Check: ", dataObj)
     const dataSetName = dataObj.DataName
     const publishedYear = dataObj.Year
     const description = dataObj.description
-    const csvTable = propObj.propObj.ArrayofArray
+    let csvTable = propObj.propObj.ArrayofArray
 
+    const [sector, setSector] = useState(propObj.propObj.slug1)
+    const [pageUrl, setPageUrl] = useState(propObj.propObj.slug2)
     const [dName, setDName] = useState(dataSetName);
     const [year, setYear] = useState(publishedYear);
     const [desc, setDesc] = useState(description);
+    const [tableData, setTableData] = useState(csvTable)
+    const [updatedTableData, setUpdatedTableData] = useState(csvTable)
+    const [updatedPgData, setUpdatedPgData] = useState({})
+    
+   
 
-    const saveTable = async (tableData) => {
-        try {
-            const payload = {
-                dataName: dName,
-                year: year, 
-                description: desc,
-                tableData: tableData
-            };
-
-        } catch (err) {
-            console.error("API error:", err);
-        }
+    const saveTable = (tableData) => {
+        // console.log("Saving table data:", tableData);
+        setTableData(tableData)
+        csvTable = tableData
     };
+
+    const updateTable = (tableData) => {
+        console.log("Updating table data:", tableData);
+       setUpdatedTableData(tableData)
+    };
+
+    const updatePage = async () =>{
+
+        fetchDataFromPostApi(updatedPgData, "RePublishing/Data")
+        console.log("Page update payload:", updatedPgData);
+    }
+
+    useEffect(() => {
+        setUpdatedPgData((prev) => {
+          const newData = {
+            OldDataSetName: dataSetName,
+            DataSetName: dName,
+            year: year,
+            description: desc,
+            tableData: tableData,
+            sector: sector,
+            PgUrl: pageUrl
+          };
+      
+          // Avoid unnecessary updates
+          if (JSON.stringify(prev) !== JSON.stringify(newData)) {
+            return newData;
+          }
+          return prev;
+        });
+      }, [dName, year, desc, tableData, sector, pageUrl]);
 
 
     return (
         <>
-            <div>
-                Dataset Name - <input
-                    type="text"
-                    value={dName}                // prefilled value
-                    onChange={(e) => setDName(e.target.value)} // update state on edit
-                    className="border p-2 rounded w-64"
-                />
+        {/* Page Heading */}
+        <div className="max-w-3xl mx-auto mt-8 mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">Edit Dataset</h1>
+          <p className="text-gray-500 mt-1">Update dataset details and make changes to the table below.</p>
+        </div>
+      
+        {/* Main container */}
+        <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-2xl space-y-6">
+          {/* Dataset Name */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-1">
+              Dataset Name
+            </label>
+            <input
+              type="text"
+              value={dName}
+              onChange={(e) => setDName(e.target.value)}
+                //   onChange={(e) => setPageData({...pageData, "DataSetName": e.target.value})}
+              className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition w-full"
+              placeholder="Enter dataset name"
+            />
+          </div>
+      
+          {/* Published Year */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-1">
+              Published Year
+            </label>
+            <input
+              type="text"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+                //   onChange={(e) => setPageData({...pageData, "year": e.target.value})}
+              className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition w-full"
+              placeholder="e.g. 2024"
+            />
+          </div>
+      
+          {/* Description */}
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-700 mb-1">
+              Data Description
+            </label>
+            <textarea
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
+                //   onChange={(e) => setPageData({...pageData, "description": e.target.value})}
+              rows={6}
+              className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition w-full resize-y"
+              placeholder="Enter dataset description"
+            />
+          </div>
+      
+          {/* Editable Grid */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">Data Table</h3>
+            <div className="shadow-sm p-3 bg-gray-50">
+              <RenderEditableGrid ArrayofArray={csvTable} onSave={saveTable} onUpdate={updateTable} />
             </div>
-            <div>
-                Published Year - <input
-                    type="text"
-                    value={dName}                // prefilled value
-                    onChange={(e) => setDName(e.target.value)} // update state on edit
-                    className="border p-2 rounded w-64"
-                />
-            </div>
-            <div>
-                Data description - <textarea
-                    value={desc}                // prefilled value
-                    onChange={(e) => setDesc(e.target.value)} // update state on edit
-                    rows={10}
-                    className="border p-2 rounded w-200"
-                />
-            </div>
-            <div>
-                <RenderEditableGrid ArrayofArray={csvTable} onSave={saveTable}/>
-            </div>
-        </>
+          </div>
+        </div>
+      
+        {/* Save button (outside container) */}
+        <div className="max-w-3xl mx-auto mt-6 flex justify-end">
+          <button
+            onClick={() => updatePage()}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 active:scale-95 transition cursor-pointer"
+          >
+            Save Changes
+          </button>
+        </div>
+      </>
+      
+      
     );
 
 
@@ -71,7 +144,7 @@ export async function getServerSideProps(context) {
     const { Data, slug } = context.params;
 
     //Fetch Data from dataStore Published_Data
-    let propObj = {}
+    let propObj = null;
     const dataSetObj = await fetchDataFromGetApi("get-dataset-objs?count=&sector=&slug=" + slug);
     propObj = { ...propObj, slug1: Data, slug2: slug, dataObj: dataSetObj };
 
