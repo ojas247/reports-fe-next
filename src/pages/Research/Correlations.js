@@ -15,6 +15,8 @@ export default function Correlations() {
     const [SecSubdata, setSecSubdata] = useState([]);
     const [selectedSector, setSelectedSector] = useState("");
     const [selectedSub1, setSelectedSub1] = useState("");
+    const [selectedDSName, setSelectedDSName] = useState([]);
+    const [listOfDataItems, setListOfDataItems] = useState([]);
     const [listOfDatasets, setListOfDatasets] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [selectedDataItems, setSelectedDataItems] = useState([]);
@@ -38,24 +40,41 @@ export default function Correlations() {
         getListOfDatasets();
     }, [selectedSub1]);
 
-
+    
     useEffect(() => {
         if (isFirstRun.current) {
             isFirstRun.current = false; // Skip first run
             return;
         }
-
         const fetchData = async () => {
             try {
                 const response = await fetchDataFromPostApi(selectedDataItems, `getTSdata`);
                 setDatasetResponses(response);
-
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         };
         fetchData();
     }, [selectedDataItems]);
+
+    useEffect(() => {
+        if (isFirstRun.current) {
+            isFirstRun.current = false; // Skip first run
+            return;
+        }
+        const fetchData = async () => {
+            try {
+                const response = await fetchDataFromPostApi(selectedDSName, `listOfDataItems`);
+                setListOfDataItems(response);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        if (selectedDSName.length > 0) {
+            fetchData(selectedDSName);
+        }
+    }, [selectedDSName]);
 
 
 
@@ -64,29 +83,29 @@ export default function Correlations() {
         setSelectedSub1(data.sub1);
     };
 
+    const getItemFilter = (data) => {
+        setSelectedDSName(data);
+    };
+
 
     const getDataSetFilter = async (newOptions) => {
         const prevValues = selectedOptions.map(opt => opt.value);
         const newValues = newOptions?.map(opt => opt.value) || [];
-
         // Find added option(s)
         const added = newValues.filter(val => !prevValues.includes(val));
         // Find removed option(s)
         const removed = prevValues.filter(val => !newValues.includes(val));
-
         // Handle added datasets
         for (const datasetName of added) {
             const payload = { item: datasetName, sub1: selectedSub1, sector: selectedSector };
             setSelectedDataItems((prev) => [...prev, payload]);
         }
-
         // Handle removed datasets (filter out removed items)
         if (removed.length > 0) {
             setSelectedDataItems((prev) =>
                 prev.filter(item => !removed.includes(item.item))
             );
         }
-
         // Update state
         setSelectedOptions(newOptions || []);
     };
@@ -108,8 +127,14 @@ export default function Correlations() {
                         <CascadingDropDown options={SecSubdata} onSelect={getSectorFilters} />
                     </div>
                     <div>
-                        <SingleDropDown options={listOfDatasets} onSelect={getDataSetFilter} />
+                        <SingleDropDown options={listOfDatasets} onSelect={getItemFilter} />
                     </div>
+                    <div>
+                        <SingleDropDown options={listOfDataItems} onSelect={getDataSetFilter} />
+                    </div>
+                    {/* <div>
+                        <SingleDropDown options={listOfDatasets} onSelect={getDataSetFilter} />
+                    </div> */}
 
                 </div>
 

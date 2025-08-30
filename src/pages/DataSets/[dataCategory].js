@@ -64,8 +64,9 @@ export default function DataCategoryPage({ data, dataCategory }) {
 export async function getServerSideProps(context) {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
     const { dataCategory } = context.params;
+    console.log("dataCategory: ", dataCategory);
 
-    const res = await fetch(`${backendAPI}/get-dataset-objs?count=&slug=&sector=${dataCategory}`, {
+    const res = await fetch(`${backendAPI}/get-dataset-objs?count=&slug=&sector=${encodeURIComponent(dataCategory)}`, {
         cache: 'no-store',
         headers: {
             'content-type': 'application/json'

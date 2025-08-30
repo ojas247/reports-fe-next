@@ -20,9 +20,6 @@ export default function RenderEditableGrid({ ArrayofArray, onSave, onUpdate }) {
     onSave(e);
   };
 
-  const handleUpdate = async (e) => {
-    onUpdate(e);
-  };
 
 
 
@@ -45,10 +42,10 @@ export default function RenderEditableGrid({ ArrayofArray, onSave, onUpdate }) {
         // filters={true}
         licenseKey="non-commercial-and-evaluation" // for non-commercial use only
         //Events
-        afterChange={(changes, source) => {
-          if (source === "loadData") return; // 👈 skip initial render
-          handleUpdate(changes)
-        }}
+        // afterChange={(changes, source) => {
+        //   if (source === "loadData") return; // 👈 skip initial render
+        //   handleUpdate(changes)
+        // }}
       />
 
       <button

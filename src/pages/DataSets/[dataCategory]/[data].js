@@ -93,11 +93,6 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
             "name": author
         },
         "datePublished": year,
-        "image": {
-            "@type": "ImageObject",
-            "width": 1000,
-            "url": ""
-        },
         "publisher": {
             "@id": "https://marketreports.in",
             "@type": "Organization",
@@ -135,8 +130,8 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
             <Head>
                 <meta name="description" content={seoDesc}></meta>
                 <title>{dataHeading}</title>
-                <link rel="canonical" href={pageURL} />
-                <meta name="robots" content="index, follow" />
+                {/* <link rel="canonical" href={pageURL} /> */}
+                {/* <meta name="robots" content="index, follow" /> */}
                 
                 <script type="application/ld+json">
                     {JSON.stringify(articleSchema)}
@@ -258,7 +253,8 @@ export async function getServerSideProps(context) {
     const dataSetObj = await fetchDataFromGetApi("get-dataset-objs?count=&sector=&slug=" + data);
     const YouMayAlsoLike = await fetchDataFromGetApi("get-dataset-objs?count=5&slug=&sector=" + dataCategory);
 
-    console.log("BucketURL123: ", dataSetObj?.[0]?.ReportUrl);
+    console.log("BucketURL123: ", dataSetObj);
+        // ?.[0]?.ReportUrl);
 
     const bucketUrl = dataSetObj?.[0]?.ReportUrl;
     const gridDescription = dataSetObj?.[0]?.description;

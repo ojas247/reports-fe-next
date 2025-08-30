@@ -49,7 +49,7 @@ function DataPublishingForm() {
       setTagsdata(OptionsTagsData);
 
       // const OptionsYearData = await fetchYears();
-      const OptionsYearData = {"options_list":[2022,2021,2018,2020,2024,2023]};
+      const OptionsYearData = { "options_list": [2022, 2021, 2018, 2020, 2024, 2023] };
       setYeardata(OptionsYearData);
     }
     getData()
@@ -211,16 +211,22 @@ function DataPublishingForm() {
             <label htmlFor="geo">Geography:</label>
             <SingleDropDown options={GeoData} onSelect={getGeo} />
           </div>
+          
 
           {/* About Dataset */}
           <div className={styles.fieldPub}>
             <label htmlFor="dataDesc">Overview of Data:</label>
-            <input
-              type="text"
+            <textarea
               name="dataDesc"
               id="dataDesc"
               defaultValue=""
               onChange={assignFormData}
+              rows={1}  // start small
+              className="w-full resize-none overflow-hidden border border-gray-300 rounded-md p-2"
+              onInput={(e) => {
+                e.target.style.height = "auto"; // reset height
+                e.target.style.height = e.target.scrollHeight + "px"; // set based on content
+              }}
             />
           </div>
 

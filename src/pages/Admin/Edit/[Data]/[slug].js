@@ -8,6 +8,7 @@ export default function DataEdits(propObj) {
     const dataSetName = dataObj.DataName
     const publishedYear = dataObj.Year
     const description = dataObj.description
+    const TSdata = dataObj.isTSdata
     let csvTable = propObj.propObj.ArrayofArray
 
     const [sector, setSector] = useState(propObj.propObj.slug1)
@@ -16,8 +17,10 @@ export default function DataEdits(propObj) {
     const [year, setYear] = useState(publishedYear);
     const [desc, setDesc] = useState(description);
     const [tableData, setTableData] = useState(csvTable)
+    const [isTimeSeriesData, setIsTimeSeriesData] = useState(TSdata); // No Need to Show this on Frontend
     const [updatedTableData, setUpdatedTableData] = useState(csvTable)
     const [updatedPgData, setUpdatedPgData] = useState({})
+    const [isUpdating, setIsUpdating] = useState(false);
     
    
 
@@ -27,15 +30,16 @@ export default function DataEdits(propObj) {
         csvTable = tableData
     };
 
-    const updateTable = (tableData) => {
-        console.log("Updating table data:", tableData);
-       setUpdatedTableData(tableData)
-    };
-
-    const updatePage = async () =>{
-
-        fetchDataFromPostApi(updatedPgData, "RePublishing/Data")
-        console.log("Page update payload:", updatedPgData);
+    const updatePage = async () => {
+        try {
+            setIsUpdating(true);
+            await fetchDataFromPostApi(updatedPgData, "RePublishing-Data");
+            console.log("Page update payload:", updatedPgData);
+        } catch (error) {
+            console.error("Error updating page:", error);
+        } finally {
+            setIsUpdating(false);
+        }
     }
 
     useEffect(() => {
@@ -47,7 +51,8 @@ export default function DataEdits(propObj) {
             description: desc,
             tableData: tableData,
             sector: sector,
-            PgUrl: pageUrl
+            PgUrl: pageUrl,
+            isTimeSeriesData: isTimeSeriesData
           };
       
           // Avoid unnecessary updates
@@ -118,7 +123,7 @@ export default function DataEdits(propObj) {
           <div>
             <h3 className="text-lg font-semibold text-gray-800 mb-3">Data Table</h3>
             <div className="shadow-sm p-3 bg-gray-50">
-              <RenderEditableGrid ArrayofArray={csvTable} onSave={saveTable} onUpdate={updateTable} />
+              <RenderEditableGrid ArrayofArray={csvTable} onSave={saveTable}/>
             </div>
           </div>
         </div>
@@ -126,10 +131,18 @@ export default function DataEdits(propObj) {
         {/* Save button (outside container) */}
         <div className="max-w-3xl mx-auto mt-6 flex justify-end">
           <button
-            onClick={() => updatePage()}
+            onClick={updatePage}
+            disabled={isUpdating}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 active:scale-95 transition cursor-pointer"
           >
-            Save Changes
+            {isUpdating ? (
+                <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Updating...
+                </div>
+            ) : (
+                "Save Changes"
+            )}
           </button>
         </div>
       </>
@@ -148,10 +161,16 @@ export async function getServerSideProps(context) {
     const dataSetObj = await fetchDataFromGetApi("get-dataset-objs?count=&sector=&slug=" + slug);
     propObj = { ...propObj, slug1: Data, slug2: slug, dataObj: dataSetObj };
 
+    console.log("dataSetObj: ", dataSetObj)
+
     //Fetch rows+columns from csv bucket object
-    const url = "https://storage.googleapis.com/marketreports/Data/Milk-Production-in-India-2024";
+    // const url = "https://storage.googleapis.com/marketreports/Data/Milk-Production-in-India-2024";
+    const url = dataSetObj[0]?.ReportUrl;
+    console.log("check: ", url);
     const res = await fetch(url);
     const csvText = await res.text();            // read CSV as plain text
+
+   
 
     const parsed = Papa.parse(csvText, {         // Parse CSV → array of arrays
         header: false,       // don't use first row as keys
