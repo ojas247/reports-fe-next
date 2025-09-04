@@ -12,7 +12,6 @@ function DataPublishingForm() {
   const [response, setResponse] = useState(null);
   const [SecSubdata, setSecSubdata] = useState([]);
   const [dataName, setDataName] = useState("");
-  const [Authordata, setAuthordata] = useState([]);
   const [Tagsdata, setTagsdata] = useState([]);
   const [Yeardata, setYeardata] = useState([]);
   const [gridCSVFile, setGridCSVFile] = useState(null);
@@ -42,9 +41,6 @@ function DataPublishingForm() {
       const OptionsSub1actualData = await fetchSetorSubOptions();
       setSecSubdata(OptionsSub1actualData);
 
-      const OptionsAuthorData = await fetchAuthors();
-      setAuthordata(OptionsAuthorData);
-
       const OptionsTagsData = await fetchTags();
       setTagsdata(OptionsTagsData);
 
@@ -58,9 +54,6 @@ function DataPublishingForm() {
   if (SecSubdata.length === 0 || Authordata.length === 0 || Yeardata.length === 0) {
     return <div>Loading...</div>;
   }
-
-
-  const author_placeholder = "Select Author"
 
   const getAuthor = (data) => {
     setRegister({ ...formRegister, author: data.map(item => item.value) });

@@ -21,8 +21,6 @@ export default function RenderEditableGrid({ ArrayofArray, onSave, onUpdate }) {
   };
 
 
-
-
   return (
     <>
       <HotTable
@@ -39,6 +37,9 @@ export default function RenderEditableGrid({ ArrayofArray, onSave, onUpdate }) {
         dropdownMenu={true}
         persistentState={true}
         multiColumnSorting={true}
+        manualColumnResize={true}
+        manualColumnResizeMode="fit"
+        mergeCells={true}
         // filters={true}
         licenseKey="non-commercial-and-evaluation" // for non-commercial use only
         //Events
