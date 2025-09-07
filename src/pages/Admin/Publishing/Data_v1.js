@@ -19,7 +19,6 @@ function DataPublishingForm() {
   const [gridCSVFile, setGridCSVFile] = useState(null);
   const [pageHeaderData, setPageHeaderData] = useState({});
   const [aggPageData, setAggPageData] = useState({});
-  const GeoData = { "options_list": ["India", "Global", "MENA"] }
   const [loading, setLoading] = useState(false);
   const [txtGrdComponents, setTxtGrdComponents] = useState([]);
   const [aggDataFromTxtgrdComponent, setAggDataFromTxtgrdComponent] = useState({});

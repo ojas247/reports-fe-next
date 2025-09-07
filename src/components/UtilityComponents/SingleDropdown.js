@@ -5,10 +5,6 @@ import Select from 'react-select';
 
 const SingleDropDown = (props) => {
   const options = props.options.options_list;
-  // const formattedOptions = options.map((item) => ({
-  //   value: item,
-  //   label: item,
-  // }));
   const placeholder = props.placeholder;
 
 
@@ -29,11 +25,11 @@ const SingleDropDown = (props) => {
       min-w-full sm:min-w-[180px]">
       {options ? (
         <Select
-        options={options.map((option, index) => ({
-          value: option, 
-          label: option  
-      }))}
-          isMulti
+          options={options.map((option, index) => ({
+            value: option,
+            label: option
+          }))}
+          isMulti= {props.isMulti}
           placeholder={placeholder}
           className="w-50 text-sm"
           onChange={(selectedOptions) => {

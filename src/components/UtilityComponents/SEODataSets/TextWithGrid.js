@@ -18,11 +18,11 @@ const TextWithGrid = (props) => {
     const GranularityData = { "options_list": ["Snapshot", "Monthly", "Yearly", "Quarterly", "Calendar Year"] }
     const UnitsData = { "options_list": ["In Numbers", "%", "Kilometers", "INR Cr", "Paise", "INR", "Lacs", "thousands", "Million", "USD Mn", "thousand tons", "Mn tons"] }
     const isTSData = { "options_list": ["Yes", "No"] }
+    const GeoData = { "options_list": ["India", "Global", "MENA"] }
     const author_placeholder = "Select Author"
 
 
     const getSectorFilters = (data) => {
-        console.log("Sector Filters: ", data);
         setComponentData({ ...componentData, sectorChain: data });
     }
 
@@ -31,7 +31,13 @@ const TextWithGrid = (props) => {
     }
 
     const getDropDownData = (field, data) => {
+        console.log("Multi Dropdown Data: ", data)
         setComponentData({ ...componentData, [field]: data.map(item => item.value), });
+    }
+
+    const getSingleDropDownData = (field, data) => {
+        console.log("Single Dropdown Data: ", data)
+        setComponentData({ ...componentData, [field]: data.value, });
     }
 
     const saveTable = (tableData) => {
@@ -62,7 +68,7 @@ const TextWithGrid = (props) => {
             <div className="border border-gray-300 rounded-md p-4">
                 <p className="text-2xl font-bold"> Text With Grid</p>
                 {/* Sector Dropdown */}
-            
+
                 <div className="px-4 py-4">
                     <SectorHierarchyDropDown options={SecSubdata} onSelect={getSectorFilters} />
                 </div>
@@ -124,6 +130,7 @@ const TextWithGrid = (props) => {
                 <div>
                     <label htmlFor="authors">Authors:</label>
                     <SingleDropDown
+                        isMulti={true}
                         options={Authordata} placeholder={author_placeholder}
                         onSelect={(data) => getDropDownData("authors", data)}
                     />
@@ -133,7 +140,7 @@ const TextWithGrid = (props) => {
                 {/* Tags Dropdown */}
                 <div className="px-4 py-4">
                     <label htmlFor="tags">Tags:</label>
-                    <SingleDropDown options={Tagsdata} onSelect={(data) => getDropDownData("tags", data)} />
+                    <SingleDropDown options={Tagsdata} isMulti={true} onSelect={(data) => getDropDownData("tags", data)} />
                 </div>
 
                 <RenderEditableGrid onSave={saveTable} />
@@ -141,19 +148,25 @@ const TextWithGrid = (props) => {
                 {/* Units / Quantity */}
                 <div >
                     <label htmlFor="units">Units:</label>
-                    <SingleDropDown options={UnitsData} onSelect={(data) => getDropDownData("units", data)} />
+                    <SingleDropDown options={UnitsData} isMulti={false} onSelect={(data) => getSingleDropDownData("units", data)} />
                 </div>
 
                 {/* Granularity */}
                 <div >
                     <label htmlFor="granularity">Granularity:</label>
-                    <SingleDropDown options={GranularityData} onSelect={(data) => getDropDownData("units", data)} />
+                    <SingleDropDown options={GranularityData} isMulti={false} onSelect={(data) => getSingleDropDownData("granularity", data)} />
                 </div>
 
                 {/* Is Time Series */}
                 <div>
                     <label htmlFor="isTSData">Is Time Series:</label>
-                    <SingleDropDown options={isTSData} onSelect={(data) => getDropDownData("isTSData", data)} />
+                    <SingleDropDown options={isTSData} isMulti={true} onSelect={(data) => getDropDownData("isTSData", data)} />
+                </div>
+
+                {/* Geo Dropdown */}
+                <div>
+                    <label htmlFor="geo">Geography:</label>
+                    <SingleDropDown options={GeoData} isMulti={true} onSelect={(data) => getDropDownData("geo", data)} />
                 </div>
 
             </div>

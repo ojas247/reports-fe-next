@@ -21,6 +21,54 @@ export default function RenderEditableGrid({ ArrayofArray, onSave, onUpdate }) {
   };
 
 
+  // return (
+  //   <>
+  //     <HotTable
+  //       themeName="ht-theme-main-dark-auto"
+  //       ref={hotRef}
+  //       // other options
+  //       data={myTable || [[]]}
+  //       rowHeaders={true}
+  //       colHeaders={true}
+  //       height="auto"
+  //       autoWrapRow={true}
+  //       autoWrapCol={true}
+  //       manualRowMove={true}
+  //       dropdownMenu={true}
+  //       persistentState={true}
+  //       minRows = {2}
+  //       minCols = {2}
+  //       multiColumnSorting={true}
+  //       manualColumnResize={true}
+  //       manualColumnResizeMode="fit"
+  //       // filters={true}
+  //       licenseKey="non-commercial-and-evaluation" // for non-commercial use only
+  //       // minRows={Array.isArray(myTable) ? myTable.length : 1}
+  //       // minCols={Array.isArray(myTable) && myTable[0] ? myTable[0].length : 1}
+  //       // stretchH="all"
+
+  //       // contextMenu={['row_above', 'row_below', 'remove_row', 'col_left', 'col_right', 'remove_col']}
+  //     //Events
+  //     // afterChange={(changes, source) => {
+  //     //   if (source === "loadData") return; // 👈 skip initial render
+  //     //   handleUpdate(changes)
+  //     // }}
+  //     />
+
+  //     <button
+  //       onClick={() =>
+  //         handleSave(hotRef.current.hotInstance.getData())
+  //       }
+  //       className="text-sm"
+  //     >
+  //       💾 Save Table
+  //     </button>
+  //   </>);
+
+
+
+
+
   return (
     <>
       <HotTable
@@ -42,6 +90,7 @@ export default function RenderEditableGrid({ ArrayofArray, onSave, onUpdate }) {
         mergeCells={true}
         // filters={true}
         licenseKey="non-commercial-and-evaluation" // for non-commercial use only
+        contextMenu={['row_above', 'row_below', 'remove_row', 'col_left', 'col_right', 'remove_col']}
         //Events
         // afterChange={(changes, source) => {
         //   if (source === "loadData") return; // 👈 skip initial render
