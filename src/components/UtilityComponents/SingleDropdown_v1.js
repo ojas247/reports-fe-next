@@ -1,9 +1,9 @@
-// // 'use client';
+ 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Select from 'react-select';
 
-const SingleDropDown = (props) => {
+const SingleDropDown_v1 = (props) => {
   const options = props.options.options_list;
   const placeholder = props.placeholder;
 
@@ -12,37 +12,54 @@ const SingleDropDown = (props) => {
     props.onSelect(e);
   };
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted) {
+    // Force SSR + first render to always match
+    return (
+      <div className="m-2 w-full sm:w-[190px] text-[12px]">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
 
   return (
     <div
       className="
-      m-2
-      w-full sm:w-[190px]
-      text-[12px]
-      pl-0 sm:pl-[13px]
-      flex sm:block
-      flex-col sm:flex-row
-      min-w-full sm:min-w-[180px]">
-      {options ? (
-        <Select
-          options={options.map((option, index) => ({
-            value: option,
-            label: option
-          }))}
-          isMulti={false}
-          isClearable 
-          placeholder={placeholder}
-          className="w-50 text-sm"
-          onChange={(selectedOptions) => {
-            handleSubmit(selectedOptions);
-          }}
-        />
-      ) : (
-        <p>Loading...</p>
-      )}
-
+        m-2
+        w-full sm:w-[190px]
+        text-[12px]
+        pl-0 sm:pl-[13px]
+        flex sm:block
+        flex-col sm:flex-row
+        min-w-full sm:min-w-[180px]"
+    >
+      <Select
+        options={
+          options
+            ? options.map((option) => ({
+                value: option,
+                label: option,
+              }))
+            : []
+        }
+        isMulti={false}
+        isClearable
+        placeholder={placeholder}
+        className="w-50 text-sm"
+        isLoading={!options}  // 🔥 shows loading indicator
+        noOptionsMessage={() =>
+          !options ? "Loading..." : "No options available"
+        } // custom loading message
+        onChange={(selectedOption) => {
+          handleSubmit(selectedOption);
+        }}
+      />
     </div>
   );
 };
 
-export default SingleDropDown;
+export default SingleDropDown_v1;

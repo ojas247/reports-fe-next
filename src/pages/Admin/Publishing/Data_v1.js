@@ -32,6 +32,7 @@ function DataPublishingForm() {
 
   /// call back functino from TxtGrid Component ///
   const getTextWithGridData = (id, data) => {
+
     setAggDataFromTxtgrdComponent((prevData) => ({ ...prevData, [`txtGrid_${id}`]: data, }));
   };
 
@@ -75,12 +76,6 @@ function DataPublishingForm() {
     setPageHeaderData({ ...pageHeaderData, data });
   }
 
-  const assignFormData = (e) => {
-    e.persist();
-    setPageHeaderData({ ...pageHeaderData, [e.target.name]: e.target.value });
-    // console.log("Assign", e.target.value);
-  }
-
   function handleSubmit(e) {
     // Prevent the browser from reloading the page
     e.preventDefault();
@@ -103,7 +98,7 @@ function DataPublishingForm() {
   }
 
 
-  if (SecSubdata.length === 0 || Authordata.length === 0 ) {
+  if (SecSubdata.length === 0 || Authordata.length === 0) {
     return <div>Loading...</div>;
   }
 
@@ -132,8 +127,8 @@ function DataPublishingForm() {
 
         {/* Reset and Submit Buttons */}
         <div className={styles.buttonGroup}>
-          <button type="submit" onClick={handleSubmit} className={styles.submitBtn}>Submit form</button>
-          <button type="reset" className={styles.resetBtn}>Reset form</button>
+          <button type="submit" onClick={handleSubmit} className="text-sm px-2 py-1 rounded-full bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">  ⭱ Publish</button>
+          <button type="reset" className="text-sm px-2 py-1 rounded-full bg-blue-300 text-white hover:bg-blue-500 cursor-pointer">Reset form</button>
         </div>
 
 
@@ -147,7 +142,7 @@ function DataPublishingForm() {
 
         {response && (
           <div className={styles.responseContainer}>
-            <p>{response}</p>
+            <p>{response.Status}</p>
           </div>
         )}
         {/* </form>*/}

@@ -12,62 +12,24 @@ import Papa from 'papaparse';
 
 registerAllModules();
 
-export default function RenderEditableGrid({ ArrayofArray, onSave, onUpdate }) {
-  const myTable = ArrayofArray;
+export default function RenderEditableGrid({ oldTableData, onSave, onUpdate }) {
+  // console.log("INcoming table: ", oldTableData);
   const hotRef = useRef(null);
 
-  const handleSave = async (e) => {
-    onSave(e);
+
+
+  const safeData = oldTableData
+    ? oldTableData.map((row) => [...row])
+    : Array(5).fill(Array(5).fill("")); // 5x5 empty table
+
+  // console.log("SafeTable: ", safeData);
+
+  const handleSave = () => {
+    const instance = hotRef.current.hotInstance;
+    const newData = instance.getData(); // snapshot
+    console.log("TableSave", newData);
+    onSave(newData);
   };
-
-
-  // return (
-  //   <>
-  //     <HotTable
-  //       themeName="ht-theme-main-dark-auto"
-  //       ref={hotRef}
-  //       // other options
-  //       data={myTable || [[]]}
-  //       rowHeaders={true}
-  //       colHeaders={true}
-  //       height="auto"
-  //       autoWrapRow={true}
-  //       autoWrapCol={true}
-  //       manualRowMove={true}
-  //       dropdownMenu={true}
-  //       persistentState={true}
-  //       minRows = {2}
-  //       minCols = {2}
-  //       multiColumnSorting={true}
-  //       manualColumnResize={true}
-  //       manualColumnResizeMode="fit"
-  //       // filters={true}
-  //       licenseKey="non-commercial-and-evaluation" // for non-commercial use only
-  //       // minRows={Array.isArray(myTable) ? myTable.length : 1}
-  //       // minCols={Array.isArray(myTable) && myTable[0] ? myTable[0].length : 1}
-  //       // stretchH="all"
-
-  //       // contextMenu={['row_above', 'row_below', 'remove_row', 'col_left', 'col_right', 'remove_col']}
-  //     //Events
-  //     // afterChange={(changes, source) => {
-  //     //   if (source === "loadData") return; // 👈 skip initial render
-  //     //   handleUpdate(changes)
-  //     // }}
-  //     />
-
-  //     <button
-  //       onClick={() =>
-  //         handleSave(hotRef.current.hotInstance.getData())
-  //       }
-  //       className="text-sm"
-  //     >
-  //       💾 Save Table
-  //     </button>
-  //   </>);
-
-
-
-
 
   return (
     <>
@@ -75,7 +37,7 @@ export default function RenderEditableGrid({ ArrayofArray, onSave, onUpdate }) {
         themeName="ht-theme-main-dark-auto"
         ref={hotRef}
         // other options
-        data={myTable}
+        data={safeData}
         rowHeaders={true}
         colHeaders={true}
         height="auto"
@@ -91,18 +53,18 @@ export default function RenderEditableGrid({ ArrayofArray, onSave, onUpdate }) {
         // filters={true}
         licenseKey="non-commercial-and-evaluation" // for non-commercial use only
         contextMenu={['row_above', 'row_below', 'remove_row', 'col_left', 'col_right', 'remove_col']}
-        //Events
-        // afterChange={(changes, source) => {
-        //   if (source === "loadData") return; // 👈 skip initial render
-        //   handleUpdate(changes)
-        // }}
+      //Events
+      // afterChange={(changes, source) => {
+      //   if (source === "loadData") return; // 👈 skip initial render
+      //   handleUpdate(changes)
+      // }}
       />
 
       <button
         onClick={() =>
           handleSave(hotRef.current.hotInstance.getData())
         }
-        className="text-sm"
+        className="text-sm px-2 py-1 rounded-full bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
       >
         💾 Save Table
       </button>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SingleDropDown from "../../../components/UtilityComponents/SingleDropdown";
+import SingleDropDown_v1 from "@/components/UtilityComponents/SingleDropdown_v1";
 import CascadingDropDown from "../../../components/UtilityComponents/CascadingDropdown";
 import { fetchSetorSubOptions, fetchAuthors, fetchYears, fetchTags } from "../../api/Api";
 import axios from 'axios';
@@ -8,24 +9,40 @@ import Image from 'next/image';
 import SubmitGrid from '../../../components/UtilityComponents/SubmitGrid';
 import TextWithGrid from '../../../components/UtilityComponents/SEODataSets/TextWithGrid';
 import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/SectorHierarchyDropDown';
+import { fetchDataFromPostApi } from '../../../pages/api/Api';
 
 function RepubData_v1() {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
     const [response, setResponse] = useState(null);
+    const [sectorChain, setSectorChain] = useState({});
+    const [reportList, setReportList] = useState(['select']);
+    const [oldReportData, setOldReportData] = useState({});
     const [SecSubdata, setSecSubdata] = useState([]);
-    const [dataName, setDataName] = useState("");
-    const [Authordata, setAuthordata] = useState([]);
-    const [Tagsdata, setTagsdata] = useState([]);
-    const [gridCSVFile, setGridCSVFile] = useState(null);
     const [pageHeaderData, setPageHeaderData] = useState({});
     const [aggPageData, setAggPageData] = useState({});
     const [loading, setLoading] = useState(false);
     const [txtGrdComponents, setTxtGrdComponents] = useState([]);
     const [aggDataFromTxtgrdComponent, setAggDataFromTxtgrdComponent] = useState({});
-    const author_placeholder = "Select Author"
+    const comp = { id: 1, data: {} }
 
 
-    /// to add new TxtGrid Component START ///
+    /// to fetch ReportList based on the sectorChain ///
+    const fetchReportList = async () => {
+        const data = await fetchDataFromPostApi(sectorChain, 'GetDataBySector_v1');
+        setReportList(data);
+    }
+
+    const getSelectedReportDetails = async (data) => {
+        const payload = { ...sectorChain, data: data.value };
+        const Report_Data = await fetchDataFromPostApi(payload, 'GetReportEntity_v1');
+        const mergedReportEntityData = {
+            ...Report_Data,
+          };
+        setOldReportData(mergedReportEntityData);
+        console.log("Old Report Data: ", mergedReportEntityData);
+    }
+
+    /// to add new TxtGrid Component ///
     const addTxtGrdComponent = () => {
         setTxtGrdComponents((prev) => [...prev, { id: Date.now() }]); // Unique ID for each component
     };
@@ -40,54 +57,39 @@ function RepubData_v1() {
         async function getData() {
             const OptionsSub1actualData = await fetchSetorSubOptions();
             setSecSubdata(OptionsSub1actualData);
-
-            const OptionsAuthorData = await fetchAuthors();
-            setAuthordata(OptionsAuthorData);
-
-            const OptionsTagsData = await fetchTags();
-            setTagsdata(OptionsTagsData);
-
         }
         getData()
     }, [])
+
+
 
     useEffect(() => {
         setAggPageData(prev => ({
             ...prev,
             ...pageHeaderData,
             ...aggDataFromTxtgrdComponent
+       
         }));
         console.log("Aggregated Data Component ->", {
             ...aggPageData,
             ...pageHeaderData,
             ...aggDataFromTxtgrdComponent
+        
         });
     }, [pageHeaderData, aggDataFromTxtgrdComponent]);
 
 
-    const getDropDownData = (field, data) => {
-        setPageHeaderData({ ...pageHeaderData, [field]: data.map(item => item.value), });
-
-    }
-
     const getSectorFilters = (data) => {
-        console.log("Sector Filters: ", data);
-        setPageHeaderData({ ...pageHeaderData, data });
+        setSectorChain({ ...sectorChain, "sectorChain": data });
     }
 
-    const assignFormData = (e) => {
-        e.persist();
-        setPageHeaderData({ ...pageHeaderData, [e.target.name]: e.target.value });
-        // console.log("Assign", e.target.value);
-    }
 
     function handleSubmit(e) {
         // Prevent the browser from reloading the page
         e.preventDefault();
         setLoading(true);
 
-
-        axios.post(`${backendAPI}/Publishing/Data_v1`, aggPageData, {
+        axios.post(`${backendAPI}/RePublishing/Data_v1`, aggPageData, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -103,41 +105,58 @@ function RepubData_v1() {
     }
 
 
-    if (SecSubdata.length === 0 || Authordata.length === 0) {
-        return <div>Loading...</div>;
-    }
+    // if (SecSubdata.length === 0 || Authordata.length === 0) {
+    //     return <div>Loading...</div>;
+    // }
 
     return (
         <div className="flex w-full">
-            <div className="w-1/4 bg-gray-100 p-4 sticky top-0 h-screen">
+            <div className="flex flex-col w-1/4 bg-gray-100 p-4 sticky top-0 h-screen">
                 <div className="px-4 py-4">
                     <SectorHierarchyDropDown options={SecSubdata} onSelect={getSectorFilters} />
                 </div>
-
-                <div className="relative">
+                <div className='px-6 py-4'>
                     <button
-                        onClick={addTxtGrdComponent}
-                        className="absolute top-0 right-0 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-                        Add Component
+                        onClick={fetchReportList}
+                        className="px-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                        Fetch ReportList
                     </button>
                 </div>
+                <div>
+                   
+                    <SingleDropDown_v1
+                        options={reportList}
+                        onSelect={getSelectedReportDetails}
+                    />
+                </div>
+              
             </div>
 
             <div className="w-3/4 bg-white p-4 overflow-y-auto h-screen">
                 <h1 className={styles.formTitle}>Re-Publishing Data</h1>
 
-                {txtGrdComponents.map((comp) => (
+                {/* {txtGrdComponents.map((comp) => (
                     <TextWithGrid
                         key={comp.id}
                         updateData={(data) => getTextWithGridData(comp.id, data)}
                         sectorSub1Data={SecSubdata}
                     />
-                ))}
+                ))} */}
+
+                {Object.keys(oldReportData).length > 0 && (
+                    <TextWithGrid
+                        key={comp.id}
+                        updateData={(data) => getTextWithGridData(comp.id, data)}
+                        sectorSub1Data={SecSubdata}
+                        initialData={oldReportData}
+                    />
+                )}
+
 
                 {/* Reset and Submit Buttons */}
                 <div className={styles.buttonGroup}>
-                    <button type="submit" onClick={handleSubmit} className={styles.submitBtn}>Submit form</button>
-                    <button type="reset" className={styles.resetBtn}>Reset form</button>
+                    <button type="submit" onClick={handleSubmit}  className="text-sm px-2 py-1 rounded-full bg-blue-600 text-white hover:bg-blue-700 cursor-pointer">  ⭱ RePublish</button>
+                    <button type="reset" className="text-sm px-2 py-1 rounded-full bg-blue-300 text-white hover:bg-blue-500 cursor-pointer">Reset form</button>
                 </div>
 
 
@@ -151,7 +170,7 @@ function RepubData_v1() {
 
                 {response && (
                     <div className={styles.responseContainer}>
-                        <p>{response}</p>
+                      <p>{response.Status}</p>
                     </div>
                 )}
                 {/* </form>*/}

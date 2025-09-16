@@ -32,9 +32,8 @@ const SingleDropDown = (props) => {
           isMulti= {props.isMulti}
           placeholder={placeholder}
           className="w-50 text-sm"
-          onChange={(selectedOptions) => {
-            handleSubmit(selectedOptions);
-          }}
+          onChange={(selectedOptions) => {handleSubmit(selectedOptions);}}
+          // value={props.selectedValue ? props.selectedValue : null}
         />
       ) : (
         <p>Loading...</p>
