@@ -4,7 +4,7 @@
 const TextWithGridImmutable = ({ id, initialData, onRemove }) => {
     console.log(id, initialData, onRemove)
     return (
-        <div className="border border-gray-300 rounded-md p-4 my-2 relative bg-gray-50">
+        <div className="relative bg-blue-50 shadow-md rounded-xl p-4 my-3 flex flex-col gap-3">
             {/* Remove button */}
             <button
                 onClick={() => onRemove(id)}

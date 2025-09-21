@@ -9,6 +9,7 @@ import styles from "../../../styles/Pages/Admin/publishing.module.css";
 import Image from 'next/image';
 import SubmitGrid from '../../../components/UtilityComponents/SubmitGrid';
 import TextWithGridImmutable from '../../../components/UtilityComponents/SEODataSets/TextWithGridImmutable';
+import TextWithTitle from '../../../components/UtilityComponents/SEODataSets/TextWithTitle';
 import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/SectorHierarchyDropDown';
 
 function DataPagePublishingForm() {
@@ -27,6 +28,8 @@ function DataPagePublishingForm() {
   const GeoData = { "options_list": ["India", "Global", "MENA"] }
   const [loading, setLoading] = useState(false);
   const [txtGrdComponents, setTxtGrdComponents] = useState([]);
+  const [txtComponents, setTxtComponents] = useState([]);
+  const [aggDataFromTxtWithTitleComponent, setAggDataFromTxtWithTitleComponent] = useState({});
 
   /// to fetch ReportList based on the sectorChain ///
   const fetchReportList = async () => {
@@ -37,7 +40,6 @@ function DataPagePublishingForm() {
 
   const getSelectedReportDetails = async (data) => {
     const payload = { ...sectorChain, data: data.value };
-    console.log("Payload69: ", payload)
     const Report_Data = await fetchDataFromPostApi(payload, 'GetReportEntity_v1');
     if (Report_Data != null) {
       addTxtGrdComponent(Report_Data);
@@ -47,16 +49,29 @@ function DataPagePublishingForm() {
   /// to add new TxtGrid Component ///
   const addTxtGrdComponent = (reportData) => {
     setTxtGrdComponents((prev) => [
-      ...prev,
-      { id: Date.now(), data: reportData }
+      ...prev, { id: Date.now(), data: reportData }
     ]);
   };
-
   //// to remove TxtGrid Component ////
   const removeTxtGrdComponent = (id) => {
-    console.log("remove: ", id)
     setTxtGrdComponents((prev) => prev.filter((comp) => comp.id !== id));
   };
+
+  /// to add new TxtWithTitle Component ///
+  const addTxtWithTitleComponent = () => {
+    setTxtComponents((prev) => [...prev, { id: Date.now() }]); // Unique ID for each component
+  };
+  //// to remove TxtWithTitle Component ////
+  const removeTxtWithTitleComponent = (id) => {
+    setTxtComponents((prev) => prev.filter((comp) => comp.id !== id));
+  };
+
+    /// call back functino from TxtWithTitle Component ///
+    const getTextWithTitleData = (id, data) => {
+      setAggDataFromTxtWithTitleComponent((prevData) => ({ ...prevData, [`txtWithTitle_${id}`]: data, }));
+    };
+
+
 
   useEffect(() => {
     if (txtGrdComponents && txtGrdComponents.length > 0) {
@@ -65,7 +80,7 @@ function DataPagePublishingForm() {
         acc[`txtGrid_${item.id}`] = item.data;
         return acc;
       }, {});
-      setAggPageData(newAggData);
+      setAggPageData({ ...aggPageData, ...newAggData });
     }
   }, [txtGrdComponents]);
 
@@ -91,14 +106,14 @@ function DataPagePublishingForm() {
   }, [])
 
   useEffect(() => {
-    setAggPageData({ ...aggPageData, "pageHeaderData": pageHeaderData });
+    setAggPageData({ ...aggPageData, "pageHeader": pageHeaderData });
   }, [pageHeaderData])
 
 
 
   const getDropDownData = (field, data) => {
-    setPageHeaderData({ ...pageHeaderData, [field]: data.map(item => item.value), });
-
+    console.log("getDropDownData: ", field, data)
+    setPageHeaderData({ ...pageHeaderData, [field]: data.map(item => item.value) });
   }
 
   const getSectorFilters = (data) => {
@@ -135,32 +150,44 @@ function DataPagePublishingForm() {
   return (
     <div className="flex w-full">
       <div className="flex flex-col w-1/4 bg-gray-100 p-4 sticky top-0 h-screen">
+      <div className="container bg-blue-100 py-4 mt-4 rounded-2xl flex flex-col items-center justify-center">
+      <p className="text-lg font-bold">Text With Grid</p>
+          <div className="px-4 py-4">
+            <SectorHierarchyDropDown options={SecSubdata} onSelect={getSectorFilters} />
+          </div>
 
-        <div className="px-4 py-4">
-          <SectorHierarchyDropDown options={SecSubdata} onSelect={getSectorFilters} />
+          <div className='px-6 py-4'>
+            <button
+              onClick={fetchReportList}
+              className="px-4 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hover:shadow-lg transform hover:scale-102 transition-all duration-200 cursor-pointer">
+              Fetch ReportList
+            </button>
+          </div>
+          <div>
+
+            <SingleDropDown_v1
+              options={reportList}
+              onSelect={getSelectedReportDetails}
+            />
+          </div>
         </div>
 
-        <div className='px-6 py-4'>
+
+        <div className="container bg-blue-100 py-4 mt-4 rounded-2xl flex flex-col items-center justify-center">
+          <p className="text-lg font-bold">Text With Title</p>
           <button
-            onClick={fetchReportList}
-            className="px-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-            Fetch ReportList
+            onClick={addTxtWithTitleComponent}
+            className="px-4 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hover:shadow-lg transform hover:scale-102 transition-all duration-200 cursor-pointer"
+          >
+            + Text With Title
           </button>
         </div>
-        <div>
 
-          <SingleDropDown_v1
-            options={reportList}
-            onSelect={getSelectedReportDetails}
-          />
-        </div>
 
       </div>
 
       <div className="w-3/4 bg-white p-4 overflow-y-auto h-screen">
         <h1 className={styles.formTitle}>Publishing Page</h1>
-
-        {/* <form method="post" onSubmit={handleSubmit} className={styles.formContainer}> */}
         <div className={styles.formContainer}>
           {/* Sector Dropdown */}
           <p className='text-lg font-bold'> Page Specific Info</p>
@@ -181,13 +208,24 @@ function DataPagePublishingForm() {
               />
             </div>
 
-            {/* SEO Desc Name Field */}
+            {/* Page Data Description Field */}
             <div className={styles.fieldPub}>
-              <label htmlFor="dataName">Description for SEO:</label>
+              <label htmlFor="pageDataDesc">Page Data Description:</label>
               <input
                 type="text"
-                name="seoDesc"
-                id="seoDesc"
+                name="pageDataDesc"
+                id="pageDataDesc"
+                onChange={assignFormData}
+              />
+            </div>
+
+            {/* SEO Desc Name Field */}
+            <div className={styles.fieldPub}>
+              <label htmlFor="pageSeoDesc">Description for SEO:</label>
+              <input
+                type="text"
+                name="pageSeoDesc"
+                id="pageSeoDesc"
                 onChange={assignFormData}
               />
             </div>
@@ -196,7 +234,10 @@ function DataPagePublishingForm() {
             {/* Tags Dropdown */}
             <div className={styles.fieldPub}>
               <label htmlFor="tags">Tags:</label>
-              <SingleDropDown options={Tagsdata} onSelect={(data) => getDropDownData("tags", data)} />
+              <SingleDropDown
+                options={Tagsdata}
+                isMulti={true}
+                onSelect={(data) => getDropDownData("tags", data)} />
             </div>
           </div>
 
@@ -209,10 +250,24 @@ function DataPagePublishingForm() {
               />
             ))}
 
+          </div>
+
+          <div>
+            {txtComponents.map((comp) => (
+              <TextWithTitle
+                key={comp.id}
+                updateData={(data) => getTextWithTitleData(comp.id, data)}
+                onRemove={removeTxtWithTitleComponent}  // pass remove handler
+              />
+            ))}
+          </div>
+
+          <div>
+
             {/* Reset and Submit Buttons */}
             <div className={styles.buttonGroup}>
-              <button type="submit" onClick={handleSubmit} className={styles.submitBtn}>Submit form</button>
-              <button type="reset" className={styles.resetBtn}>Reset form</button>
+              <button type="submit" onClick={handleSubmit} className="text-sm px-2 py-1 rounded-full bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"> ⭱ Submit form</button>
+              <button type="reset" className="text-sm px-2 py-1 rounded-full bg-blue-300 text-white hover:bg-blue-500 cursor-pointer">Reset form</button>
             </div>
 
           </div>
@@ -227,7 +282,7 @@ function DataPagePublishingForm() {
 
           {response && (
             <div className={styles.responseContainer}>
-              <p>{response}</p>
+              <p>{response.Status}</p>
             </div>
           )}
           {/* </form>*/}

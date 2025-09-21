@@ -32,7 +32,6 @@ function DataPublishingForm() {
 
   /// call back functino from TxtGrid Component ///
   const getTextWithGridData = (id, data) => {
-
     setAggDataFromTxtgrdComponent((prevData) => ({ ...prevData, [`txtGrid_${id}`]: data, }));
   };
 
