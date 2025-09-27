@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 
-const TextWithTitle = ({ updateData, onRemove }) => {
+const TextWithTitle = ({id, index, updateData, onRemove }) => {
     const [title, setTitle] = useState("");
     const [text, setText] = useState("");
 
     // Send updated data back to parent
     useEffect(() => {
-        updateData({ title, text });
+        updateData(id, { title, text });
     }, [title, text]);
 
     return (

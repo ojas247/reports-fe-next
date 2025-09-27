@@ -119,6 +119,10 @@ export function isSessionTokenValid() {
   return true; // Token is valid
 }
 
+export function sleep_function (ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 
 
 

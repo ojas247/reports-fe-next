@@ -253,7 +253,6 @@ export async function getServerSideProps(context) {
     const dataSetObj = await fetchDataFromGetApi("get-dataset-objs?count=&sector=&slug=" + data);
     const YouMayAlsoLike = await fetchDataFromGetApi("get-dataset-objs?count=5&slug=&sector=" + dataCategory);
 
-    console.log("BucketURL123: ", dataSetObj);
         // ?.[0]?.ReportUrl);
 
     const bucketUrl = dataSetObj?.[0]?.ReportUrl;

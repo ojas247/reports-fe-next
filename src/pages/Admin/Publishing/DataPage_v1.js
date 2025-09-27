@@ -11,6 +11,7 @@ import SubmitGrid from '../../../components/UtilityComponents/SubmitGrid';
 import TextWithGridImmutable from '../../../components/UtilityComponents/SEODataSets/TextWithGridImmutable';
 import TextWithTitle from '../../../components/UtilityComponents/SEODataSets/TextWithTitle';
 import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/SectorHierarchyDropDown';
+import { sleep_function } from '../../../pages/api/UtilFunctions';
 
 function DataPagePublishingForm() {
   const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
@@ -21,15 +22,28 @@ function DataPagePublishingForm() {
   const [Authordata, setAuthordata] = useState([]);
   const [reportList, setReportList] = useState(['select']);
   const [Tagsdata, setTagsdata] = useState([]);
-  const [Yeardata, setYeardata] = useState([]);
-  const [gridCSVFile, setGridCSVFile] = useState(null);
   const [pageHeaderData, setPageHeaderData] = useState({});
   const [aggPageData, setAggPageData] = useState({});
   const GeoData = { "options_list": ["India", "Global", "MENA"] }
   const [loading, setLoading] = useState(false);
   const [txtGrdComponents, setTxtGrdComponents] = useState([]);
+  const [ComponentsArray, setComponentsArray] = useState([]);
   const [txtComponents, setTxtComponents] = useState([]);
-  const [aggDataFromTxtWithTitleComponent, setAggDataFromTxtWithTitleComponent] = useState({});
+  const [apiCallTrigger, setApiCallTrigger] = useState(false);
+
+
+  const addComponentToArray = (compName, componentData) => {
+    const newComp = { id: Date.now(), compName, componentData };
+    setComponentsArray((prev = []) => {
+      if (compName === "pageHeader") {
+        // Put PageHeader first, keep others after
+        return [newComp, ...prev.filter(comp => comp.compName !== "pageHeader")];
+      } else {
+        // Just append normally
+        return [...prev, newComp];
+      }
+    });
+  };
 
   /// to fetch ReportList based on the sectorChain ///
   const fetchReportList = async () => {
@@ -37,39 +51,31 @@ function DataPagePublishingForm() {
     const data = await fetchDataFromPostApi(sectorChain, 'GetDataBySector_v1');
     setReportList(data);
   }
-
+  /// to fetch All Data of an Entity (Report) that is selected by the user
   const getSelectedReportDetails = async (data) => {
     const payload = { ...sectorChain, data: data.value };
     const Report_Data = await fetchDataFromPostApi(payload, 'GetReportEntity_v1');
     if (Report_Data != null) {
-      addTxtGrdComponent(Report_Data);
+      addComponentToArray("txtGrid", Report_Data);
     }
   }
 
-  /// to add new TxtGrid Component ///
-  const addTxtGrdComponent = (reportData) => {
-    setTxtGrdComponents((prev) => [
-      ...prev, { id: Date.now(), data: reportData }
-    ]);
-  };
-  //// to remove TxtGrid Component ////
-  const removeTxtGrdComponent = (id) => {
-    setTxtGrdComponents((prev) => prev.filter((comp) => comp.id !== id));
-  };
+  useEffect(() => {
+    console.log("ComponentsArrayCheck: ", ComponentsArray)
+  }, [ComponentsArray])
 
-  /// to add new TxtWithTitle Component ///
-  const addTxtWithTitleComponent = () => {
-    setTxtComponents((prev) => [...prev, { id: Date.now() }]); // Unique ID for each component
+  
+  const removeComponentFromArray = (id) => {
+    setComponentsArray((prev) => prev.filter((comp) => comp.id !== id));
   };
-  //// to remove TxtWithTitle Component ////
-  const removeTxtWithTitleComponent = (id) => {
-    setTxtComponents((prev) => prev.filter((comp) => comp.id !== id));
+  /// call back functino from TxtWithTitle Component ///
+  const getTextWithTitleData = (id, data) => {
+    setComponentsArray((prev) =>
+      prev.map((comp) =>
+        comp.id === id ? { ...comp, componentData: data } : comp
+      )
+    );
   };
-
-    /// call back functino from TxtWithTitle Component ///
-    const getTextWithTitleData = (id, data) => {
-      setAggDataFromTxtWithTitleComponent((prevData) => ({ ...prevData, [`txtWithTitle_${id}`]: data, }));
-    };
 
 
 
@@ -100,58 +106,62 @@ function DataPagePublishingForm() {
 
       const OptionsTagsData = await fetchTags();
       setTagsdata(OptionsTagsData);
-
     }
     getData()
   }, [])
 
   useEffect(() => {
     setAggPageData({ ...aggPageData, "pageHeader": pageHeaderData });
+   
   }, [pageHeaderData])
 
 
 
   const getDropDownData = (field, data) => {
-    console.log("getDropDownData: ", field, data)
     setPageHeaderData({ ...pageHeaderData, [field]: data.map(item => item.value) });
   }
-
   const getSectorFilters = (data) => {
     setSectorChain({ ...sectorChain, "sectorChain": data });
     setPageHeaderData({ ...pageHeaderData, "sectorChain": data });
   }
-
   const assignFormData = (e) => {
     e.persist();
     setPageHeaderData({ ...pageHeaderData, [e.target.name]: e.target.value });
     // console.log("Assign", e.target.value);
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     // Prevent the browser from reloading the page
     e.preventDefault();
     setLoading(true);
+    addComponentToArray("pageHeader", pageHeaderData);
+    setApiCallTrigger(true)
+  }
 
-    axios.post(`${backendAPI}/Publishing/DataPage_v1`, aggPageData, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
+  useEffect(() => {
+    if (apiCallTrigger) {
+      axios.post(`${backendAPI}/Publishing/DataPage_v1`, ComponentsArray, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      })
       .then(res => {
         console.log("resData", res.data);
         setResponse(res.data);
       })
       .finally(() => {
         setLoading(false); // Stop the loader
+        setApiCallTrigger(false)
       });
-  }
+    }
+  }, [apiCallTrigger])
 
 
   return (
     <div className="flex w-full">
       <div className="flex flex-col w-1/4 bg-gray-100 p-4 sticky top-0 h-screen">
-      <div className="container bg-blue-100 py-4 mt-4 rounded-2xl flex flex-col items-center justify-center">
-      <p className="text-lg font-bold">Text With Grid</p>
+        <div className="container bg-blue-100 py-4 mt-4 rounded-2xl flex flex-col items-center justify-center">
+          <p className="text-lg font-bold">Text With Grid</p>
           <div className="px-4 py-4">
             <SectorHierarchyDropDown options={SecSubdata} onSelect={getSectorFilters} />
           </div>
@@ -176,16 +186,16 @@ function DataPagePublishingForm() {
         <div className="container bg-blue-100 py-4 mt-4 rounded-2xl flex flex-col items-center justify-center">
           <p className="text-lg font-bold">Text With Title</p>
           <button
-            onClick={addTxtWithTitleComponent}
+            onClick={() => addComponentToArray("txtWithTitle", {})}
             className="px-4 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hover:shadow-lg transform hover:scale-102 transition-all duration-200 cursor-pointer"
           >
             + Text With Title
           </button>
         </div>
-
-
       </div>
 
+
+      {/* Right Side of the page */}
       <div className="w-3/4 bg-white p-4 overflow-y-auto h-screen">
         <h1 className={styles.formTitle}>Publishing Page</h1>
         <div className={styles.formContainer}>
@@ -242,25 +252,35 @@ function DataPagePublishingForm() {
           </div>
 
           <div>
-            {txtGrdComponents.map((comp) => (
-              <TextWithGridImmutable
-                id={comp.id}
-                initialData={comp.data}   // pass report details
-                onRemove={removeTxtGrdComponent}  // pass remove handler
-              />
-            ))}
-
+            {ComponentsArray !== null && ComponentsArray.length > 0 &&
+              ComponentsArray.map((comp, index) => {
+                if (comp.compName === "txtGrid") {
+                  return (
+                    <TextWithGridImmutable
+                      key={comp.id}
+                      id={comp.id}
+                      initialData={comp.componentData}
+                      onRemove={removeComponentFromArray}
+                    />
+                  );
+                }
+                if (comp.compName === "txtWithTitle") {
+                  return (
+                    <TextWithTitle
+                      key={comp.id}
+                      id={comp.id}
+                      index={index + 1}
+                      updateData={(id, data) => getTextWithTitleData(id, data)}
+                      onRemove={removeComponentFromArray}
+                    />
+                  );
+                }
+                return null;
+              })
+            }
           </div>
 
-          <div>
-            {txtComponents.map((comp) => (
-              <TextWithTitle
-                key={comp.id}
-                updateData={(data) => getTextWithTitleData(comp.id, data)}
-                onRemove={removeTxtWithTitleComponent}  // pass remove handler
-              />
-            ))}
-          </div>
+
 
           <div>
 
