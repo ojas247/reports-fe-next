@@ -19,6 +19,8 @@ export default function CsvGridPage(props) {
   const heading = props.heading;
   const units = props.units;
   const granularity = props.granularity;
+  const source = props.source || "";
+  const dataSetURL = props.dataSetURL || "";
 
   let desc1 = description;
   let desc2 = "";
@@ -38,16 +40,6 @@ export default function CsvGridPage(props) {
       setGranularityText("Monthly");
     }
   }, [granularity]);
-
-  // Client-side state for grid (starts from the SSR‑provided rows)
-  const [gridRows, setGridRows] = useState(() =>
-    rows.map(r =>
-      headers.reduce((obj, col, i) => {
-        obj[col] = r[i];
-        return obj;
-      }, {})
-    )
-  );
 
   // Build column definitions for react-data-grid
   const columns = headers.map(col => ({
@@ -91,11 +83,37 @@ export default function CsvGridPage(props) {
         })}
 
 
-      <div className="flex p-1 m-0 justify-end cursor-pointer">
-        <a href={bucketUrl} className="text-blue-600" target="_blank" rel="noopener noreferrer">
-          <i className="bi bi-cloud-download"></i>
-        </a>
+      <div className="flex flex-row items-center justify-between w-full">
+        {/* Left section → graph button (if any) */}
+        <div className="flex flex-row gap-2">
+          {dataSetURL && (
+            <div className="flex p-2 m-0 cursor-pointer">
+              <a
+                href={dataSetURL}
+                className="flex items-center gap-1 bg-blue-100 text-blue-600 px-3 py-0 rounded-full text-xs font-medium hover:bg-blue-200 transition-colors cursor-pointer"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="text-[10px] text-blue-600">Visualize</span>
+                <i className="bi bi-graph-up"></i>
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* Right section → always download icon */}
+        <div className="flex p-1 m-0 cursor-pointer">
+          <a
+            href={bucketUrl}
+            className="flex items-center gap-1 text-blue-600 px-3 py-1 cursor-pointer"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <i className="bi bi-cloud-download"></i>
+          </a>
+        </div>
       </div>
+
 
       {/* 1) SSR‑rendered HTML table */}
       <div className="w-full overflow-x-auto">
@@ -125,8 +143,14 @@ export default function CsvGridPage(props) {
           </tbody>
         </table>
       </div>
-      <div className="text-[10px] text-gray-800">{units && `Units: ${units}`} {granularityText && `Granularity: ${granularityText}`}</div>
-
+      <div className="flex flex-row gap-2 justify-between">
+        <div className="text-[10px] text-gray-800">{units && `Units: ${units}`} {granularityText && `Granularity: ${granularityText}`}</div>
+        {source && (
+          <div className="text-[10px] text-gray-800 text-right">
+            Source: {source}
+          </div>
+        )}
+      </div>
       {desc2 && desc2.trim() !== "" && (
         desc2
           .replace(/\\n/g, '\n')

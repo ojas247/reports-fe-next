@@ -1,26 +1,44 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useMemo  } from "react";
 import 'handsontable/styles/handsontable.min.css';
 import 'handsontable/styles/ht-theme-main.min.css';
 import Handsontable from 'handsontable/base';
 import { registerAllModules } from 'handsontable/registry';
 import { HotTable } from '@handsontable/react-wrapper';
+import RenderChartsFromCSVgrid from '../../../SEODataSets/GenericCharts';
+import HighchartsReact from 'highcharts-react-official';
+import Highcharts from 'highcharts';
+import CsvGridPage from '../../../RenderCSVgrid';
 
-const TextWithGrid = ({ dataName, units, tableData = [] }) => {
-  return (
-    <div className="p-4 rounded-lg overflow-x-auto">
-      <h3 className="text-lg font-bold mb-2">
-        {dataName} ({units})
-      </h3>
-      <HotTable
-        data={tableData}              // list of lists
-        colHeaders={false}        // show headers
-        rowHeaders={false}        // show row numbers
-        licenseKey="non-commercial-and-evaluation"  // required
-       
-        stretchH="none"
-      />
-    </div>
-  );
+// const TextWithGrid = ({ dataName, units, tableData = [] }) => {
+const TextWithGrid = (props) => {
+  const FRONTEND_URL = process.env.NEXT_PUBLIC_frontendAPI;
+
+  const fetchDataSetURL = (props) => {
+    const slug = props.slugURL;
+    const sectorChain = props.sectorHierarchy;
+    const sector = sectorChain.split("Sector/")[1].split("/")[0];
+    const dataSetURL = `${FRONTEND_URL}/DataSets/${sector}/${slug}`;
+    return dataSetURL;
+  }
+  
+const propsForCsvGrid = {
+  headers: props.tableData[0],
+  rows: props.tableData.slice(1),
+  heading: props.dataName,
+  description: props.dataDesc || "",
+  units: props.units,
+  granularity: props.Granularity,
+  bucketUrl: props.ReportUrl,
+  source: props.SourceURL,
+  dataSetURL: fetchDataSetURL(props)
+}
+
+return (
+  <>
+  <CsvGridPage {...propsForCsvGrid} />
+  </>
+)
+
 };
 
 export default TextWithGrid;

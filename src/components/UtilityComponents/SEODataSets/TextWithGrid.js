@@ -131,6 +131,23 @@ const TextWithGrid = (props) => {
             }}
           />
         </div>
+
+         {/* Description for SEO */}
+         <div>
+          <label htmlFor="seoDesc">SEO Desc:</label>
+          <textarea
+            name="seoDesc"
+            id="seoDesc"
+            value={componentData.seoDesc}
+            onChange={assignFormData}
+            rows={1}
+            className="w-full resize-none overflow-hidden border border-gray-300 rounded-md p-2"
+            onInput={(e) => {
+              e.target.style.height = "auto";
+              e.target.style.height = e.target.scrollHeight + "px";
+            }}
+          />
+        </div>
   
         {/* Year-Month Field */}
         <div className="px-4 py-4">

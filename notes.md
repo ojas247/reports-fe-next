@@ -12,7 +12,6 @@ Backgroud Color (bluish pestal):  rgb(244 245 255)
 CREATES a IMAGE IN REGISTRY
 gcloud builds submit --tag asia-east1-docker.pkg.dev/marketreports/next-reports-frontend/nextjs-frontend-app
 
-
 DEPLOYS TO RUN
 gcloud run deploy nextjs-frontend-app --image=asia-east1-docker.pkg.dev/marketreports/next-reports-frontend/nextjs-frontend-app --platform=managed --region=asia-east1 --allow-unauthenticated
 

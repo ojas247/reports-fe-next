@@ -11,38 +11,6 @@ import CompsRenderExplorePg from '@/components/UtilityComponents/SEODataSets/Pag
 export default function Insights({ page_data }) {
     console.log("page_data:", page_data);
 
-    const page_data1 = [
-        {
-            compName: "pageHeader",
-            compData: {
-                PageName: "My Page",
-                pageDataDesc: "This is a sample description",
-                pageSeoDesc: "SEO friendly text here",
-                sectorChain: { Sector: "FinTech", Sub1: "Payments" },
-                tags: ["Case Study", "Financials"]
-            }
-        },
-        {
-            compName: "txtWithTitle",
-            compData: '{"title":"Hello World","text":"This is a text block"}'
-        },
-        {
-            compName: "txtGrid",
-            compData: {
-                dataName: "Heart Report",
-                units: "%",
-                tableData: [
-                    ["Col1", "Col2", "Col3"],
-                    ["1", "2", "3"],
-                    ["4", "5", "6"]
-                ]
-            }
-        }
-    ];
-
-
-
-
     return (
         <>
             <NavBar />

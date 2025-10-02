@@ -64,7 +64,7 @@ function DataPagePublishingForm() {
     console.log("ComponentsArrayCheck: ", ComponentsArray)
   }, [ComponentsArray])
 
-  
+
   const removeComponentFromArray = (id) => {
     setComponentsArray((prev) => prev.filter((comp) => comp.id !== id));
   };
@@ -112,7 +112,7 @@ function DataPagePublishingForm() {
 
   useEffect(() => {
     setAggPageData({ ...aggPageData, "pageHeader": pageHeaderData });
-   
+
   }, [pageHeaderData])
 
 
@@ -145,14 +145,14 @@ function DataPagePublishingForm() {
           'Content-Type': 'application/json'
         },
       })
-      .then(res => {
-        console.log("resData", res.data);
-        setResponse(res.data);
-      })
-      .finally(() => {
-        setLoading(false); // Stop the loader
-        setApiCallTrigger(false)
-      });
+        .then(res => {
+          console.log("resData", res.data);
+          setResponse(res.data);
+        })
+        .finally(() => {
+          setLoading(false); // Stop the loader
+          setApiCallTrigger(false)
+        });
     }
   }, [apiCallTrigger])
 
@@ -221,11 +221,13 @@ function DataPagePublishingForm() {
             {/* Page Data Description Field */}
             <div className={styles.fieldPub}>
               <label htmlFor="pageDataDesc">Page Data Description:</label>
-              <input
+              <textarea
                 type="text"
                 name="pageDataDesc"
                 id="pageDataDesc"
                 onChange={assignFormData}
+                rows={10} // start with one line
+                className="w-full border border-gray-300 rounded-md p-2"
               />
             </div>
 

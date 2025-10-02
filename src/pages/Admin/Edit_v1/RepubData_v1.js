@@ -9,7 +9,7 @@ import Image from 'next/image';
 import SubmitGrid from '../../../components/UtilityComponents/SubmitGrid';
 import TextWithGrid from '../../../components/UtilityComponents/SEODataSets/TextWithGrid';
 import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/SectorHierarchyDropDown';
-import { fetchDataFromPostApi } from '../../../pages/api/Api';
+import { fetchDataFromPostApi } from '../../api/Api';
 
 function RepubData_v1() {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
