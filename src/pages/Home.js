@@ -10,6 +10,7 @@ import styles from "../styles/Pages/home.module.css";
 import Link from 'next/link';
 import Image from 'next/image';
 import { fetchDataFromGetApi } from '../pages/api/Api';
+import HomeMosaic from '@/components/Website/HomeMosaic';
 
 export default function HomePage() {
   const [expandedFAQs, setExpandedFAQs] = useState([true, true, true, true, true, true]);
@@ -109,6 +110,32 @@ export default function HomePage() {
       <div className="w-full z-50 relative">
         <NavBar />
       </div>
+
+
+      <div className='w-full h-full py-10'>
+        <div className="text-center pt-8 pr-6 pb-2 pl-6">
+          <p className="text-3xl sm:text-4xl text-center text-[#27406d] mb-12 leading-snug">
+            <span className="bg-yellow-200 text-[#1a1a1a] px-2 py-1 rounded-md">
+              Byte-Size
+            </span>{" "}
+            Market Data, <br />
+            <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-md">
+              SIMPLIFIED
+            </span>{" "}
+            and{" "}
+            <span className="bg-green-100 text-green-700 px-2 py-1 rounded-md">
+              VIZUALIZED
+            </span>{" "}
+            for easy Access
+          </p>
+
+        </div>
+      </div>
+
+      <div className='w-full h-full py-10'>
+        <HomeMosaic />
+      </div>
+   
 
       <div className={styles.homeContainer}>
         <div className={styles.homeSearchBar}>

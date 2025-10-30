@@ -103,7 +103,7 @@ export default function SectorHierarchyDropDown(props) {
   
     return (
       <div className="p-4">
-        <h2 className="font-bold mb-2">Sector Hierarchy Dropdowns</h2>
+        <h2 className="block text-sm font-medium text-gray-600 mb-1 sm:px-6">Sector Hierarchy Dropdowns</h2>
   
         <div className="flex flex-row flex-wrap px-0 py-2" >
           {dropdowns.map((dropdown, idx) => (

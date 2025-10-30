@@ -253,6 +253,8 @@ export async function getServerSideProps(context) {
     const dataSetObj = await fetchDataFromGetApi("get-dataset-objs?count=&sector=&slug=" + data);
     const YouMayAlsoLike = await fetchDataFromGetApi("get-dataset-objs?count=5&slug=&sector=" + dataCategory);
 
+    console.log("DataSetObj: ", dataSetObj);
+
     const bucketUrl = dataSetObj?.[0]?.ReportUrl;
     const gridDescription = dataSetObj?.[0]?.description;
     const dataHeading = dataSetObj?.[0]?.DataName;
@@ -263,9 +265,12 @@ export async function getServerSideProps(context) {
     const units = dataSetObj?.[0]?.Units;
     const SourceURL = dataSetObj?.[0]?.SourceURL;
     const seoDesc = dataSetObj?.[0]?.seoDesc;
-    const granularity = dataSetObj?.[0]?.granularity;
+    const granularity = dataSetObj?.[0]?.granularity || "Yearly";
     let headerRow = null;
     let dataRows = null;
+
+    console.log("granularity: ", granularity);
+    console.log("year: ", year);
 
 
     if (bucketUrl) {
@@ -287,6 +292,7 @@ export async function getServerSideProps(context) {
         [headerRow, ...dataRows] = parsed.data;
     }
 
+    console.log("HeaderRow: ", headerRow);
 
 
     return {

@@ -15,7 +15,7 @@ export default function Data() {
   const hasMounted = useRef(false);
   const [loading, setLoading] = useState(true);
   const [appliedFilters, setAppliedFilters] = useState({});
-  const [isToggled, setIsToggled] = useState(false);
+  const [isToggled, setIsToggled] = useState(true);
 
   const getAppliedFiltersFromChild = (filters) => {
     console.log("Received filters from SearchFilters:", filters);

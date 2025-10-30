@@ -88,15 +88,15 @@ const SearchBar = () => {
 
         const fetchSuggestions = async () => {
             try {
-                const tokenString = sessionStorage.getItem("token");
-                const token = JSON.parse(tokenString).value;
-
-                const isAuthenticated = await checkAuthentication();
-                console.log("isAuthenticated: ", isAuthenticated);
-                if (!isAuthenticated) {
-                    router.push('/Login', { state: {} });
-                    return;
-                }
+                // const tokenString = sessionStorage.getItem("token")? JSON.parse(sessionStorage.getItem("token")).value : null;
+                // const token = tokenString;
+                const token ="x@dffgfumdflkd76tg8jivdgoolnvll==";
+              
+                // const isAuthenticated = await checkAuthentication();
+                // if (!isAuthenticated) {
+                //     router.push('/Login', { state: {} });
+                //     return;
+                // }
                 const response = await axios.get(
                     `${backendAPI}/AlgoliaSearchEndpoint?keyStroke=${query}`,
                     {
@@ -156,6 +156,10 @@ const SearchBar = () => {
                     value={query}
                     onChange={handleInputChange}
                     placeholder="Search Authors, Sectors, Sub-Sectors..."
+                    style={{
+                        padding: "10px",
+                        fontSize: "16px",
+                    }}
                 />
                 <button className={styles.searchButton}>Search</button>
 

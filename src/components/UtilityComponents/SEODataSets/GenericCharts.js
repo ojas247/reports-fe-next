@@ -21,15 +21,15 @@ const parseIndianNumber = (value) => {
 // Converts "dd-mm-yyyy" → "Qn-FY'yy" or "FY'yy" based on granularity (Indian FY)
 const formatToFYQuarterOrYear = (dateStr, granularity) => {
     if (!dateStr) return dateStr;
-  
+
     const parts = dateStr.split("-");
     if (parts.length < 3) return dateStr; // Fallback if format is wrong
-  
+
     const month = parseInt(parts[1], 10); // 1–12
     const year = parseInt(parts[2], 10);
-  
+
     const fyYear = (month >= 4) ? year + 1 : year;
-  
+
     if (granularity === "Quarterly") {
         let quarter;
         if (month >= 4 && month <= 6) quarter = 1;
@@ -39,6 +39,8 @@ const formatToFYQuarterOrYear = (dateStr, granularity) => {
         return `Q${quarter}-FY'${String(fyYear).slice(-2)}`;
     } else if (granularity === "Yearly") {
         return `FY'${String(fyYear).slice(-2)}`;
+    } else if (granularity === "Calendar Year") {
+        return `${String(year)}`;
     }
     return dateStr; // Default to original string for Monthly or other cases
 };
@@ -55,6 +57,8 @@ export default function RenderChartsFromCSVgrid({ headers, rows, description, bu
             setGranularityText("Financial QoQ");
         } else if (granularity === "Monthly") {
             setGranularityText("Monthly");
+        } else if (granularity === "Calendar Year") {
+            setGranularityText("Calendar Year");
         }
     }, [granularity]);
 
@@ -62,8 +66,8 @@ export default function RenderChartsFromCSVgrid({ headers, rows, description, bu
         const rawCategories = !transposed
             ? rows.map(row => row[0])
             : headers.slice(1);
-      
-        if (granularity === "Quarterly" || granularity === "Yearly") {
+
+        if (granularity === "Quarterly" || granularity === "Yearly" || granularity === "Calendar Year") {
             return rawCategories.map(date => formatToFYQuarterOrYear(date, granularity));
         }
         return rawCategories;
@@ -72,7 +76,7 @@ export default function RenderChartsFromCSVgrid({ headers, rows, description, bu
     const seriesData = useMemo(() => {
         if (!transposed) {
             return headers.slice(1).map((header, colIndex) => ({
-                name: granularity === "Quarterly" || granularity === "Yearly" ? formatToFYQuarterOrYear(header, granularity) : header,
+                name: granularity === "Quarterly" || granularity === "Yearly" || granularity === "Calendar Year" ? formatToFYQuarterOrYear(header, granularity) : header,
                 data: rows.map(row => parseIndianNumber(row[colIndex + 1]))
             }));
         }
@@ -118,9 +122,9 @@ export default function RenderChartsFromCSVgrid({ headers, rows, description, bu
         tooltip: {
             shared: true,
             formatter: function () {
-                const categoryLabel = categories[this.points[0].point.index]; 
+                const categoryLabel = categories[this.points[0].point.index];
                 let tooltipHTML = `<b>${categoryLabel}</b><br/>`; // Formatted date/quarter/year on top
-        
+
                 this.points.forEach(point => {
                     let val = point.y;
                     let formatted;
@@ -130,7 +134,7 @@ export default function RenderChartsFromCSVgrid({ headers, rows, description, bu
                     else formatted = val.toLocaleString('en-IN');
                     tooltipHTML += `<span style="color:${point.color}">\u25CF</span> ${point.series.name}: <b>${formatted}</b><br/>`;
                 });
-        
+
                 return tooltipHTML;
             }
         },

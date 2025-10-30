@@ -19,8 +19,8 @@ export default function RenderEditableGrid({ oldTableData, onSave, onUpdate }) {
 
 
   const safeData = oldTableData
-    ? oldTableData.map((row) => [...row])
-    : Array(5).fill(Array(5).fill("")); // 5x5 empty table
+  ? oldTableData.map((row) => [...row])
+  : Array.from({ length: 5 }, () => Array(5).fill(""));
 
   // console.log("SafeTable: ", safeData);
 
@@ -53,11 +53,6 @@ export default function RenderEditableGrid({ oldTableData, onSave, onUpdate }) {
         // filters={true}
         licenseKey="non-commercial-and-evaluation" // for non-commercial use only
         contextMenu={['row_above', 'row_below', 'remove_row', 'col_left', 'col_right', 'remove_col']}
-      //Events
-      // afterChange={(changes, source) => {
-      //   if (source === "loadData") return; // 👈 skip initial render
-      //   handleUpdate(changes)
-      // }}
       />
 
       <button

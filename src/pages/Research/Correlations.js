@@ -9,8 +9,12 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { fetchSetorSubOptions, fetchAuthors, fetchDataFromGetApi, fetchDataFromPostApi } from '../../pages/api/Api';
 import styles from '../../styles/Pages/reports.module.css';
+import SectorHierarchyDropDown from '../../components/Functionalities/Admin/SectorHierarchyDropDown';
+
+
 
 export default function Correlations() {
+    const initialData = {};
     const isFirstRun = useRef(true);
     const [SecSubdata, setSecSubdata] = useState([]);
     const [selectedSector, setSelectedSector] = useState("");
@@ -31,16 +35,16 @@ export default function Correlations() {
         getData(); // call the async function
     }, []);
 
-    useEffect(() => {
-        async function getListOfDatasets() {
-            const payload = { "sector": selectedSector, "sub1": selectedSub1 };
-            const resp = await fetchDataFromPostApi(payload, `listOfDatasets`);
-            setListOfDatasets(resp);
-        }
-        getListOfDatasets();
-    }, [selectedSub1]);
+    // useEffect(() => {
+    //     async function getListOfDatasets() {
+    //         const payload = { "sector": selectedSector, "sub1": selectedSub1 };
+    //         const resp = await fetchDataFromPostApi(payload, `listOfDatasets`);
+    //         setListOfDatasets(resp);
+    //     }
+    //     getListOfDatasets();
+    // }, [selectedSub1]);
 
-    
+
     useEffect(() => {
         if (isFirstRun.current) {
             isFirstRun.current = false; // Skip first run
@@ -78,17 +82,25 @@ export default function Correlations() {
 
 
 
-    const getSectorFilters = (data) => {
-        setSelectedSector(data.sector);
-        setSelectedSub1(data.sub1);
+    // const getSectorFilters = (data) => {
+    //     setSelectedSector(data.sector);
+    //     setSelectedSub1(data.sub1);
+    // };
+
+    const getSectorFilters = async (data) => {
+        if (data && Object.keys(data).length > 0) {
+            const resp = await fetchDataFromPostApi(data, `listOfDatasets_v1`);
+            setListOfDatasets(resp);
+        }
     };
 
     const getItemFilter = (data) => {
-        setSelectedDSName(data);
+        setSelectedDSName([data]);
     };
 
 
     const getDataSetFilter = async (newOptions) => {
+        console.log("getDataOptions: ", newOptions);
         const prevValues = selectedOptions.map(opt => opt.value);
         const newValues = newOptions?.map(opt => opt.value) || [];
         // Find added option(s)
@@ -115,34 +127,51 @@ export default function Correlations() {
         return <div>Loading...!</div>;
     }
 
-
     return (
         <div className={styles.resultBodyContainer}>
             <Navbar />
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col">
-           
-                {/* <div className="mb-4 flex flex-row"> */}
-                <div>
-                    <div>
-                        <CascadingDropDown options={SecSubdata} onSelect={getSectorFilters} />
-                    </div>
-                    <div>
-                        <SingleDropDown options={listOfDatasets} onSelect={getItemFilter} />
-                    </div>
-                    <div>
-                        <SingleDropDown options={listOfDataItems} onSelect={getDataSetFilter} />
-                    </div>
-                    {/* <div>
-                        <SingleDropDown options={listOfDatasets} onSelect={getDataSetFilter} />
-                    </div> */}
 
-                </div>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col py-1">
 
-                <div className="mb-4">
-                    {selectedOptions && (
-                        <div className="flex flex-wrap gap-2">
-                            {selectedOptions.map(opt => (
-                                <span key={opt.value} className="bg-blue-900 text-gray-100 px-4 rounded-full text-sm">
+                {/* Filters Section */}
+                <div className="bg-white rounded-2xl shadow-md p-6 mb-8">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                        Corellate Datasets
+                    </h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="px-4 py-2 shadow-md rounded-2xl">
+                            <SectorHierarchyDropDown preSelectedData={initialData.sectorChain} options={SecSubdata} onSelect={getSectorFilters} />
+                        </div>
+
+                        <div className="px-4 py-6 shadow-md rounded-2xl">
+                            <label className="block text-sm font-medium text-gray-600 mb-1 sm:px-10">
+                                Dataset Category
+                            </label>
+                            <div className="px-0 py-0 sm:px-5 sm:py-0.5">
+                                <SingleDropDown options={listOfDatasets} onSelect={getItemFilter} />
+                            </div>
+                        </div>
+
+                        <div className="px-4 py-6 shadow-md rounded-2xl">
+                            <label className="block text-sm font-medium text-gray-600 mb-1 sm:px-6">
+                                Data Items
+                            </label>
+                            <SingleDropDown
+                                isMulti={true}
+                                options={listOfDataItems}
+                                onSelect={getDataSetFilter}
+                            />
+                        </div>
+                    </div>
+
+                    {selectedOptions?.length > 0 && (
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            {selectedOptions.map((opt) => (
+                                <span
+                                    key={opt.value}
+                                    className="bg-blue-800 text-gray-100 px-4 py-1 rounded-full text-sm shadow-sm"
+                                >
                                     {opt.value}
                                 </span>
                             ))}
@@ -150,29 +179,28 @@ export default function Correlations() {
                     )}
                 </div>
 
+                {/* Chart or No Data Section */}
                 {datasetResponses.length > 0 ? (
                     <CoCharts apiData={datasetResponses} />
-                ) : (<div className="flex flex-col items-center justify-center p-8">
-                    <p className="text-gray-600 text-lg text-center">
-                        No Datasets found. Please adjust your filters.
-                    </p>
-                    <div className="max-w-md w-full">
+                ) : (
+                    <div className="flex flex-col items-center justify-center text-center py-16">
+                        <p className="text-gray-600 text-lg font-medium mb-4">
+                            No datasets found. Please adjust your filters.
+                        </p>
                         <Image
                             src="https://storage.googleapis.com/marketreports/Brand/Website/detectiveSearching.jpg"
                             alt="No reports found"
-                            className="w-full h-auto rounded-lg shadow-lg mb-4"
-                            width={100}
-                            height={100}
+                            className="w-64 h-auto rounded-xl shadow-lg opacity-90"
+                            width={300}
+                            height={300}
                         />
                     </div>
-                </div>
                 )}
-
             </div>
+
             <Footer />
         </div>
-
-    )
+    );
 }
 
 

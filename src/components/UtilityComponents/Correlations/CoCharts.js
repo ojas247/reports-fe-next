@@ -32,50 +32,85 @@ export default function CoCharts({ apiData }) {
     opposite: index % 2 !== 0,
   }));
   
+  // Helper to format labels
+  const formatLabel = (dateStr, granularity) => {
+  if (!dateStr) return dateStr;
 
-  const series1 = apiData.map((item) => {
-    const unitIndex = uniqueUnits.indexOf(item.units);
-    return {
-      name: item.item,
-      data: item.x.map((_, idx) => [
-        new Date(item.x[idx]).getTime(),
-        item.y[idx],
-      ]),
-      yAxis: unitIndex,
-      color: colors[unitIndex % colors.length],
-      showInLegend: true,
-      visible: true,
-      type: chartType,
-    };
-  });
+  const parts = dateStr.split("-");
+  if (parts.length < 2) return dateStr; // fallback
 
-  const options = {
-    chart: {
-      type: chartType,
-    },
-    title: { text: null },
-    credits: { enabled: false },
-    xAxis: {
-      type: "datetime",
-      labels: {
-        format: "{value:%Y}",
-      },
-    },
-    yAxis: yAxis,
-    tooltip: {
-      shared: true,
-      xDateFormat: "%Y-%m-%d",
-    },
-    plotOptions: {
-      series: {
-        stacking: isStacked ? "normal" : undefined,
-      },
-    },
-    legend: {
-      enabled: true,
-    },
-    series: series1,
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+ 
+  if (granularity === "Monthly") {
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${monthNames[month - 1]}'${String(year).slice(-2)}`;
+  }
+
+  if (granularity === "Quarterly") {
+    let quarter;
+    if (month >= 1 && month <= 3) quarter = 1;
+    else if (month >= 4 && month <= 6) quarter = 2;
+    else if (month >= 7 && month <= 9) quarter = 3;
+    else quarter = 4;
+    return `Q${quarter}'${String(year).slice(-2)}`;
+  }
+  if (granularity === "Yearly") {
+    // Financial year ending logic: if month >= Apr, FY ends next year
+    const fyYear = month >= 4 ? year + 1 : year;
+    return `FY'${String(fyYear).slice(-2)}`;
+  }
+  if (granularity === "Calendar Year") {
+    const cyYear = year;
+    return `CY'${String(cyYear).slice(-2)}`;
+  }
+
+
+  // Default fallback
+  return dateStr;
+};
+
+// Prepare categories
+const categories = apiData[0]?.x.map((xValue, idx) => formatLabel(xValue, apiData[0].granularity));
+
+// Prepare series
+const series1 = apiData.map((item) => {
+  const unitIndex = uniqueUnits.indexOf(item.units);
+  return {
+    name: item.item,
+    data: item.y, // just Y values, X is mapped via categories
+    yAxis: unitIndex,
+    color: colors[unitIndex % colors.length],
+    showInLegend: true,
+    visible: true,
+    type: chartType,
   };
+});
+
+// Chart options
+const options = {
+  chart: { type: chartType },
+  title: { text: null },
+  credits: { enabled: false },
+  xAxis: {
+    categories: categories, // <-- Use preformatted labels
+    labels: { style: { fontSize: "12px" } },
+  },
+  yAxis: yAxis,
+  tooltip: {
+    shared: true,
+    formatter: function () {
+      let s = `<b>${this.x}</b>`;
+      this.points.forEach((point) => {
+        s += `<br/><span style="color:${point.color}">\u25CF</span> ${point.series.name}: ${point.y}`;
+      });
+      return s;
+    },
+  },
+  plotOptions: { series: { stacking: isStacked ? "normal" : undefined } },
+  legend: { enabled: true },
+  series: series1,
+};
 
   return (
     <div className="p-2">

@@ -18,8 +18,7 @@ const ReportResultsComp = (props) => {
     const SearchReportsList = async () => {
         if (isEmpty(filters)) return;
 
-        console.log("Making API call with filters:", filters);
-        console.log(" length:", filters.length);
+        // console.log("Making API call with filters:", filters);
         const tokenString = sessionStorage.getItem("token");
         const tokenData = JSON.parse(tokenString);
         let token = null;
@@ -111,6 +110,7 @@ const ReportResultsComp = (props) => {
                         sub1={item.Sub1}
                         units={item.Units}
                         sourceURL={item.Source}
+                        slugURL = {item.slugURL}
                     />
                 ))}
             </ul>

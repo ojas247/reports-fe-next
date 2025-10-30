@@ -16,15 +16,12 @@ export default function DataPage_v1(propObj) {
 
 export async function getServerSideProps(context) {
     const { DataPage} = context.params;
-    console.log("DataPage: ", DataPage)
 
     //Fetch Data from dataStore Published_Data
     let propObj = null;
     const dataSetObj = await fetchDataFromGetApi("GetDataPageEntity_v1slug=" + DataPage);
 
-    console.log("dataSetObj: ", dataSetObj)
-
-
+    // console.log("dataSetObj: ", dataSetObj)
 
    
     return {

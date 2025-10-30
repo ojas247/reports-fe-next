@@ -21,7 +21,6 @@ const TextWithGrid = (props) => {
 
     useEffect(() => {
     if (props.initialData && Object.keys(props.initialData).length > 0) {
-        console.log("This is called one time: ", props.initialData)
         setComponentData(prev => ({
             ...prev,              // keep existing (including sectorChain etc.)
             ...props.initialData, // overwrite only provided fields
@@ -33,7 +32,8 @@ const TextWithGrid = (props) => {
     const [Tagsdata, setTagsdata] = useState([]);
   
     const GranularityData = { options_list: ["Snapshot", "Monthly", "Yearly", "Quarterly", "Calendar Year"] };
-    const UnitsData = { options_list: ["In Numbers", "%", "Kilometers", "INR Cr", "Paise", "INR", "Lacs", "thousands", "Million", "USD Mn", "thousand tons", "Mn tons"] };
+    const UnitsData = { options_list: ["In Numbers", "%", "Kilometers", "INR Cr", "Paise", "INR", "Lakhs", 
+      "thousands", "Million", "USD Mn", "thousand tons", "Mn tons", "MN USD", "INR Lakh Cr"] };
     const isTSData = { options_list: ["Yes", "No"] };
     const GeoData = { options_list: ["India", "Global", "MENA"] };
     const author_placeholder = "Select Author";

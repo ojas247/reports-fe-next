@@ -7,11 +7,16 @@ import Image from 'next/image';
 
 const RegisterComp = () => {
   const [email, setEmail] = useState("example@mail.com");
+  const [phone, setPhone] = useState("9876543210");
   const [password, setPassword] = useState("pass");
   const router = useRouter();
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
+  };
+
+  const handlePhoneChange = (e) => {
+    setPhone(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
@@ -22,7 +27,7 @@ const RegisterComp = () => {
     e.preventDefault(); // Prevents the default form submission behavior
     // Encrypt the password before sending//
     // const encryptedPassword = encryptPassword(password);
-    CreateUserId(email, password);
+    CreateUserId(email, password, phone);
     navigate('/Login', { state: { "message": "User Registered Successfully. Please Login to Continue." } });
 
        // Push GTM event
@@ -59,6 +64,21 @@ const RegisterComp = () => {
           <div className="w-full md:w-6/12 lg:w-5/12 xl:w-4/12 px-4">
           <p className={styles.LoginDEscTitle}>Register to Search Reports</p>
             <form onSubmit={handleSubmit}>
+              {/* Phone Field */}
+              <div className="mb-4">
+                <label htmlFor="form3Example3" className="block">
+                  <input
+                    type="phone"
+                    id="form3Example3"
+                    value={phone}
+                    onChange={handlePhoneChange}
+                    className="w-full px-4 py-2 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Email address"
+                    style={{ opacity: 0.4 }}
+                  />
+                </label>
+              </div>
+
               {/* Email Field */}
               <div className="mb-4">
                 <label htmlFor="form3Example3" className="block">

@@ -94,6 +94,11 @@ export default function Navbar() {
                 <Link href="/Research/Data" style={{ paddingLeft: '10px' }}>Data</Link>
               </div>
 
+              <div className={styles.dropdownContentItem}>
+                <i className="bi bi-reception-3" style={{ color: 'midnightblue' }}></i>
+                <Link href="/Research/Correlations" style={{ paddingLeft: '10px' }}>Corellations</Link>
+              </div>
+
             </div>
           </li>
 

@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { formatGridHeader } from '../../pages/api/UtilFunctions';
 
 // Dynamically import DataGrid so it only runs in the browser:
 const DataGrid = dynamic(
@@ -12,7 +13,7 @@ const DataGrid = dynamic(
 
 export default function CsvGridPage(props) {
   const [granularityText, setGranularityText] = useState('');
-  const headers = props.headers;
+  const headers_raw = props.headers;
   const rows = props.rows;
   const bucketUrl = props.bucketUrl;
   const description = props.description || "";
@@ -41,13 +42,10 @@ export default function CsvGridPage(props) {
     }
   }, [granularity]);
 
-  // Build column definitions for react-data-grid
-  const columns = headers.map(col => ({
-    key: col,
-    name: col,
-    editable: false
-  }));
+  console.log("Header: ", headers_raw)
+  const headers_v1 = formatGridHeader(headers_raw, granularityText);
 
+ 
   return (
     <div className="p-4 space-y-0">
       <h1 className="text-2xl font-bold text-blue-900">{heading}</h1>
@@ -120,7 +118,7 @@ export default function CsvGridPage(props) {
         <table className="min-w-full border-collapse">
           <thead>
             <tr>
-              {headers.map((col) => (
+              {headers_v1.map((col) => (
                 <th
                   key={col}
                   className="border px-2 py-1 bg-gray-100 text-left whitespace-nowrap"

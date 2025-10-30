@@ -29,14 +29,18 @@ const SingleDropDown = (props) => {
             value: option,
             label: option
           }))}
-          isMulti= {props.isMulti}
+          isMulti={props.isMulti}
           placeholder={placeholder}
           className="w-50 text-sm"
-          onChange={(selectedOptions) => {handleSubmit(selectedOptions);}}
-          // value={props.selectedValue ? props.selectedValue : null}
+          onChange={(selectedOptions) => { handleSubmit(selectedOptions); }}
+        // value={props.selectedValue ? props.selectedValue : null}
         />
       ) : (
-        <p>Loading...</p>
+        // <p>Loading...</p>
+        <p>
+          <i className="bi bi-exclamation-diamond text-xl sm:text-2xl lg:text-3xl px-6"></i>
+        </p>
+
       )}
 
     </div>

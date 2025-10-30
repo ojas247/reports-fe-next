@@ -1,7 +1,7 @@
 User-agent: *
 
-Allow: /DataSets/
-Allow: /Insights/
+
+Allow: /
 
 Sitemap: https://marketreports.in/sitemap-index.xml
 Sitemap: https://marketreports.in/sitemap-insights-investments.xml
