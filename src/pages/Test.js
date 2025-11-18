@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import SingleDropDown_v1 from "@/components/UtilityComponents/SingleDropdown_v1";
+import NavBar_PostLogin from "@/components/Website/NavBar_PostLogin"
+import SearchBar from '../components/Functionalities/SearchBar';
+import CollapsibleSidebar from '@/components/Website/CollapsibleSidebar';
 
 
 
@@ -89,28 +92,32 @@ export default function HierarchyManager() {
   };
 
   return (
-    <div className="p-4">
-      <h2 className="font-bold mb-2">Dynamic Hierarchy Dropdowns</h2>
+    <> <NavBar_PostLogin />
+    <CollapsibleSidebar />
+      <div className="p-4">
 
-      <div className="flex flex-row gap-4">
-        {dropdowns.map((dropdown, idx) => (
-          <SingleDropDown_v1
-            key={idx}
-            options={{ options_list: dropdown.options_list }}
-            placeholder={`Select ${dropdown.level}`}
-            onSelect={(selected) => handleSelect(idx, selected)}
-          />
-        ))}
-      </div>
+        <h2 className="font-bold mb-2">Dynamic Hierarchy Dropdowns</h2>
 
-      <div className="mt-4 text-sm text-gray-700">
-        <strong>Selected Path:</strong>{" "}
-        {selectedPath
-          .map((p, i) =>
-            dropdowns[i] ? `${dropdowns[i].level}:${p}` : p
-          )
-          .join(" > ")}
+        <div className="flex flex-row gap-4">
+          {dropdowns.map((dropdown, idx) => (
+            <SingleDropDown_v1
+              key={idx}
+              options={{ options_list: dropdown.options_list }}
+              placeholder={`Select ${dropdown.level}`}
+              onSelect={(selected) => handleSelect(idx, selected)}
+            />
+          ))}
+        </div>
+
+        <div className="mt-4 text-sm text-gray-700">
+          <strong>Selected Path:</strong>{" "}
+          {selectedPath
+            .map((p, i) =>
+              dropdowns[i] ? `${dropdowns[i].level}:${p}` : p
+            )
+            .join(" > ")}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

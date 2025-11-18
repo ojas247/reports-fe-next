@@ -10,7 +10,7 @@ import styles from "../styles/Pages/home.module.css";
 import Link from 'next/link';
 import Image from 'next/image';
 import { fetchDataFromGetApi } from '../pages/api/Api';
-import HomeMosaic from '@/components/Website/HomeMosaic';
+import DataTiles from '@/components/Website/DataTiles';
 
 export default function HomePage() {
   const [expandedFAQs, setExpandedFAQs] = useState([true, true, true, true, true, true]);
@@ -116,9 +116,9 @@ export default function HomePage() {
         <div className="text-center pt-8 pr-6 pb-2 pl-6">
           <p className="text-3xl sm:text-4xl text-center text-[#27406d] mb-12 leading-snug">
             <span className="bg-yellow-200 text-[#1a1a1a] px-2 py-1 rounded-md">
-              Byte-Size
+              Byte-Size 
             </span>{" "}
-            Market Data, <br />
+            Snackable Data-Nuggets, <br />
             <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-md">
               SIMPLIFIED
             </span>{" "}
@@ -133,7 +133,7 @@ export default function HomePage() {
       </div>
 
       <div className='w-full h-full py-10'>
-        <HomeMosaic />
+        <DataTiles />
       </div>
    
 

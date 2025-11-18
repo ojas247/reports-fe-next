@@ -150,13 +150,31 @@ const LoginComp = ({ message }) => {
 
             {/* Login button */}
             <div className="mt-6 hover:cursor-pointer" >
-              <button
+              {/* <button
                 type="button"
                 className={styles.loginBtn}
                 onClick={handleLogin}
               >
                 Login
+              </button> */}
+
+              <button
+                type="button"
+                onClick={handleLogin}
+                disabled={loading} // optional state
+                className={` w-full sm:w-auto bg-[#27406d] text-white font-semibold px-6 py-2 rounded-lg shadow-md transition-all duration-300 hover:bg-[#1d3055] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer `}
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <i className="bi bi-arrow-repeat animate-spin"></i> Logging in...
+                  </span>
+                ) : (
+                  <>
+                    <i className="bi bi-box-arrow-in-right mr-2"></i> Login
+                  </>
+                )}
               </button>
+
             </div>
 
             {/* Register link */}

@@ -134,7 +134,7 @@ const RegisterComp = () => {
                 </button>
                 <p className="text-sm font-semibold mt-2 pt-1 mb-0">
                   Already have an account?{" "}
-                  <Link href="/login" className="text-red-600 hover:underline">
+                  <Link href="/Login" className="text-red-600 hover:underline">
                     Login
                   </Link>
                 </p>

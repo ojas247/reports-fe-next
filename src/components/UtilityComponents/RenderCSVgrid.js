@@ -39,11 +39,14 @@ export default function CsvGridPage(props) {
       setGranularityText("Financial QoQ");
     } else if (granularity === "Monthly") {
       setGranularityText("Monthly");
+    } else if (granularity === "Calendar Year") {
+      setGranularityText("Calendar Year");
     }
   }, [granularity]);
 
-  console.log("Header: ", headers_raw)
+  console.log("Header: ", headers_raw, " Granularity: ", granularity, " granularityText: ", granularityText)
   const headers_v1 = formatGridHeader(headers_raw, granularityText);
+  console.log("Output from formatGridHeader: ", headers_v1);
 
  
   return (

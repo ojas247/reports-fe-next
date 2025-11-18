@@ -22,7 +22,7 @@ function DataPublishingForm() {
   const [loading, setLoading] = useState(false);
   const [txtGrdComponents, setTxtGrdComponents] = useState([]);
   const [aggDataFromTxtgrdComponent, setAggDataFromTxtgrdComponent] = useState({});
-  const author_placeholder = "Select Author"
+  // const [apiMessage, setApiMessage] = useState(null);
 
 
   /// to add new TxtGrid Component START ///
@@ -139,9 +139,25 @@ function DataPublishingForm() {
           </div>
         )}
 
-        {response && (
+        {/* {response && (
           <div className={styles.responseContainer}>
             <p>{response.Status}</p>
+            <p>{response.URLSlug}</p>
+          </div>
+        )} */}
+        {response && (
+          <div className={`${styles.responseContainer} relative p-4 rounded-md bg-blue-100 text-blue-800`}>
+            {/* Close Button */}
+            <button
+              onClick={() => setResponse(null)}
+              className="absolute top-2 right-3 text-gray-600 hover:text-gray-900 font-bold"
+            >
+              ×
+            </button>
+
+            {/* Message Content */}
+            <p className="font-semibold">{response.Status}</p>
+            <p className="text-sm">{response.URLSlug}</p>
           </div>
         )}
         {/* </form>*/}

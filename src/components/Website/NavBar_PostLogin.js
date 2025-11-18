@@ -2,10 +2,11 @@
 import { useEffect, useState } from "react";
 import styles from "../../styles/UtilityComps/navbar.module.css";
 import { isSessionTokenValid } from "../../pages/api/UtilFunctions";
+import SearchBar from '../../components/Functionalities/SearchBar';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function Navbar() {
+export default function NavBar_PostLogin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // false in production
   const [isOpen, setIsOpen] = useState(false);
   const [isServicesOpen1, setIsServicesOpen1] = useState(false); // false in production
@@ -35,10 +36,10 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className={styles.header}>
+    <header className="flex justify-between items-center p-4 bg-white relative">
       <div className={styles.logo}>
         <Link href="/">
-          <Image className={styles.LogoImg} src="/Assets/Images/Logo-Trans.svg" alt="MarketInsight" width={180 } height={280}/>
+          <Image className={styles.LogoImg} src="/favicon.ico" alt="MarketInsight" width={40 } height={150}/>
         </Link>
       </div>
 
@@ -65,87 +66,14 @@ export default function Navbar() {
         </button>
       )}
 
+      <SearchBar />
+
 
       <nav
         id="primary-navigation"
         className={`${styles.navMenu} ${isOpen ? styles.show : styles.hide}`}
       >
-        <ul className={styles.navList}>
-          <li className={styles.dropdown}>
-            <Link href="/Home">Home</Link>
-          </li>
-
-          <li className={styles.dropdown}>
-            <button className={styles.dropbtn} onClick={toggleServices1}>
-              MarketResearch
-              <Image className={styles.toggleImg} src="\Assets\Images\Toggle.svg" alt="MarketInsight"  width={8} height={8} />
-            </button>
-            <div
-              className={`${styles.dropdownContent} ${isServicesOpen1 ? styles.showDropdown : ""
-                }`}
-            >
-              <div className={styles.dropdownContentItem}>
-                <i className="bi bi-newspaper" style={{ color: 'midnightblue' }}></i>
-                <Link href="/Research/Reports" style={{ paddingLeft: '10px' }}>Reports</Link>
-              </div>
-
-              <div className={styles.dropdownContentItem}>
-                <i className="bi bi-pie-chart" style={{ color: 'midnightblue' }}></i>
-                <Link href="/Research/Data" style={{ paddingLeft: '10px' }}>Data</Link>
-              </div>
-
-              <div className={styles.dropdownContentItem}>
-                <i className="bi bi-reception-3" style={{ color: 'midnightblue' }}></i>
-                <Link href="/Research/Correlations" style={{ paddingLeft: '10px' }}>Corellations</Link>
-              </div>
-
-              <div className={styles.dropdownContentItem}>
-                <i className="bi bi-claude" style={{ color: 'midnightblue' }}></i>
-                <Link href="/Research/AI-Insights" style={{ paddingLeft: '10px' }}>AI Insights</Link>
-              </div>
-
-            </div>
-          </li>
-
-          <li className={styles.dropdown}>
-            <button className={styles.dropbtn} onClick={toggleServices2}>
-              Resources
-              <Image className={styles.toggleImg} src="\Assets\Images\Toggle.svg" alt="MarketInsight" width={8} height={8} />
-            </button>
-            <div
-              className={`${styles.dropdownContent} ${isServicesOpen2 ? styles.showDropdown : ""
-                }`}
-            >
-              <div className={styles.dropdownContentItem}>
-                <i className="bi bi-layout-text-sidebar" style={{ color: 'midnightblue' }}></i>
-                <Link href="/Insights" style={{ paddingLeft: '10px' }}>Insights</Link>
-              </div>
-              <div className={styles.dropdownContentItem}>
-                <i className="bi bi-clipboard-data" style={{ color: 'midnightblue' }}></i>
-                <Link href="/DataSets" style={{ paddingLeft: '10px' }}>DataSets</Link>
-              </div>
-            </div>
-          </li>
-
-          <li className={styles.dropdown}>
-            <Link href="/Pricing">Pricing</Link>
-          </li>
-
-
-          {!isAuthenticated && (
-            <ul className={styles.LoginSignup}>
-
-              <li className={`${styles.dropdown} ${styles.signupBtn}`}>
-                <Link href="/Register">Signup</Link>
-              </li>
-
-              <li className={styles.dropdown}>
-                <Link href="/Login">Login</Link>
-              </li>
-            </ul>
-          )}
-
-          {isAuthenticated && (
+        <ul className={styles.navList}>          
             <li className={styles.dropdown}>
               <button className={styles.dropbtn} onClick={toggleServices3}>
                 <i className="bi bi-person-circle" style={{ fontSize: '1.25rem' }}></i>
@@ -173,7 +101,7 @@ export default function Navbar() {
                 </div>
               </div>
             </li>
-          )}
+        
 
         </ul>
       </nav>

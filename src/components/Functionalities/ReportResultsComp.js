@@ -29,7 +29,7 @@ const ReportResultsComp = (props) => {
         }
         setLoading(true);
         try {
-            const response = await axios.post(`${backendAPI}/SearchReports`, filters, {
+            const response = await axios.post(`${backendAPI}/SearchReports_v1`, filters, {
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "X-ResearchType": props.researchType

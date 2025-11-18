@@ -43,8 +43,8 @@ function Volunteers() {
           </button>
 
           <p className="mt-4 text-sm text-gray-600">
-            Whether you're an intern, a student, or a professional — your
-            contribution matters. Let’s grow together.
+            Whether you are an intern, a student, or a professional — your
+            contribution matters. Let us grow together.
           </p>
         </section>
       </main>

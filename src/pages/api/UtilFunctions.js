@@ -133,7 +133,6 @@ export function sleep_function(ms) {
 // }
 
 export function parseDDMMYYYY(str) {
-  console.log("Str: ", str);
   if (!str) return null;
 
   str = str.trim(); // remove spaces or invisible chars
@@ -171,14 +170,15 @@ export function parseDDMMYYYY(str) {
 
 
 export function formatGridHeader(headers, granularity) {
-  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   return headers.map((h, index) => {
     try {
       if (index === 0) return h; // keep first column as title
 
+      // console.log("Input to DateParser: ", h);
       const date = parseDDMMYYYY(h);
+      // console.log("Output from DateParser: ", date);
       if (isNaN(date)) return h; // fallback if parse fails
 
       const year = date.getFullYear().toString().slice(-2);
@@ -203,8 +203,14 @@ export function formatGridHeader(headers, granularity) {
       }
 
       if (granularity === "Financial YoY") {
-        const fyYear = month >= 3 ? date.getFullYear() : date.getFullYear() - 1;
+        // const fyYear = month >= 3 ? date.getFullYear() : date.getFullYear() - 1;
+        const fyYear =  date.getFullYear();
         return `FY${fyYear.toString().slice(-2)}`;
+      }
+
+      if (granularity === "Calendar Year") {
+        const cyYear =  date.getFullYear();
+        return `CY${cyYear.toString().slice(-2)}`;
       }
     }
     catch (error) {

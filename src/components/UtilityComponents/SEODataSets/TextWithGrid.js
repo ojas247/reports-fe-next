@@ -32,8 +32,8 @@ const TextWithGrid = (props) => {
     const [Tagsdata, setTagsdata] = useState([]);
   
     const GranularityData = { options_list: ["Snapshot", "Monthly", "Yearly", "Quarterly", "Calendar Year"] };
-    const UnitsData = { options_list: ["In Numbers", "%", "Kilometers", "INR Cr", "Paise", "INR", "Lakhs", 
-      "thousands", "Million", "USD Mn", "thousand tons", "Mn tons", "MN USD", "INR Lakh Cr"] };
+    const UnitsData = { options_list: ["In Numbers", "%", "Kilometers", "'000 Km", "INR", "INR Cr", "INR Lakh Cr",  "USD", "USD Mn", "USD Bn", "Paise",  "Lakhs", 
+      "Thousands", "Million",  "thousand tons", "Mn tons"] };
     const isTSData = { options_list: ["Yes", "No"] };
     const GeoData = { options_list: ["India", "Global", "MENA"] };
     const author_placeholder = "Select Author";

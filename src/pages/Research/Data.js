@@ -3,6 +3,7 @@ import NavBar from "../../components/Functionalities/NavBar";
 import Footer from "../../components/Website/Footer";
 import ReportResultsComp from "../../components/Functionalities/ReportResultsComp";
 import SearchFilters from '../../components/Functionalities/SearchFilters';
+import SearchFilters_v1 from '../../components/Functionalities/Research/SearchFilters_v1';
 import FilterTags from '../../components/UtilityComponents/FilterTags';
 import ToggleLeftPanel from '../../components/UtilityComponents/ToggleLeftPanel';
 import { checkAuthentication } from '../api/UtilFunctions';
@@ -47,7 +48,8 @@ export default function Data() {
           </div>
         </button>
         {isToggled && appliedFilters !== null && (
-          <SearchFilters onDataSend={getAppliedFiltersFromChild} />
+          // <SearchFilters onDataSend={getAppliedFiltersFromChild} />
+          <SearchFilters_v1 onDataSend={getAppliedFiltersFromChild} />
         )}
         {!isToggled &&
           <div className={styles.searchContainerRpts}>
@@ -58,9 +60,9 @@ export default function Data() {
         }
 
       </div>
-      <div className={styles.filterTags}>
+      {/* <div className={styles.filterTags}>
         <FilterTags applied_filters={appliedFilters} />
-      </div>
+      </div> */}
       <div className={styles.resultContainer}>
         <div className={styles.toggleLeftPanel}>
           <ToggleLeftPanel />
