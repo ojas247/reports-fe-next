@@ -14,8 +14,6 @@ const LoginComp = ({ message }) => {
   const [password, setPassword] = useState('');
   const [authenticationFailed, setAuthenticationFailed] = useState(false);
 
-  console.log("backendAPICHECK: ", process.env.NEXT_PUBLIC_backendAPI);
-
 
   const updateUsername = (e) => {
     setUsername(e.target.value)

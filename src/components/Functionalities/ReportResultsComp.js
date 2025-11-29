@@ -76,20 +76,9 @@ const ReportResultsComp = (props) => {
     }
 
     if (!filteredReportsList || filteredReportsList.length === 0) {
-        return <div className="flex flex-col items-center justify-center p-8">
-            <p className="text-gray-600 text-lg text-center">
-                No reports found. Please adjust your filters.
-            </p>
-            <div className="max-w-md w-full">
-                <Image
-                    src="https://storage.googleapis.com/marketreports/Brand/Website/detectiveSearching.jpg"
-                    alt="No reports found"
-                    className="w-full h-auto rounded-lg shadow-lg mb-4"
-                    width={100}
-                    height={100}
-                />
-            </div>
-
+        return <div className="">
+         No reports found. 
+         Please adjust your filters.
         </div>;
     }
 

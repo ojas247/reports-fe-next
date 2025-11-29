@@ -1,3 +1,4 @@
+'use client'
 import React, { useEffect, useState } from "react";
 import SingleDropDown_v1 from "@/components/UtilityComponents/SingleDropdown_v1";
 import NavBar_PostLogin from "@/components/Website/NavBar_PostLogin"
@@ -5,117 +6,54 @@ import SearchBar from '../components/Functionalities/SearchBar';
 import CollapsibleSidebar from '@/components/Website/CollapsibleSidebar';
 
 
-
-export default function HierarchyManager() {
-  const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
-  const [dropdowns, setDropdowns] = useState([
-    { level: "Sector", options_list: [] },
-  ]);
-  const [selectedPath, setSelectedPath] = useState([]);
-
-  // Fetch items from backend
-  const fetchItems = async (parentKind, parentName, parentPath, childKind) => {
-    let payload = {};
-
-    if (parentKind && parentName && childKind) {
-      payload = { parentKind, parentName, childKind };
-      if (parentPath) payload.parentPath = parentPath;
-    }
-
-    const res = await fetch(`${backendAPI}/HierarchyControllerGet`, {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-    return data.items?.map((item) => item.name) || [];
-  };
-
-  // Load top-level Sectors on mount
-  useEffect(() => {
-    const loadSectors = async () => {
-      const sectors = await fetchItems(); // empty payload fetches sectors
-      setDropdowns([{ level: "Sector", options_list: sectors }]);
-      setSelectedPath([]);
-    };
-    loadSectors();
-  }, []);
-
-  // Handle selection in any dropdown
-  const handleSelect = async (levelIndex, selected) => {
-    const chosenValue = selected?.value; // single selection
-    let newPath = [...selectedPath];
-    let newDropdowns = dropdowns.slice(0, levelIndex + 1);
-
-    if (!chosenValue) {
-      // user cleared the selection → remove deeper dropdowns and path
-      newDropdowns = dropdowns.slice(0, levelIndex);
-      newPath = selectedPath.slice(0, levelIndex);
-      setDropdowns(newDropdowns);
-      setSelectedPath(newPath);
-      return;
-    }
-
-    // update path
-    newPath[levelIndex] = chosenValue;
-    newPath = newPath.slice(0, levelIndex + 1);
-
-    // figure out parent info
-    const parent = newDropdowns[levelIndex];
-    const parentKind = parent.level;
-    const parentName = chosenValue;
-    const parentPath = newPath
-      .slice(0, -1)
-      .map((name, idx) => `${dropdowns[idx].level}/${name}`)
-      .join("/");
-
-    // determine child kind (simple convention)
-    const childKind =
-      levelIndex === 0 ? "Sub1" : `Sub${levelIndex + 1}`;
-
-    const children = await fetchItems(
-      parentKind,
-      parentName,
-      parentPath,
-      childKind
-    );
-
-    if (children.length > 0) {
-      newDropdowns.push({
-        level: childKind,
-        options_list: children,
-      });
-    }
-
-    setDropdowns(newDropdowns);
-    setSelectedPath(newPath);
-  };
-
+export default function ExpandableSearchBar() {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
   return (
-    <> <NavBar_PostLogin />
-    <CollapsibleSidebar />
-      <div className="p-4">
-
-        <h2 className="font-bold mb-2">Dynamic Hierarchy Dropdowns</h2>
-
-        <div className="flex flex-row gap-4">
-          {dropdowns.map((dropdown, idx) => (
-            <SingleDropDown_v1
-              key={idx}
-              options={{ options_list: dropdown.options_list }}
-              placeholder={`Select ${dropdown.level}`}
-              onSelect={(selected) => handleSelect(idx, selected)}
-            />
-          ))}
-        </div>
-
-        <div className="mt-4 text-sm text-gray-700">
-          <strong>Selected Path:</strong>{" "}
-          {selectedPath
-            .map((p, i) =>
-              dropdowns[i] ? `${dropdowns[i].level}:${p}` : p
-            )
-            .join(" > ")}
+    <>
+      {/* MOBILE SEARCH CONTAINER */}
+      <div className="md:hidden fixed top-4 right-4 z-50">
+        <div className="relative flex items-center">
+          {/* EXPANDABLE INPUT - Animates from icon position */}
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search..."
+            className={`
+              absolute right-12 top-1/2 -translate-y-1/2
+              bg-white border-2 border-gray-300 rounded-full pl-4 pr-12 py-2
+              focus:border-green-600 outline-none text-[16px] placeholder-gray-400 text-gray-800
+              transition-all duration-300 ease-in-out
+              ${open 
+                ? "w-[calc(100vw-100px)] opacity-100 shadow-lg"  // Expand to near-full width
+                : "w-0 opacity-0 pointer-events-none"
+              }
+            `}
+            onClick={(e) => e.stopPropagation()}  // Prevent click from bubbling to close
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                // Trigger search logic here
+                setOpen(false);
+              }
+            }}
+          />
+          {/* SEARCH ICON BUTTON - Stays fixed, triggers expand */}
+          <button
+            className="p-3 rounded-full bg-white shadow flex items-center justify-center relative z-10"
+            onClick={() => {
+              if (open) {
+                // Trigger search if open
+                // Add your search logic here
+                setOpen(false);
+              } else {
+                setOpen(true);
+              }
+            }}
+          >
+            <i className={`bi ${open ? "bi-x-lg" : "bi-search"} text-2xl text-gray-600`}></i>
+          </button>
+         
         </div>
       </div>
     </>

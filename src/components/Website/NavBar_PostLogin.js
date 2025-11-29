@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import styles from "../../styles/UtilityComps/navbar.module.css";
 import { isSessionTokenValid } from "../../pages/api/UtilFunctions";
 import SearchBar from '../../components/Functionalities/SearchBar';
+import SearchBarMobile from '../../components/Functionalities/SearchBarMobile';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -36,12 +37,7 @@ export default function NavBar_PostLogin() {
   }, []);
 
   return (
-    <header className="flex justify-between items-center p-4 bg-white relative">
-      <div className={styles.logo}>
-        <Link href="/">
-          <Image className={styles.LogoImg} src="/favicon.ico" alt="MarketInsight" width={40 } height={150}/>
-        </Link>
-      </div>
+    <header className="flex w-full sticky sm:relative top-0 md:py-2 z-50 justify-between items-center px-4 py-0 bg-white">
 
       {!isOpen && (
         <button
@@ -66,17 +62,49 @@ export default function NavBar_PostLogin() {
         </button>
       )}
 
-      <SearchBar />
+      {/* MOBILE VERSION (visible only on mobile) */}
+      <div className="w-full">
+        {/* Mobile: Below md breakpoint */}
+        <div className="md:hidden">
+          <SearchBarMobile />
+        </div>
+        {/* Desktop: md breakpoint and up */}
+        <div className="hidden md:block">
+          <SearchBar />
+        </div>
+      </div>
+
 
 
       <nav
         id="primary-navigation"
         className={`${styles.navMenu} ${isOpen ? styles.show : styles.hide}`}
       >
-        <ul className={styles.navList}>          
-            <li className={styles.dropdown}>
+        <ul className={styles.navList}>
+          <li className={styles.dropdown}>
+            <div className="flex flex-col ">
+              <div className="inline-flex items-center flex-row ml-4 md:hidden">
+                <i className="bi bi-newspaper" style={{ color: 'midnightblue' }}></i>
+                <Link href="/Research/Reports" style={{ paddingLeft: '10px' }}>Reports</Link>
+              </div>
+
+              <div className="inline-flex items-center flex-row ml-4 md:hidden">
+                <i className="bi bi-pie-chart" style={{ color: 'midnightblue' }}></i>
+                <Link href="/Research/Data" style={{ paddingLeft: '10px' }}>Data</Link>
+              </div>
+
+              <div className="inline-flex items-center flex-row ml-4 md:hidden">
+                <i className="bi bi-reception-3" style={{ color: 'midnightblue' }}></i>
+                <Link href="/Research/Correlations" style={{ paddingLeft: '10px' }}>Corellations</Link>
+              </div>
+
+              <div className="inline-flex items-center flex-row ml-4 md:hidden">
+                <i className="bi bi-claude" style={{ color: 'midnightblue' }}></i>
+                <Link href="/Research/AI-Insights" style={{ paddingLeft: '10px' }}>AI Insights</Link>
+              </div>
+
               <button className={styles.dropbtn} onClick={toggleServices3}>
-                <i className="bi bi-person-circle" style={{ fontSize: '1.25rem' }}></i>
+                <i className="bi bi-person-circle" style={{ fontSize: '2.25rem', color: 'midnightblue'  }}></i>
               </button>
               <div
                 className={`${styles.dropdownContentProfile} ${isServicesOpen3 ? styles.showDropdown : ""
@@ -100,8 +128,9 @@ export default function NavBar_PostLogin() {
                     }}>Logout</Link>
                 </div>
               </div>
-            </li>
-        
+            </div>
+          </li>
+
 
         </ul>
       </nav>

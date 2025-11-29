@@ -10,24 +10,13 @@ import { isSessionTokenValid, checkAuthentication } from '../../pages/api/UtilFu
 const SearchBar = () => {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
     const [query, setQuery] = useState('');
+    const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [suggestions, setSuggestions] = useState([]);
-    const [showSearch, setShowSearch] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const suggestionRef = useRef();
     const isFirstRender = useRef(true);
     const router = useRouter();
-
-    // Close search bar if clicked outside
-    useEffect(() => {
-        const handler = (e) => {
-            if (suggestionRef.current && !suggestionRef.current.contains(e.target)) {
-                setShowSearch(false);
-            }
-        };
-        document.addEventListener("mousedown", handler);
-        return () => document.removeEventListener("mousedown", handler);
-    }, []);
 
 
     const create_filter_options = (getUrl) => {
@@ -166,25 +155,59 @@ const SearchBar = () => {
     return (
         <div className="flex flex-col items-center justify-center w-full px-4 py-4 sm:py-0">
             <div ref={suggestionRef} className="relative w-full max-w-[500px]">
-                {/* Search Input */}
-                <input
-                    type="text"
-                    value={query}
-                    onChange={handleInputChange}
-                    placeholder="Search Authors, Sectors, Sub-Sectors..."
-                    className=" w-full border-2 border-gray-300 rounded-full pl-4 pr-16 py-2 text-[16px] focus:outline-none focus:border-[#4CAF50] focus:shadow-md transition-all duration-200 placeholder-gray-400 text-gray-800 "
-                />
 
-                {/* Search Button */}
-                <button
-                    className=" absolute right-1 top-1/2 -translate-y-1/2 bg-[#27406d] text-white border-2 border-[#27406d] rounded-full px-4 py-1.5 text-sm sm:text-base hover:bg-[#162746] hover:border-[#162746] active:bg-[#162746] cursor-pointer transition-all duration-200 flex items-center justify-center ">
-                    <i className="bi bi-search text-white"></i>
-                    <span className="hidden sm:inline ml-2">Search</span>
-                </button>
+                {/* MOBILE SEARCH CONTAINER */}
+                <div className="md:hidden fixed top-4 right-4 z-50">
+                    <div className="relative flex items-center">
+                        {/* EXPANDABLE INPUT - Animates from icon position */}
+                        <input
+                            type="text"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            placeholder="Search..."
+                            className={`
+                                absolute right-12 top-1/2 -translate-y-1/2
+                                bg-white border-2 border-gray-300 rounded-full pl-4 pr-12 py-2
+                                focus:border-green-600 outline-none text-[16px] placeholder-gray-400 text-gray-800
+                                transition-all duration-300 ease-in-out
+                                ${open
+                                    ? "w-[calc(80vw-80px)] opacity-100 shadow-lg"  // Expand to near-full width
+                                    : "w-0 opacity-0 pointer-events-none"
+                                }
+            `}
+                            onClick={(e) => e.stopPropagation()}  // Prevent click from bubbling to close
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    // Trigger search logic here
+                                    setOpen(false);
+                                }
+                            }}
+                        />
+                        {/* SEARCH ICON BUTTON - Stays fixed, triggers expand */}
+                        <button
+                            className="p-1 rounded-full bg-blue flex items-center justify-center relative z-5"
+                            onClick={() => {
+                                if (open) {
+                                    // Trigger search if open
+                                    // Add your search logic here
+                                    setOpen(false);
+                                } else {
+                                    setOpen(true);
+                                }
+                            }}
+                        >
+                            <i className={`bi ${open ? "bi-x-lg" : "bi-search"} text-xl text-gray-600`}></i>
+                        </button>
 
-                {!loading && suggestions.length > 0 && showSuggestions && (
-                    <ShowSuggestions suggestions={suggestions} suggestionClick={suggestionClick} />
-                )}
+                    </div>
+                </div>
+
+
+                <div className='px-10 py-5'>
+                    {!loading && suggestions.length > 0 && showSuggestions && (
+                        <ShowSuggestions suggestions={suggestions} suggestionClick={suggestionClick} />
+                    )}
+                </div>
 
                 {/* Loading Indicator */}
                 {loading && (

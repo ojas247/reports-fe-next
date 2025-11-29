@@ -142,7 +142,8 @@ export default function HomePage() {
           <SearchBar />
         </div>
 
-        <p className="text-3xl sm:text-4xl text-center text-[#27406d] mb-12">Search what you&apos;d Research</p>
+        <p className="text-3xl sm:text-4xl text-center text-[#27406d] mb-5">Search / Download for FREE</p>
+        <p className="text-xl sm:text-sm text-center text-[#27406d] mb-12">We do charge a small patronage fee, if you wish to use product-features for analytics, AI-assisted Summaries and Insigths</p>
 
         <div className="flex flex-col lg:flex-row justify-between items-center gap-12 py-16">
           <div className="lg:w-1/2 pl-4 lg:pl-40 pt-10">
@@ -154,23 +155,25 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className={styles.homeNumbersBackground}>
-          <h3 className={styles.homeNumbersText}>A Macro-Analytics Platform for Market Research</h3>
-          <div className={styles.homeNumbersUnderline}></div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#27406d" fill-opacity="1" d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,250.7C960,267,1056,245,1152,250.7C1248,256,1344,288,1392,304L1440,320L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>
+        <div className="bg-[#27406d] w-full pt-12 pb-12 text-center">
+          <h3 className="text-2xl sm:text-4xl font-semibold mb-[-12px] text-blue-100">A Macro-Analytics Platform for Market Research</h3>
+          <div className="h-2 bg-blue-300 w-3/5 mx-auto opacity-50 mb-8"></div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 px-4">
             {[
               { number: 150, label: "Publications" },
               { number: 1000, label: "Market Reports" },
               { number: 70, label: "Industries" },
-              { number: 10, label: "Clients" }
+              { number: 80000, label: "Data Points" }
             ].map(({ number, label }, i) => (
               <div key={i} className="text-center">
-                <div className={styles.homeFactsNumbers}>{number}<span className="text-2xl">+</span></div>
+                <div className="text-blue-300 text-4xl leading-10 font-bold">{number}<span className="text-2xl">+</span></div>
                 <p className="font-semibold">{label}</p>
               </div>
             ))}
           </div>
         </div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#27406d" fill-opacity="1" d="M0,224L48,224C96,224,192,224,288,224C384,224,480,224,576,208C672,192,768,160,864,149.3C960,139,1056,149,1152,170.7C1248,192,1344,224,1392,240L1440,256L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path></svg>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-16">
           {[
@@ -206,6 +209,7 @@ export default function HomePage() {
           </Link>
         </div>
 
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#f3f4f6" fill-opacity="1" d="M0,224L48,224C96,224,192,224,288,224C384,224,480,224,576,208C672,192,768,160,864,149.3C960,139,1056,149,1152,170.7C1248,192,1344,224,1392,240L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>
         <div className="w-full bg-gray-100 px-6 py-12 border-t border-gray-200">
           <h2 className={styles.homeFAQText}>Frequently Asked Questions</h2>
           {[

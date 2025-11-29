@@ -2,20 +2,25 @@
 
 import Navbar from "@/components/Functionalities/NavBar";
 import Footer from "@/components/Website/Footer";
+import { useRouter } from "next/navigation";
 import CoCharts from "./../../components/UtilityComponents/Correlations/CoCharts"
 import CascadingDropDown from "./../../components/UtilityComponents/CascadingDropdown"
+import { isSessionTokenValid } from "../../pages/api/UtilFunctions"
 import SingleDropDown from "./../../components/UtilityComponents/SingleDropdown"
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { fetchSetorSubOptions, fetchAuthors, fetchDataFromGetApi, fetchDataFromPostApi } from '../../pages/api/Api';
 import styles from '../../styles/Pages/reports.module.css';
 import SectorHierarchyDropDown from '../../components/Functionalities/Admin/SectorHierarchyDropDown';
+import DashboardLayout from "@/components/Layout/DashboardLayout";
 
 
 
 export default function Correlations() {
     const initialData = {};
+    const router = useRouter();
     const isFirstRun = useRef(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false); // false in production
     const [SecSubdata, setSecSubdata] = useState([]);
     const [selectedSector, setSelectedSector] = useState("");
     const [selectedSub1, setSelectedSub1] = useState("");
@@ -28,22 +33,22 @@ export default function Correlations() {
 
 
     useEffect(() => {
+        const auth = isSessionTokenValid();
+        setIsAuthenticated(auth);
+
+        if (!auth) {
+            alert("Please login to access product-based services.");
+            router.push("/Login");
+            return;
+        }
+
         async function getData() {
             const OptionsSub1actualData = await fetchSetorSubOptions(); // ✅ wait for the data
             setSecSubdata(OptionsSub1actualData); // ✅ set actual data 
         }
         getData(); // call the async function
+
     }, []);
-
-    // useEffect(() => {
-    //     async function getListOfDatasets() {
-    //         const payload = { "sector": selectedSector, "sub1": selectedSub1 };
-    //         const resp = await fetchDataFromPostApi(payload, `listOfDatasets`);
-    //         setListOfDatasets(resp);
-    //     }
-    //     getListOfDatasets();
-    // }, [selectedSub1]);
-
 
     useEffect(() => {
         if (isFirstRun.current) {
@@ -79,13 +84,6 @@ export default function Correlations() {
             fetchData(selectedDSName);
         }
     }, [selectedDSName]);
-
-
-
-    // const getSectorFilters = (data) => {
-    //     setSelectedSector(data.sector);
-    //     setSelectedSub1(data.sub1);
-    // };
 
     const getSectorFilters = async (data) => {
         if (data && Object.keys(data).length > 0) {
@@ -128,78 +126,78 @@ export default function Correlations() {
     }
 
     return (
-        <div className={styles.resultBodyContainer}>
-            <Navbar />
+        <DashboardLayout>
+            <div className={styles.resultBodyContainer}>
+                <h2 className="text-xl font-semibold text-gray-800 mb-1">
+                    Corellate Datasets
+                </h2>
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col py-1">
 
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col py-1">
+                    {/* Filters Section */}
+                    <div className="bg-white rounded-2xl shadow-md p-6 mb-8">
 
-                {/* Filters Section */}
-                <div className="bg-white rounded-2xl shadow-md p-6 mb-8">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                        Corellate Datasets
-                    </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="px-4 py-2 shadow-md rounded-2xl">
+                                <SectorHierarchyDropDown preSelectedData={initialData.sectorChain} options={SecSubdata} onSelect={getSectorFilters} />
+                            </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="px-4 py-2 shadow-md rounded-2xl">
-                            <SectorHierarchyDropDown preSelectedData={initialData.sectorChain} options={SecSubdata} onSelect={getSectorFilters} />
-                        </div>
+                            <div className="px-4 py-6 shadow-md rounded-2xl">
+                                <label className="block text-sm font-medium text-gray-600 mb-1 sm:px-10">
+                                    Dataset Category
+                                </label>
+                                <div className="px-0 py-0 sm:px-5 sm:py-0.5">
+                                    <SingleDropDown options={listOfDatasets} onSelect={getItemFilter} />
+                                </div>
+                            </div>
 
-                        <div className="px-4 py-6 shadow-md rounded-2xl">
-                            <label className="block text-sm font-medium text-gray-600 mb-1 sm:px-10">
-                                Dataset Category
-                            </label>
-                            <div className="px-0 py-0 sm:px-5 sm:py-0.5">
-                                <SingleDropDown options={listOfDatasets} onSelect={getItemFilter} />
+                            <div className="px-4 py-6 shadow-md rounded-2xl">
+                                <label className="block text-sm font-medium text-gray-600 mb-1 sm:px-6">
+                                    Data Items
+                                </label>
+                                <SingleDropDown
+                                    isMulti={true}
+                                    options={listOfDataItems}
+                                    onSelect={getDataSetFilter}
+                                />
                             </div>
                         </div>
 
-                        <div className="px-4 py-6 shadow-md rounded-2xl">
-                            <label className="block text-sm font-medium text-gray-600 mb-1 sm:px-6">
-                                Data Items
-                            </label>
-                            <SingleDropDown
-                                isMulti={true}
-                                options={listOfDataItems}
-                                onSelect={getDataSetFilter}
-                            />
-                        </div>
+                        {selectedOptions?.length > 0 && (
+                            <div className="mt-4 flex flex-wrap gap-2">
+                                {selectedOptions.map((opt) => (
+                                    <span
+                                        key={opt.value}
+                                        className="bg-blue-800 text-gray-100 px-4 py-1 rounded-full text-sm shadow-sm"
+                                    >
+                                        {opt.value}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
-                    {selectedOptions?.length > 0 && (
-                        <div className="mt-4 flex flex-wrap gap-2">
-                            {selectedOptions.map((opt) => (
-                                <span
-                                    key={opt.value}
-                                    className="bg-blue-800 text-gray-100 px-4 py-1 rounded-full text-sm shadow-sm"
-                                >
-                                    {opt.value}
-                                </span>
-                            ))}
+                    {/* Chart or No Data Section */}
+                    {datasetResponses.length > 0 ? (
+                        <CoCharts apiData={datasetResponses} />
+                    ) : (
+                        <div className="flex flex-col items-center justify-center text-center py-16">
+                            <p className="text-gray-600 text-lg font-medium mb-4">
+                                No datasets found. Please adjust your filters.
+                            </p>
+                            <Image
+                                src="https://storage.googleapis.com/marketreports/Brand/Website/detectiveSearching.jpg"
+                                alt="No reports found"
+                                className="w-64 h-auto rounded-xl shadow-lg opacity-90"
+                                width={300}
+                                height={300}
+                            />
                         </div>
                     )}
                 </div>
 
-                {/* Chart or No Data Section */}
-                {datasetResponses.length > 0 ? (
-                    <CoCharts apiData={datasetResponses} />
-                ) : (
-                    <div className="flex flex-col items-center justify-center text-center py-16">
-                        <p className="text-gray-600 text-lg font-medium mb-4">
-                            No datasets found. Please adjust your filters.
-                        </p>
-                        <Image
-                            src="https://storage.googleapis.com/marketreports/Brand/Website/detectiveSearching.jpg"
-                            alt="No reports found"
-                            className="w-64 h-auto rounded-xl shadow-lg opacity-90"
-                            width={300}
-                            height={300}
-                        />
-                    </div>
-                )}
-            </div>
 
-            <Footer />
-        </div>
+            </div>
+        </DashboardLayout>
     );
 }
 

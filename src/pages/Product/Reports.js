@@ -6,31 +6,16 @@ import SearchFilters from '../../components/Functionalities/SearchFilters';
 import FilterTags from '../../components/UtilityComponents/FilterTags';
 import ToggleLeftPanel from '../../components/UtilityComponents/ToggleLeftPanel';
 import { checkAuthentication } from '../api/UtilFunctions';
+import { useRouter } from 'next/router';
 import SearchBar from '../../components/Functionalities/SearchBar';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import styles from '../../styles/Pages/reports.module.css';
-import DashboardLayout from "@/components/Layout/DashboardLayout";
-import { isSessionTokenValid } from "../../pages/api/UtilFunctions"
-import { useRouter } from "next/navigation";
 
 export default function Reports() {
-  const router = useRouter();
   const hasMounted = useRef(false);
   const [loading, setLoading] = useState(true);
   const [appliedFilters, setAppliedFilters] = useState({});
   const [isToggled, setIsToggled] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // false in production
-
-  useEffect(() => {
-    const auth = isSessionTokenValid();
-    setIsAuthenticated(auth);
-
-    if (!auth) {
-      alert("Please login to access product-based services.");
-      router.push("/Login");
-      return;
-    }
-  }, []);
 
   const getAppliedFiltersFromChild = (filters) => {
     console.log("Received filters from SearchFilters:", filters);
@@ -44,20 +29,45 @@ export default function Reports() {
 
 
   return (
-    <DashboardLayout>
-      <div className={styles.resultBodyContainer}>
-        <div className={styles.searchRow}>
-          <div className={styles.searchToggle}></div>
-          <SearchFilters onDataSend={getAppliedFiltersFromChild} />
+    <div className={styles.resultBodyContainer}>
+      <NavBar />
+      <div className={styles.searchRow}>
+        <div className={styles.searchToggle}></div>
 
-        </div>
-        <div className={styles.filterTags}>
-          <FilterTags applied_filters={appliedFilters} />
-        </div>
-        <div className={styles.resultContainer}>
-          <ReportResultsComp researchType="Reports" result={appliedFilters} />
-        </div>
+        <button
+          onClick={handleToggle}
+          className={`${styles.toggleButton} ${isToggled ? styles.filter : styles.search}`}
+        >
+          <div className={styles.toggleImg}>
+            {isToggled ? (
+              <i className="bi bi-search"></i>
+            ) : (
+              <i className="bi bi-funnel"></i>
+            )}
+          </div>
+        </button>
+        {isToggled && appliedFilters !== null && (
+          <SearchFilters onDataSend={getAppliedFiltersFromChild} />
+        )}
+        {!isToggled &&
+          <div className={styles.searchContainerRpts}>
+            <div className={styles.searchWrapperRpts}>
+              <SearchBar />
+            </div>
+          </div>
+        }
+
       </div>
-    </DashboardLayout>
+      <div className={styles.filterTags}>
+        <FilterTags applied_filters={appliedFilters} />
+      </div>
+      <div className={styles.resultContainer}>
+        <div className={styles.toggleLeftPanel}>
+          <ToggleLeftPanel />
+        </div>       
+          <ReportResultsComp researchType="Reports" result={appliedFilters} />
+      </div>
+      <Footer />
+    </div>
   );
 }

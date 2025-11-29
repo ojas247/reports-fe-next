@@ -11,7 +11,6 @@ export default function Navbar() {
   const [isServicesOpen1, setIsServicesOpen1] = useState(false); // false in production
   const [isServicesOpen2, setIsServicesOpen2] = useState(false); // false in production
   const [isServicesOpen3, setIsServicesOpen3] = useState(false); // false in production
-
   const toggleNav = () => setIsOpen(!isOpen);
   const toggleServices1 = () => setIsServicesOpen1(!isServicesOpen1);
   const toggleServices2 = () => setIsServicesOpen2(!isServicesOpen2);
@@ -33,6 +32,22 @@ export default function Navbar() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const handleClick = (eventName) => {
+    // Push GTM event
+    pushGTMEvent({
+      eventName: eventName,
+      eventParams: {
+        page: window.location.pathname
+      },
+      userId: "anonymous_user",
+      userProperties: {
+        role: 'anonymous-user',
+        plan: 'xxx',
+        country: 'IN'
+      }
+    });
+}
 
   return (
     <header className={styles.header}>
@@ -86,7 +101,7 @@ export default function Navbar() {
             >
               <div className={styles.dropdownContentItem}>
                 <i className="bi bi-newspaper" style={{ color: 'midnightblue' }}></i>
-                <Link href="/Research/Reports" style={{ paddingLeft: '10px' }}>Reports</Link>
+                <Link onClick = {handleClick("Research Reports")} href="/Research/Reports" style={{ paddingLeft: '10px' }}>Reports</Link>
               </div>
 
               <div className={styles.dropdownContentItem}>
@@ -148,7 +163,7 @@ export default function Navbar() {
           {isAuthenticated && (
             <li className={styles.dropdown}>
               <button className={styles.dropbtn} onClick={toggleServices3}>
-                <i className="bi bi-person-circle" style={{ fontSize: '1.25rem' }}></i>
+                <i className="bi bi-person-circle " style={{ fontSize: '1.25rem' }}></i>
               </button>
               <div
                 className={`${styles.dropdownContentProfile} ${isServicesOpen3 ? styles.showDropdown : ""

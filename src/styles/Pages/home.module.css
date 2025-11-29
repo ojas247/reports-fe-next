@@ -18,46 +18,7 @@
     line-height: 2.5rem;
 }
 
-.homeFactsNumbers {
-    color: #4338ca;
-    /* Tailwind's indigo-700 */
-    font-size: 2.25rem;
-    /* Tailwind's text-4xl = 36px */
-    line-height: 2.5rem;
-    /* 40px for proper vertical rhythm */
-    font-weight: 700;
-}
 
-.homeNumbersBackground {
-    background-color: #99aadf;
-    width: 100%;
-    padding-top: 3rem;
-    padding-bottom: 3rem;
-    text-align: center;
-}
-
-.homeNumbersUnderline {
-    height: 0.5rem;
-    /* Tailwind's h-2 = 8px */
-    background-color: #5b74f1;
-    /* Tailwind's bg-indigo-300 */
-    width: 40%;
-    /* Tailwind's w-1/2 */
-    margin-left: auto;
-    /* Tailwind's mx-auto */
-    margin-right: auto;
-    opacity: 0.5;
-    /* Tailwind's opacity-50 */
-    margin-bottom: 2rem;
-}
-
-.homeNumbersText {
-    font-size: 1.5rem;
-    /* Tailwind's text-2xl */
-    font-weight: 600;
-    /* Tailwind's font-semibold */
-    margin-bottom: -12px;
-}
 
 .homeRegisterBtn {
     background-color: #27406d;

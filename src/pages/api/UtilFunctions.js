@@ -122,15 +122,6 @@ export function sleep_function(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// export function parseDDMMYYYY(str) {
-//   console.log("Str: ", str)
-//   if (!str) return null;
-//   str = str.trim(); // remove spaces / invisible chars
-//   const [day, month, year] = str.split("-").map(x => parseInt(x, 10));
-
-//   if (!day || !month || !year) return null;
-//   return new Date(year, month - 1, day);
-// }
 
 export function parseDDMMYYYY(str) {
   if (!str) return null;
