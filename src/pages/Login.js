@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 import NavBar from "../components/Functionalities/NavBar";
 import LoginComp from "../components/Acquisition/LoginComp";
 import Footer from "../components/Website/Footer";
@@ -8,11 +9,17 @@ export default function Login() {
   const message = router.query.message;
 
   return (
-    <main>
-      <NavBar />
-      <LoginComp message={message} />  
-      <Footer />
-    </main>
+    <>
+      <Head>
+        <title>Login to Your MarketReports Account</title>
+      </Head>
+
+      <main>
+        <NavBar />
+        <LoginComp message={message} />
+        <Footer />
+      </main>
+    </>
   );
 }
 

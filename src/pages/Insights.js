@@ -1,6 +1,7 @@
 // pages/insights/index.tsx
 
 import Link from 'next/link';
+import Head from 'next/head';;
 import styles from '../styles/Pages/insights.module.css';
 import NavBar from '../components/Functionalities/NavBar';
 import Footer from '../components/Website/Footer';
@@ -12,6 +13,9 @@ export default function Insights({ data }) {
 
     return (
         <>
+        <Head>
+        <title>Get Resources for Market Insights</title>
+        </Head>
             <NavBar />
             <div className={styles.mainContainerBlogs}>
                 <div className={styles.pageTitle}>

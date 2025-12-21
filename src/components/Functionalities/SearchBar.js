@@ -5,13 +5,14 @@ import axios from 'axios';
 import styles from '../../styles/searchbar.module.css';
 import { useRouter } from 'next/router';
 import ShowSuggestions from "./ShowSuggestions";
-import { isSessionTokenValid, checkAuthentication } from '../../pages/api/UtilFunctions';
+import { isSessionTokenValid, checkAuthentication, pushGTMEvent } from '../../pages/api/UtilFunctions';
 
 const SearchBar = () => {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
     const [query, setQuery] = useState('');
     const [loading, setLoading] = useState(false);
     const [suggestions, setSuggestions] = useState([]);
+    const [ucc, setUcc] = useState('anonymous_user');  // default
     const [showSearch, setShowSearch] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const suggestionRef = useRef();
@@ -20,6 +21,8 @@ const SearchBar = () => {
 
     // Close search bar if clicked outside
     useEffect(() => {
+        const storedUcc = sessionStorage.getItem('UCC') || 'anonymous_user';
+        setUcc(storedUcc);
         const handler = (e) => {
             if (suggestionRef.current && !suggestionRef.current.contains(e.target)) {
                 setShowSearch(false);
@@ -85,6 +88,22 @@ const SearchBar = () => {
         const value = e.target.value;
         setQuery(value);
         // console.log("Query: ", value);
+        
+
+        // Push GTM event
+        pushGTMEvent({
+            eventName: "Searched_SearchBar",
+            eventParams: {
+                page: window.location.pathname,
+                query: value
+            },
+            userId: ucc,
+            userProperties: {
+                role: 'anonymous-user',
+                plan: 'xxx',
+                country: 'IN'
+            }
+        });
     }
 
     useEffect(() => {

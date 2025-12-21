@@ -25,3 +25,12 @@ description = "Visit our platform at @link-start platform @link-end @url-start h
 
 To break link use \n
 To split para in desc1 an desc2 use \p
+To make a text bold '''Bold text'''
+To make a text <h2>= Heading Level 2 =
+For External Hyperlinking put this [external link](https://www.google.com) // TO BE IMPLEMENTED
+
+
+
+######################## Event Nomenclature ####################
+<ActionofUser>_<Component/Page>-<NameOfTheButton>
+eg --> Clicked_NavBar-Research Correlations

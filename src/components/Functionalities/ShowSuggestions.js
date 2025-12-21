@@ -8,11 +8,11 @@ export default function ShowSuggestions({ suggestions, suggestionClick }) {
       className="
         absolute bg-white border border-gray-300 border-t-0 rounded-b-lg shadow-lg overflow-y-auto z-[1000] divide-y divide-gray-100 transition-all duration-200
         /* Mobile (default): 50vw width, 150px max-h, full-width feel */
-        w-[50vw] max-h-[150px]
+        w-[70vw] max-h-[150px]
         /* Tablet/Small Desktop (sm): Transition width */
         sm:w-[400px] sm:max-h-[180px]
         /* Large Desktop (lg+): Fixed 500px width, taller list */
-        lg:w-[500px] lg:max-h-[250px]
+        lg:w-[400px] lg:max-h-[250px]
       ">
       {suggestions.map((value, index) => (
         <li

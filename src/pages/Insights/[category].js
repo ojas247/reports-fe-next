@@ -16,6 +16,9 @@ export default function CategoryPage({ blog_list, category }) {
 
   return (
     <>
+      <Head>
+        <title>Checkout Categories for Market Insights</title>
+      </Head>
       <NavBar />
       <div className={styles.mainContainerBlogs}>
         <div className={styles.pageTitle}>

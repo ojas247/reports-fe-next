@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRouter } from 'next/router';
 import ReportTile from "../UtilityComponents/ReportTile";
 import Image from 'next/image';
+import FactsLoader from "../UtilityComponents/Tools/FactsLoader";
 
 
 const ReportResultsComp = (props) => {
@@ -72,7 +73,8 @@ const ReportResultsComp = (props) => {
 
 
     if (loading) {
-        return <div>Loading reports...</div>;
+        // return <div>Loading reports...</div>;
+        <FactsLoader isLoading={loading} />
     }
 
     if (!filteredReportsList || filteredReportsList.length === 0) {

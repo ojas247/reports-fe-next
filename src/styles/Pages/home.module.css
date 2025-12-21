@@ -1,16 +1,3 @@
-.homeContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.homeSearchBar{
-    width: 80%;                /* w-full */
-    max-width: 28rem;           /* max-w-md → 448px (in Tailwind) */
-    margin-top: 3rem;           /* my-12 → 3rem top... */
-    margin-bottom: 3rem;   
-}
-
 .homeHeroText {
     font-size: 2.25rem;
     font-weight: 400;

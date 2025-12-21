@@ -60,7 +60,7 @@ export default function Footer() {
           </Link>
           <p className="text-sm text-gray-400 mb-4">A Synthesis Data Product</p>
           <p className="text-sm text-gray-500">
-            Simplifying economic insights through structured visual data.
+            A Public Data Platform, where core-data is free for everyone to access and download. We simplify complex data into simple and interactive visuals.
           </p>
         </div>
 
@@ -79,11 +79,12 @@ export default function Footer() {
         <div>
           <h3 className="text-lg font-semibold text-white mb-3">FOLLOW US</h3>
           <div className="flex space-x-4 text-lg">
-            <a href="#" className=" text-gray-400  hover:text-blue-700"><i className="bi bi-facebook"></i></a>
-            <a href="#" className=" text-gray-400 hover:text-blue-700"><i className="bi bi-instagram"></i></a>
             <a href="https://x.com/data_bytes_247" className=" text-gray-400 hover:text-blue-700"><i className="bi bi-twitter-x"></i></a>
             <a href="https://www.linkedin.com/company/market-reports-and-data/" className=" text-gray-400 hover:text-blue-700"><i className="bi bi-linkedin"></i></a>
-            <a href="#" className=" text-gray-400 hover:text-blue-700"><i className="bi bi-youtube"></i></a>
+            <a href="https://in.pinterest.com/MarketReportsIn/" className=" text-gray-400 hover:text-blue-700"> <i className="bi bi-pinterest"></i></a>
+            {/* <a href="#" className=" text-gray-400  hover:text-blue-700"><i className="bi bi-facebook"></i></a>
+            <a href="#" className=" text-gray-400 hover:text-blue-700"><i className="bi bi-instagram"></i></a>
+            */}
           </div>
 
           <h3 className="text-lg font-semibold text-white mt-6 mb-3">HOW WE MAY HELP YOU?</h3>
@@ -91,7 +92,7 @@ export default function Footer() {
             <i className="bi bi-telephone-fill text-gray-400 mr-2"></i> (+91) 911 2434 968
           </p>
           <p className="flex items-center text-sm text-gray-400">
-            <i className="bi bi-envelope-fill text-gray-400 mr-2"></i> admin@marketreports.com
+            <i className="bi bi-envelope-fill text-gray-400 mr-2"></i> admin@marketreports.in
           </p>
         </div>
 

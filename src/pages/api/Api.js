@@ -19,7 +19,7 @@ export async function fetchDataFromGetApi(urlSlug) {
      // console.log("response api.js:",data);
       return data;
     } catch (error) {
-      console.error('Error:', error);
+      console.error(`Error from ${urlSlug}:`, error);
       throw error;
     }
   }

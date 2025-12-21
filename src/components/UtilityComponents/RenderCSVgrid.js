@@ -2,8 +2,11 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';  // Allows raw HTML in Markdown
 import PropTypes from 'prop-types';
 import { formatGridHeader } from '../../pages/api/UtilFunctions';
+
 
 // Dynamically import DataGrid so it only runs in the browser:
 const DataGrid = dynamic(
@@ -44,44 +47,37 @@ export default function CsvGridPage(props) {
     }
   }, [granularity]);
 
-  console.log("Header: ", headers_raw, " Granularity: ", granularity, " granularityText: ", granularityText)
+  // console.log("Header: ", headers_raw, " Granularity: ", granularity, " granularityText: ", granularityText)
   const headers_v1 = formatGridHeader(headers_raw, granularityText);
-  console.log("Output from formatGridHeader: ", headers_v1);
+  // console.log("Output from formatGridHeader: ", headers_v1);
 
- 
+  const processedDesc1 = desc1
+  .replace(/\\n/g, '<br />') // New line
+  .replace(/\\p/g, '\n\n')            // ← NEW PARAGRAPH
+  .replace(/'''([^']+)'''/g, '**$1**')  // '''bold''' → **bold**
+  .replace(/=([^=]+)=/g, '## $1')  // = xxx = → ## xxx (H2)
+  .replace(/==([^=]+)==/g, '### $1')  // == xxx == → ### xxx (H3; change to '## $1' if you want both as H2)
+  .replace(/@link-start\s*(.*?)\s*@link-end\s*@url-start\s*(.*?)\s*@url-end/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">$1</a>');  // Custom links to HTML
+
+
   return (
     <div className="p-4 space-y-0">
       <h1 className="text-2xl font-bold text-blue-900">{heading}</h1>
 
-      {desc1
-        .replace(/\\n/g, '\n')
-        .split(/\r?\n/)
-        .map((line, idx) => {
-          const linkRegex = /@link-start\s*(.*?)\s*@link-end\s*@url-start\s*(.*?)\s*@url-end/;
-          const match = line.match(linkRegex);
+      <ReactMarkdown
+        rehypePlugins={[rehypeRaw]}  // Enables raw HTML (for links/bold)
+        components={{
+          h1: ({ children }) => <h1 className="text-2xl font-bold mb-2 mt-4">{children}</h1>,  // Custom H1
+          h2: ({ children }) => <h2 className="text-xl font-semibold mb-1 mt-3">{children}</h2>,  // Custom H2
+          a: ({ children, ...props }) => <a {...props} className="text-blue-600 underline">{children}</a>,  // Style links
+          strong: ({ children }) => <strong className="font-bold">{children}</strong>,  // Bold styling
+          p: ({ children }) => <div className="mb-1"> {children}</div>,  // Bullet for paragraphs. Removed a • after <....>• {children}
+          br: ({ node }) => <br className="my-1" />,  // Optional: Custom <br /> spacing
+        }}
+      >
+        {processedDesc1}
+      </ReactMarkdown>
 
-          if (match) {
-            const [fullMatch, linkText, url] = match;
-            const beforeLink = line.substring(0, match.index);
-            const afterLink = line.substring(match.index + fullMatch.length);
-
-            return (
-              <div key={idx} className="mb-1">
-                • {beforeLink}
-                <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                  {linkText}
-                </a>
-                {afterLink}
-              </div>
-            );
-          }
-
-          return (
-            <div key={idx} className="mb-1">
-              • {line}
-            </div>
-          );
-        })}
 
 
       <div className="flex flex-row items-center justify-between w-full">

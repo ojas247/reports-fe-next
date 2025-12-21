@@ -9,7 +9,7 @@ export default function App({ Component, pageProps }) {
       <Head>
         {/* <link rel="icon" href="Assets/Images/Logo.ico/" /> */}
         <link rel="icon" href="/favicon.ico" />
-        <title>MarketInsights - Search for Industry and Market Reports</title>        
+              
       </Head>
       <Component {...pageProps} />
     </>

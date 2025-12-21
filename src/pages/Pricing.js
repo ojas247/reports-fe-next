@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
 import NavBar from "../components/Functionalities/NavBar";
 import Footer from "../components/Website/Footer";
@@ -60,7 +61,7 @@ export default function Pricing() {
       setEmailID("");  // Reset email if no valid token
     }
   }
- 
+
 
 
   const handleClick = (price) => {
@@ -138,6 +139,9 @@ export default function Pricing() {
 
   return (
     <>
+      <Head>
+        <title>Payment Plans for MarketReports </title>
+      </Head>
       <NavBar />
       <div className={styles.pricingContainer}>
         <h1 className={styles.pricingTitle}>Pricing Plans</h1>
@@ -151,8 +155,8 @@ export default function Pricing() {
               ₹ 20 <span className="text-sm text-gray-500">/day</span>
             </p>
             <ul className={styles.pricingListDetails}>
-              <li className="border-b border-gray-200 pb-2">50 Searches per day</li>
-              <li className="border-b border-gray-200 pb-2">10 download credits</li>
+              <li className="border-b border-gray-200 pb-2">10 Filter-based Searches/day</li>
+              <li className="border-b border-gray-200 pb-2">TAT of 2 Days for requested Data</li>
               <li className="border-b border-gray-200 pb-2">Email Support</li>
             </ul>
             <button
@@ -170,8 +174,8 @@ export default function Pricing() {
               ₹ 199 <span className="text-sm text-gray-500">/month</span>
             </p>
             <ul className={styles.pricingListDetails}>
-              <li className="border-b border-gray-200 pb-2">50 Searches per day</li>
-              <li className="border-b border-gray-200 pb-2">200 download credits</li>
+              <li className="border-b border-gray-200 pb-2">50 Filter-based Searches/day</li>
+              <li className="border-b border-gray-200 pb-2">TAT of 1 Days for requested Data</li>
               <li className="border-b border-gray-200 pb-2">Priority Support</li>
             </ul>
             <button
@@ -190,7 +194,7 @@ export default function Pricing() {
             </p>
             <ul className={styles.pricingListDetails}>
               <li className="border-b border-gray-200 pb-2">Unlimited Searches</li>
-              <li className="border-b border-gray-200 pb-2">Unlimited downloads</li>
+              <li className="border-b border-gray-200 pb-2">TAT of 3 hours for requested Data</li>
               <li className="border-b border-gray-200 pb-2">24/7 Support</li>
             </ul>
             <button

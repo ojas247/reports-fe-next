@@ -8,6 +8,7 @@ import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/S
 import { useRouter } from 'next/router';
 import { fetchSetorSubOptions, fetchAuthors, fetchYears, fetchTags } from '../../../pages/api/Api';
 import Image from 'next/image';
+import FactsLoader from '@/components/UtilityComponents/Tools/FactsLoader';
 
 
 const SearchFilters_v1 = (props) => {
@@ -45,7 +46,8 @@ const SearchFilters_v1 = (props) => {
   if (loading) {
     return (
       <div style={{ width: "80%", marginLeft: "40%" }} >
-        <Image src="/Assets/Gifs/loading.gif" alt="Loading..." width={100} height={80} />
+        {/* <Image src="/Assets/Gifs/loading.gif" alt="Loading..." width={100} height={80} /> */}
+        <FactsLoader isLoading={loading} />
       </div>
     );
   }

@@ -158,7 +158,7 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
                         </div>
                     )}
 
-
+                    {/* Lead Form */}
                     <div className={styles.leadFormContainer}>
                         <h3>NEED HELP IN RESEARCH?</h3>
                         <p>Signup to get access to our market reports and insights.</p>
@@ -250,21 +250,28 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
 export async function getServerSideProps(context) {
     const { dataCategory, data } = context.params;
 
-    const dataSetObj = await fetchDataFromGetApi("get-dataset-objs?count=&sector=&slug=" + data);
-    const YouMayAlsoLike = await fetchDataFromGetApi("get-dataset-objs?count=5&slug=&sector=" + dataCategory);
+    // const decodedDataCategory = decodeURIComponent(dataCategory);
+    // console.log("decodedDataCategory: ", decodedDataCategory)
+    const apiQuery = encodeURIComponent(dataCategory);
 
-    console.log("DataSetObj: ", dataSetObj);
+    // const dataSetObj = await fetchDataFromGetApi("get-dataset-objs?count=&sector=&slug=" + data);
+    // const YouMayAlsoLike = await fetchDataFromGetApi("get-dataset-objs?count=5&slug=&sector=" + dataCategory);
+    const dataSetObj = await fetchDataFromGetApi("get-dataset-objs?slug=" + data);
+    const YouMayAlsoLike = await fetchDataFromGetApi("get-dataset-objs?sector=" + apiQuery);
 
-    const bucketUrl = dataSetObj?.[0]?.ReportUrl;
-    const gridDescription = dataSetObj?.[0]?.description;
-    const dataHeading = dataSetObj?.[0]?.DataName;
-    const author = dataSetObj?.[0]?.author;
-    const year = dataSetObj?.[0]?.Year;
-    const sector = dataSetObj?.[0]?.Sector;
-    const subcategory = dataSetObj?.[0]?.Sub1;
-    const units = dataSetObj?.[0]?.Units;
-    const SourceURL = dataSetObj?.[0]?.SourceURL;
-    const seoDesc = dataSetObj?.[0]?.seoDesc;
+    // console.log("DataSetObj: ", dataSetObj);
+    console.log("DataSetObj: ", YouMayAlsoLike);
+
+    const bucketUrl = dataSetObj?.[0]?.ReportUrl || null;
+    const gridDescription = dataSetObj?.[0]?.description || null;
+    const dataHeading = dataSetObj?.[0]?.DataName || null;
+    const author = dataSetObj?.[0]?.author || null;
+    const year = dataSetObj?.[0]?.Year || null;
+    const sector = dataSetObj?.[0]?.Sector || null;
+    const subcategory = dataSetObj?.[0]?.Sub1 || null;
+    const units = dataSetObj?.[0]?.Units || null;
+    const SourceURL = dataSetObj?.[0]?.SourceURL || null;
+    const seoDesc = dataSetObj?.[0]?.seoDesc || null;
     const granularity = dataSetObj?.[0]?.granularity || "Yearly";
     let headerRow = null;
     let dataRows = null;

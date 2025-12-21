@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { fetchDataFromGetApi, fetchDataFromPostApi } from '../../api/Api';
 
+export const config = {
+  unstable_runtimeJS: true
+};
+
 export default function CrawlerBoard() {
   const [crawlerData, setCrawlerData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +16,7 @@ export default function CrawlerBoard() {
       const payload = { url };
       const response = await fetchDataFromPostApi(payload, 'DataSiteCrawler');
 
-      if (response?.status === 200 || response?.Status === "Success") {
+      if (response?.status === 200 || response?.status === "success") {
         console.log("Page updated successfully");
         alert("Page updated successfully ✅");
       } else {
@@ -32,8 +36,9 @@ export default function CrawlerBoard() {
         setLoading(true);
         const data = await fetchDataFromGetApi('DataSiteCrawler');
         setCrawlerData(data);
-      } catch (err) {
-        console.error("Failed to fetch crawler data:", err);
+      } catch (err) {     
+          console.error("Failed to fetch crawler data:", err);
+      
       } finally {
         setLoading(false);
       }
@@ -148,11 +153,10 @@ export default function CrawlerBoard() {
 
                 <td className="px-6 py-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      data.pgChanged
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${data.pgChanged
                         ? "bg-red-100 text-red-800"
                         : "bg-green-100 text-green-800"
-                    }`}
+                      }`}
                   >
                     {data.pgChanged ? "Changed" : "Unchanged"}
                   </span>

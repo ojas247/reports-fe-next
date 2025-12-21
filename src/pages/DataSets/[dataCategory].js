@@ -3,13 +3,27 @@ import Link from "next/link";
 import Head from "next/head";
 import Navbar from "../../components/Functionalities/NavBar";
 import Footer from "../../components/Website/Footer";
-import fetchSetorSubOptions from "../../pages/api/Api";
+import FactsLoader from "@/components/UtilityComponents/Tools/FactsLoader";
 
 export default function DataCategoryPage({ data, dataCategory }) {
+    const [loading, setLoading] = useState(true);
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
     const imageURLs = ['https://storage.googleapis.com/marketreports/Blogs/Banners/DeepTech1.jpg',
         'https://storage.googleapis.com/marketreports/Blogs/Banners/Trading.png'
     ]
+
+    useEffect(() => {
+        // Simulate brief loading delay for UX polish (e.g., 1-2s; adjust or remove if not needed)
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 2000); // 1.5s delay – matches typical network/hydration time
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <FactsLoader isLoading={true} />; // Show facts loader while "loading"
+    }
 
 
     return (
@@ -64,7 +78,7 @@ export default function DataCategoryPage({ data, dataCategory }) {
 export async function getServerSideProps(context) {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
     const { dataCategory } = context.params;
-    console.log("dataCategory: ", dataCategory);
+    // console.log("dataCategory: ", dataCategory);
 
     const res = await fetch(`${backendAPI}/get-dataset-objs?count=&slug=&sector=${encodeURIComponent(dataCategory)}`, {
         cache: 'no-store',
@@ -73,10 +87,7 @@ export async function getServerSideProps(context) {
         }
     });
 
-
-
     const data = await res.json();
-    console.log("CheckData: ", data);
 
     return {
         props: {

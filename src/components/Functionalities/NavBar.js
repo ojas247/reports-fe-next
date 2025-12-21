@@ -1,7 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////////////
+'use client'
 import { useEffect, useState } from "react";
 import styles from "../../styles/UtilityComps/navbar.module.css";
-import { isSessionTokenValid } from "../../pages/api/UtilFunctions";
+import { isSessionTokenValid, pushGTMEvent } from "../../pages/api/UtilFunctions";
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -36,9 +36,10 @@ export default function Navbar() {
   const handleClick = (eventName) => {
     // Push GTM event
     pushGTMEvent({
-      eventName: eventName,
+      eventName: "prelogin_nav_click",
       eventParams: {
-        page: window.location.pathname
+        page: window.location.pathname,
+        btnName: eventName
       },
       userId: "anonymous_user",
       userProperties: {
@@ -47,13 +48,13 @@ export default function Navbar() {
         country: 'IN'
       }
     });
-}
+  }
 
   return (
     <header className={styles.header}>
       <div className={styles.logo}>
         <Link href="/">
-          <Image className={styles.LogoImg} src="/Assets/Images/Logo-Trans.svg" alt="MarketInsight" width={180 } height={280}/>
+          <Image className={styles.LogoImg} src="/Assets/Images/Logo-Trans.svg" alt="MarketInsight" width={180} height={280} />
         </Link>
       </div>
 
@@ -87,13 +88,13 @@ export default function Navbar() {
       >
         <ul className={styles.navList}>
           <li className={styles.dropdown}>
-            <Link href="/Home">Home</Link>
+            <Link href="/">Home</Link>
           </li>
 
           <li className={styles.dropdown}>
             <button className={styles.dropbtn} onClick={toggleServices1}>
               MarketResearch
-              <Image className={styles.toggleImg} src="\Assets\Images\Toggle.svg" alt="MarketInsight"  width={8} height={8} />
+              <Image className={styles.toggleImg} src="\Assets\Images\Toggle.svg" alt="MarketInsight" width={8} height={8} />
             </button>
             <div
               className={`${styles.dropdownContent} ${isServicesOpen1 ? styles.showDropdown : ""
@@ -101,22 +102,22 @@ export default function Navbar() {
             >
               <div className={styles.dropdownContentItem}>
                 <i className="bi bi-newspaper" style={{ color: 'midnightblue' }}></i>
-                <Link onClick = {handleClick("Research Reports")} href="/Research/Reports" style={{ paddingLeft: '10px' }}>Reports</Link>
+                <Link onClick={() => handleClick("Research-Reports")} href="/Research/Reports" style={{ paddingLeft: '10px' }}>Reports</Link>
               </div>
 
               <div className={styles.dropdownContentItem}>
                 <i className="bi bi-pie-chart" style={{ color: 'midnightblue' }}></i>
-                <Link href="/Research/Data" style={{ paddingLeft: '10px' }}>Data</Link>
+                <Link onClick={() => handleClick("Research-Data")} href="/Research/Data" style={{ paddingLeft: '10px' }}>Data</Link>
               </div>
 
               <div className={styles.dropdownContentItem}>
                 <i className="bi bi-reception-3" style={{ color: 'midnightblue' }}></i>
-                <Link href="/Research/Correlations" style={{ paddingLeft: '10px' }}>Corellations</Link>
+                <Link onClick={() => handleClick("Research-Correlations")} href="/Research/Correlations" style={{ paddingLeft: '10px' }}>Corellations</Link>
               </div>
 
               <div className={styles.dropdownContentItem}>
                 <i className="bi bi-claude" style={{ color: 'midnightblue' }}></i>
-                <Link href="/Research/AI-Insights" style={{ paddingLeft: '10px' }}>AI Insights</Link>
+                <Link onClick={() => handleClick("Research-AIInsights")} href="/Research/AI-Insights" style={{ paddingLeft: '10px' }}>AI Insights</Link>
               </div>
 
             </div>
@@ -132,18 +133,18 @@ export default function Navbar() {
                 }`}
             >
               <div className={styles.dropdownContentItem}>
-                <i className="bi bi-layout-text-sidebar" style={{ color: 'midnightblue' }}></i>
-                <Link href="/Insights" style={{ paddingLeft: '10px' }}>Insights</Link>
+                <i className="bi bi-clipboard-data" style={{ color: 'midnightblue' }}></i>
+                <Link onClick={() => handleClick("Resources-DataSets")} href="/DataSets" style={{ paddingLeft: '10px' }}>DataSets</Link>
               </div>
               <div className={styles.dropdownContentItem}>
-                <i className="bi bi-clipboard-data" style={{ color: 'midnightblue' }}></i>
-                <Link href="/DataSets" style={{ paddingLeft: '10px' }}>DataSets</Link>
+                <i className="bi bi-layout-text-sidebar" style={{ color: 'midnightblue' }}></i>
+                <Link onClick={() => handleClick("Resources-Insights")} href="/Insights" style={{ paddingLeft: '10px' }}>Insights</Link>
               </div>
             </div>
           </li>
 
           <li className={styles.dropdown}>
-            <Link href="/Pricing">Pricing</Link>
+            <Link onClick={() => handleClick("Clicked_NavBar-Pricing")} href="/Pricing">Pricing</Link>
           </li>
 
 
@@ -151,11 +152,11 @@ export default function Navbar() {
             <ul className={styles.LoginSignup}>
 
               <li className={`${styles.dropdown} ${styles.signupBtn}`}>
-                <Link href="/Register">Signup</Link>
+                <Link onClick={() => handleClick("Clicked_NavBar-Signup")} href="/Register">Signup</Link>
               </li>
 
               <li className={styles.dropdown}>
-                <Link href="/Login">Login</Link>
+                <Link onClick={() => handleClick("Clicked_NavBar-Login")} href="/Login">Login</Link>
               </li>
             </ul>
           )}
