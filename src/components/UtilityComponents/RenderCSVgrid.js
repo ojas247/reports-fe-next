@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';  // Allows raw HTML in Markdown
 import PropTypes from 'prop-types';
 import { formatGridHeader } from '../../pages/api/UtilFunctions';
@@ -52,12 +53,12 @@ export default function CsvGridPage(props) {
   // console.log("Output from formatGridHeader: ", headers_v1);
 
   const processedDesc1 = desc1
-  .replace(/\\n/g, '<br />') // New line
-  .replace(/\\p/g, '\n\n')            // ← NEW PARAGRAPH
-  .replace(/'''([^']+)'''/g, '**$1**')  // '''bold''' → **bold**
-  .replace(/=([^=]+)=/g, '## $1')  // = xxx = → ## xxx (H2)
-  .replace(/==([^=]+)==/g, '### $1')  // == xxx == → ### xxx (H3; change to '## $1' if you want both as H2)
-  .replace(/@link-start\s*(.*?)\s*@link-end\s*@url-start\s*(.*?)\s*@url-end/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">$1</a>');  // Custom links to HTML
+    .replace(/\\n/g, '<br />') // New line
+    .replace(/\\p/g, '\n\n')            // ← NEW PARAGRAPH
+    .replace(/'''([^']+)'''/g, '**$1**')  // '''bold''' → **bold**
+    .replace(/=([^=]+)=/g, '## $1')  // = xxx = → ## xxx (H2)
+    .replace(/==([^=]+)==/g, '### $1')  // == xxx == → ### xxx (H3; change to '## $1' if you want both as H2)
+    .replace(/@link-start\s*(.*?)\s*@link-end\s*@url-start\s*(.*?)\s*@url-end/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">$1</a>');  // Custom links to HTML
 
 
   return (
@@ -66,6 +67,7 @@ export default function CsvGridPage(props) {
 
       <ReactMarkdown
         rehypePlugins={[rehypeRaw]}  // Enables raw HTML (for links/bold)
+        remarkPlugins={[remarkGfm]} // <--- ADD THIS for Table support
         components={{
           h1: ({ children }) => <h1 className="text-2xl font-bold mb-2 mt-4">{children}</h1>,  // Custom H1
           h2: ({ children }) => <h2 className="text-xl font-semibold mb-1 mt-3">{children}</h2>,  // Custom H2
@@ -73,6 +75,36 @@ export default function CsvGridPage(props) {
           strong: ({ children }) => <strong className="font-bold">{children}</strong>,  // Bold styling
           p: ({ children }) => <div className="mb-1"> {children}</div>,  // Bullet for paragraphs. Removed a • after <....>• {children}
           br: ({ node }) => <br className="my-1" />,  // Optional: Custom <br /> spacing
+
+          // --- TABLE STYLING ---
+          table: ({ children }) => (
+            <div className="overflow-x-auto my-6 border border-gray-300 rounded-md">
+              {/* The wrapper div above handles the outer square boundary */}
+              <table className="min-w-full border-collapse">
+                {children}
+              </table>
+            </div>
+          ),
+          thead: ({ children }) => (
+            <thead className="bg-[#27406d]">
+              {children}
+            </thead>
+          ),
+          th: ({ children }) => (
+            <th className="px-4 py-3 text-left text-sm font-semibold text-white border-b border-r last:border-r-0 border-blue-800 tracking-wider">
+              {children}
+            </th>
+          ),
+          td: ({ children }) => (
+            <td className="px-4 py-2 text-sm text-gray-700 border-b border-r last:border-r-0 border-gray-200">
+              {children}
+            </td>
+          ),
+          tr: ({ children }) => (
+            <tr className="even:bg-gray-50/50 last:border-b-0">
+              {children}
+            </tr>
+          ),
         }}
       >
         {processedDesc1}

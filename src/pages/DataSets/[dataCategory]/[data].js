@@ -15,7 +15,7 @@ import { CreateUserId } from '../../api/UtilFunctions'
 
 
 export default function DataSets({ bucketUrl, gridDescription, dataHeading, units, headerRow, dataRows, dataCategory, author, year,
-    sector, subcategory, YouMayAlsoLike, slug, SourceURL, seoDesc, granularity }) {
+    sector, subcategory, YouMayAlsoLike, slug, SourceURL, seoDesc, granularity, publishedTS, updatedTS }) {
     const frontendAPI = process.env.NEXT_PUBLIC_frontendAPI;
     const [email, setEmail] = useState('');
     const [PasswordPop, setPasswordPop] = useState('');
@@ -92,7 +92,7 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
             "@type": "Person",
             "name": author
         },
-        "datePublished": year,
+        "datePublished": publishedTS,
         "publisher": {
             "@id": "https://marketreports.in",
             "@type": "Organization",
@@ -108,8 +108,8 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
         "mainEntityOfPage": "https://marketreports.in/DataSets",
         "inLanguage": "EN",
         "isAccessibleForFree": "true",
-        "datePublished": year,
-        "dateModified": year,
+        "datePublished": publishedTS,
+        "dateModified": updatedTS,
         "description": gridDescription
     };
 
@@ -260,7 +260,7 @@ export async function getServerSideProps(context) {
     const YouMayAlsoLike = await fetchDataFromGetApi("get-dataset-objs?sector=" + apiQuery);
 
     // console.log("DataSetObj: ", dataSetObj);
-    console.log("DataSetObj: ", YouMayAlsoLike);
+    console.log("DataSetObj: ", dataSetObj);
 
     const bucketUrl = dataSetObj?.[0]?.ReportUrl || null;
     const gridDescription = dataSetObj?.[0]?.description || null;
@@ -273,11 +273,12 @@ export async function getServerSideProps(context) {
     const SourceURL = dataSetObj?.[0]?.SourceURL || null;
     const seoDesc = dataSetObj?.[0]?.seoDesc || null;
     const granularity = dataSetObj?.[0]?.granularity || "Yearly";
+    const publishedTS = dataSetObj?.[0]?.publishedTime || null;
+    const updatedTS = dataSetObj?.[0]?.updatedTime || null;
     let headerRow = null;
     let dataRows = null;
 
     console.log("granularity: ", granularity);
-    console.log("year: ", year);
 
 
     if (bucketUrl) {
@@ -319,7 +320,9 @@ export async function getServerSideProps(context) {
             YouMayAlsoLike: YouMayAlsoLike,
             SourceURL: SourceURL,
             seoDesc: seoDesc,
-            granularity: granularity
+            granularity: granularity,
+            publishedTS: publishedTS,
+            updatedTS: updatedTS
         }
     }
 

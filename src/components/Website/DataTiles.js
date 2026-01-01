@@ -52,8 +52,6 @@ export default function DataTiles() {
 
   return (
     <div className="p-6 bg-gray-50">
-        <h2 className="text-2xl font-bold text-[#27406d] border-b border-gray-600">Data Insights 8k Datapoints across 70 Sectors</h2>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 py-4">
         {images.map((img, i) => (
           <a

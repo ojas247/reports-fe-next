@@ -9,6 +9,15 @@ const IMAGE_ASPECT_RATIO = 1.6; // Example: 16:10 for a modern look
 const AutoCarouselBanner = ({ images, height = 400, containerWidthClass = 'w-[95%] md:w-[65%] max-w-7xl mx-auto' }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // --- Next.js Image Dimension Hints (Optimization) ---
+  const imageDimensionHints = useMemo(() => {
+  return {
+    // We use the fixed 'height' prop as a reference for optimization hints
+    widthHint: height * IMAGE_ASPECT_RATIO,
+    heightHint: height,
+  };
+}, [height]);
+
   // --- Auto-Scroll Effect ---
   useEffect(() => {
     if (images.length === 0) return;
@@ -25,14 +34,7 @@ const AutoCarouselBanner = ({ images, height = 400, containerWidthClass = 'w-[95
     setCurrentIndex(index);
   };
 
-  // --- Next.js Image Dimension Hints (Optimization) ---
-  const imageDimensionHints = useMemo(() => {
-    return {
-      // We use the fixed 'height' prop as a reference for optimization hints
-      widthHint: height * IMAGE_ASPECT_RATIO,
-      heightHint: height,
-    };
-  }, [height]);
+ 
 
 
   return (

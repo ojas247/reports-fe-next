@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { fetchDataFromGetApi } from '../pages/api/Api';
 import DataTiles from '@/components/Website/DataTiles';
 import AutoCarouselBanner from '@/components/Website/AutoCarouselBanner';
+import MarketUpdate from '@/components/Website/MarketUpdate';
 
 export default function IndexPage() {
   const [expandedFAQs, setExpandedFAQs] = useState([true, true, true, true, true, true]);
@@ -148,25 +149,39 @@ export default function IndexPage() {
         </div>
       </div>
 
-      <div className='w-full h-full py-10'>
+      <div className='w-full h-full py-10 ml-[3%]'>
+        <h2 className="text-2xl font-bold text-[#27406d] border-b border-gray-600">Insights across 8k Datapoints</h2>
         <DataTiles />
       </div>
 
 
-      <div className=" min-h-screen flex flex-col items-center mt-[10%]">
-        
-          <div className="w-[80%] max-w-md my-12">
-            <SearchBar />
-          </div>
-    
-
+      <div className=" flex flex-col items-center mt-[10%] mb-[10%]">
+        <div className="w-[80%] max-w-md my-8">
+          <SearchBar />
+        </div>
         <p className="text-3xl sm:text-4xl text-center text-[#27406d] mb-5">Search / Download for FREE</p>
-        <p className="text-xl sm:text-sm text-center text-[#27406d] mb-12">We do charge a small patronage fee, if you wish to use product-features for analytics, AI-assisted Summaries and Insigths</p>
+        <p className="text-xl sm:text-sm text-center text-[#27406d] mb-8">We do charge a small patronage fee, if you wish to use product-features for analytics, AI-assisted Summaries and Insigths</p>
+      </div>
 
 
+      <div className="bg-white shadow rounded-xl p-6">
+        <h2 className="text-2xl font-bold text-[#27406d] border-b border-gray-600">Monitor 70+ Sectors & Sub-Sectors</h2>
+        <MarketUpdate />
+      </div>
 
-        <div className="bg-gray-50 py-10 mt-[15%]">
-          {/* <h2 className="text-4xl py-10 font-bold text-[#27406d] flex justify-center border-gray-600 pb-4">You don't have to go far to find the data you need</h2> */}
+      <div className="flex flex-col lg:flex-row justify-between items-center gap-12 py-16">
+        <div className="lg:w-1/2 pl-4 lg:pl-40 pt-10">
+          <h1 className={styles.homeHeroText}>Reports & Insights <br /> from over <b>10 years</b></h1>
+          <p>MARKET-REPORTS by SYNTHESIS is a community driven platform to help <br /> Investment Analysts & Funds gather market insights with ease.</p>
+        </div>
+        <div className="lg:w-1/2 flex justify-center">
+          <Image src="/Assets/Images/HeroIllustration.svg" alt="MarketInsight" className="w-[350px] h-auto pt-5" width={80} height={80} />
+        </div>
+      </div>
+
+      <div>
+        <div className="bg-gray-50 py-8 mt-[15%] ml-[3%]">
+          <h2 className="text-2xl font-bold text-[#27406d] border-b border-gray-600 mb-8">APIs and Data-Correlation Inside </h2>
           <AutoCarouselBanner
             images={bannerImages}
             height={500}
@@ -174,15 +189,7 @@ export default function IndexPage() {
         </div>
 
 
-        <div className="flex flex-col lg:flex-row justify-between items-center gap-12 py-16">
-          <div className="lg:w-1/2 pl-4 lg:pl-40 pt-10">
-            <h1 className={styles.homeHeroText}>Reports & Insights <br /> from over <b>10 years</b></h1>
-            <p>MARKET-REPORTS by SYNTHESIS is a community driven platform to help <br /> Investment Analysts & Funds gather market insights with ease.</p>
-          </div>
-          <div className="lg:w-1/2 flex justify-center">
-            <Image src="/Assets/Images/HeroIllustration.svg" alt="MarketInsight" className="w-[350px] h-auto pt-5" width={80} height={80} />
-          </div>
-        </div>
+
 
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#27406d" fill-opacity="1" d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,250.7C960,267,1056,245,1152,250.7C1248,256,1344,288,1392,304L1440,320L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>
         <div className="bg-[#27406d] w-full pt-12 pb-12 text-center">
