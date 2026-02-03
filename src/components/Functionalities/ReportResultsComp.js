@@ -102,6 +102,9 @@ const ReportResultsComp = (props) => {
                         units={item.Units}
                         sourceURL={item.Source}
                         slugURL = {item.slugURL}
+                        publishedTS = {item.publishedTS}
+                        updatedTS = {item.updatedTS}
+                        granularity = {item.granularity}
                     />
                 ))}
             </ul>

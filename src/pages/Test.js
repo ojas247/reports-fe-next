@@ -5,18 +5,14 @@ import NavBar_PostLogin from "@/components/Website/NavBar_PostLogin"
 import SearchBar from '../components/Functionalities/SearchBar';
 import CollapsibleSidebar from '@/components/Website/CollapsibleSidebar';
 import MarketUpdate from '@/components/Website/MarketUpdate';
+import CrossFilters from '@/components/UtilityComponents/Tools/CrossFilters';
 import AutoCarouselBanner from '@/components/Website/AutoCarouselBanner'
 
 
 export default function MarketSectors() {
-  const bannerImages = [
-    '/Assets/Images/DigitalRev.png', // Replace with your image paths (local or external URLs)
-    '/Assets/Images/DigitalRev.png', // Replace with your image paths (local or external URLs)
-    '/Assets/Images/DigitalRev.png', // Replace with your image paths (local or external URLs)
-  ];
   return (
     <div className="bg-white shadow rounded-xl p-6">
-      <MarketUpdate />
+      <CrossFilters />
     </div>
   );
 }

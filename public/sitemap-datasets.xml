@@ -1,157 +1,298 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <url>
-    <loc>https://marketreports.in/DataSets/Automobiles/Automobile-Domestic-Sales-2025</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Automobiles/Automobile-Exports-Trends-2025</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Automobiles/Automobile-Production-Trends-2025</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Government-Capital-Infusion-In-Public-Sector-Banks</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Individual-Intraday-Traders-Vs-All-Individuals-cash-Segment</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Intraday-Traders-Classification-By-Number-Of-Trades</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Intraday-Traders-Classification-By-Trade-Size</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Intraday-Traders-Classification-By-Turnover</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Numbering-Of-Functioning-Offices-Of-Commercial-Banks</loc>
-  </url>
-   <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Volume-of-Trxns-via-ATMs--Financial-Switches-</loc>
-  </url>
-   <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Payments-via-Adhaar-ACH-and-Cheque</loc>
-  </url>
-   <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Payments-transactions-on-RuPay-and-IMPS</loc>
-  </url>
-   <url>
-    <loc>https://marketreports.in/DataSets/FinTech/UPI-and-Mobile-Banking-Transactions</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Profile-of-Indian-Life-Insurance-Sector</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Life-Insurance-Penetration-and-MarketShare-of-LIC</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FinTech/AUM-of-Life-Insurance-Funds</loc>
-  </url>
-     <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Channel-Wise-Distribution-of-Life-Insurance</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Global-Comparison-of-Life-Insurance-Penetration</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Housing-Finance-in-Indian-States</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Retail-Investor-Distribution-across-States</loc>
-  </url>
-
-
-  <url>
-    <loc>https://marketreports.in/DataSets/FinTech/Crar-Net-Profit-And-Gois-Shareholding-Of-Public-Sector-Banks</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Manufacturing/Spice-Wise-Production-and-Area-State-wise-2025</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Manufacturing/Spice-Wise-Production-and-Area-of-Cultivation</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Manufacturing/Item-Wise-Export-Of-Spices-From-India</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Pepper--2025</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Cardamom-2025</loc>
-  </url>
-   <url>
-    <loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Chilli-2025</loc>
-  </url>
-   <url>
-    <loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Ginger-2025</loc>
-  </url>
-   <url>
-    <loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Termeric-2025</loc>
-  </url>
-   <url>
-    <loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Coriander-Seeds-2025</loc>
-  </url>
-   <url>
-    <loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Garlic-2025</loc>
-  </url>
-   <url>
-    <loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Tamarind-2025</loc>
-  </url>
-   <url>
-    <loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Cardamom-2025</loc>
-  </url>
-   <url>
-    <loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Clove-2025</loc>
-  </url>
-
-  <url>
-    <loc>https://marketreports.in/DataSets/Indian Economy/India’s-Transformed-Poverty-Story</loc>
-  </url>
-  <url>
-  <loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Railways-Operations---Electrified-Routes</loc>
-</url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Railways-Operations---Efficiency-of-Goods-and-Passengers</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Railways-Operations---Earnings-from-Goods-and-Passengers</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Indian Economy/Real-Gross-Value-Added-at-Basic-Prices-by-Industry-</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Growth-of-Civil-Aviation-Fleet-Strength-of-Aircrafts</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Growth-of-Civil-Aviation-No-of-Passengers</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Cargo-handled-at-Indian-Airports</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Passengers-handled-at-Indian-Airports</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Telecom-Service-Providers-Subscriber-Base-in-Rural-India</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Telecom-Service-Providers-Subscriber-Base</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FoodTech/Value-of-Alcoholic-Beverages-Exported-from-India-2023</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FoodTech/Milk-Production-in-India-2024</loc>
-  </url>
-  <url>
-    <loc>https://marketreports.in/DataSets/FoodTech/Value-of-Output-from-Livestock-sector-2023</loc>
-  </url>
-
-    <!-- 48 -->
- 
-
-  
-
-
+		<loc>https://marketreports.in/DataSets/AgriTech/Agricultural-Infra-Fund-Deployment-Amount-Statewise</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/AgriTech/Agricultural-Loans-Obtained-Through-Kisan-Credit-Cards</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Automobiles/Automobile-Domestic-Sales-2025</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Automobiles/Automobile-Exports-Trends-2025</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Automobiles/Automobile-Production-Trends-2025</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/DeepTech/Evolution-of-Consumer-GPU</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Education/Function-wise-Placements-of-IIM-Ahmedabad-PGP</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Education/Maximum-Function-wise-Placements-of-IIM-Ahmedabad-PGP</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Education/Statistics-of-Class-X-Examination</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Education/Statistics-of-Class-XII-Examination</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Crar-Net-Profit-And-Gois-Shareholding-Of-Public-Sector-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Government-Capital-Infusion-In-Public-Sector-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Numbering-Of-Functioning-Offices-Of-Commercial-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Payments-via-Adhaar-ACH-and-Cheque</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Volume-of-Trxns-via-ATMs--Financial-Switches-</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Category-wise-Outstanding-Individual-Housing-Loans</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Housing-Finance-in-Indian-States</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/AUM-of-Life-Insurance-Funds</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Channel-Wise-Distribution-of-Life-Insurance</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Global-Comparison-of-Life-Insurance-Penetration</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Life-Insurance-Penetration-and-MarketShare-of-LIC</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Profile-of-Indian-Life-Insurance-Sector</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Payments-transactions-on-RuPay-and-IMPS</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/UPI-and-Mobile-Banking-Transactions</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Credit-Cards-by-Foreign-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Credit-Cards-by-Private-Sector-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Credit-Cards-by-Public-Sector-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Credit-Cards-by-Small-Finance-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Debit-Cards-by-Foreign-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Debit-Cards-by-Payments-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Debit-Cards-by-Private-Sector-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Debit-Cards-by-Public-Sector-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Debit-Cards-by-Small-Finance-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/PoS-by-Private-Sector-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/PoS-by-Public-Sector-Banks</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Country-wise-Share-in-India’s-Inward-Remittances</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Inward-Foreign-Remittance-Received-by-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Individual-Intraday-Traders-Vs-All-Individuals-cash-Segment</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Intraday-Traders-Classification-By-Number-Of-Trades</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Payment-Fraud-in-Domestic-Market</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Intraday-Traders-Classification-By-Trade-Size</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Intraday-Traders-Classification-By-Turnover</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Penetration-of-Securities-Products-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FinTech/Retail-Investor-Distribution-across-States</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FoodTech/Value-of-Alcoholic-Beverages-Exported-from-India-2023</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FoodTech/Milk-Production-in-India-2024</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/FoodTech/Value-of-Output-from-Livestock-sector-2023</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Health Care/Causes-of-Death-per-Capita-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Indian Economy/India’s-Transformed-Poverty-Story</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Indian Economy/Causes-of-Crime-to-Outrage-Womens-Modesty-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Indian Economy/Causes-of-Death-Due-to-Negligence-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Indian Economy/Causes-of-crime-to-Hurt-another-person-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Indian Economy/IPC-Crimes-Over-the-Years</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Indian Economy/Miscellaneous-Crimes-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Indian Economy/Number-of-incidence-and-reasons-of-Riots-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Indian Economy/Number-of-incidence-of-Kidnapping-and-Abduction-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Indian Economy/Segment-wise-IPC-Crime-Incidences-In-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Indian Economy/Theft-related-Crimes-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Indian Economy/Real-Gross-Value-Added-at-Basic-Prices-by-Industry-</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Indian Economy/Indian-Population-and-Agri-Workforce</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Indian Economy/Sectoral-share-in-Gross-Value-Added-at-Current-Basic-Prices</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Cargo-handled-at-Indian-Airports</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Growth-of-Civil-Aviation-Fleet-Strength-of-Aircrafts</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Growth-of-Civil-Aviation-No-of-Passengers</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Number-of-Airports-by-Categories-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Passengers-handled-at-Indian-Airports</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Budge-Allocation-towards-Infrastructure-Development</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Global-Crude-Steel-Production</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Production-of-Different-types-of-Steel-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Steel-Import-and-Export-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Steel-Production-Consumption-Import-and-Export-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Top-Steel-Manufacturing-Companies-Globally</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Mineral-Production-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Mineral-Production-in-India-by-Value</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Railways-Operations---Earnings-from-Goods-and-Passengers</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Railways-Operations---Efficiency-of-Goods-and-Passengers</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Railways-Operations---Electrified-Routes</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Telecom-Service-Providers-Subscriber-Base</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Infra &amp; Utilities/Telecom-Service-Providers-Subscriber-Base-in-Rural-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Production-Import-Export-of-Cement-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Production-of-Major-Chemicals-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Production-of-Major-Petrochemicals-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Item-Wise-Export-Of-Spices-From-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Spice-Wise-Production-and-Area-State-wise-2025</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Spice-Wise-Production-and-Area-of-Cultivation</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Cardamom-2025</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Chilli-2025</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Clove-2025</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Coriander-Seeds-2025</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Garlic-2025</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Ginger-2025</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Pepper---2025</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Tamarind-2025</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Statewise-Production-of-Termeric-2025</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Production-of-Cotton-and-Yarn-in-India</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Country-wise-Cotton-Consumption</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Country-wise-Cotton-Imports</loc>
+	</url>
+	<url>
+		<loc>https://marketreports.in/DataSets/Manufacturing/Country-wise-Cotton-Production</loc>
+	</url>
+  <!-- 98 -->
 </urlset>

@@ -4,6 +4,7 @@ import Head from "next/head";
 import Navbar from "../../components/Functionalities/NavBar";
 import Footer from "../../components/Website/Footer";
 import FactsLoader from "@/components/UtilityComponents/Tools/FactsLoader";
+import { useState, useEffect } from "react";
 
 export default function DataCategoryPage({ data, dataCategory }) {
     const [loading, setLoading] = useState(true);

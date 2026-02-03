@@ -22,6 +22,8 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
     const router = useRouter();
     const pageURL = frontendAPI + '/DataSets/' + sector + '/' + slug
 
+    const cleanString = (str) => str?.replace(/\s+/g, ' ').trim();
+   
 
     const breadcrumbItems = [
         { label: 'Home', href: '/' },
@@ -29,7 +31,6 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
         { label: sector, href: '/DataSets/' + sector },
         { label: dataHeading } // no href = current page
     ];
-
     const breadcrumbItemsList = [
         {
             name: 'Home',
@@ -65,7 +66,7 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
         "@type": "Dataset",
         "name": dataHeading,
         "description": gridDescription,
-        "url":pageURL,
+        "url": pageURL,
         "keywords": [dataCategory, dataHeading],
         "creator": {
             "@type": "Organization",
@@ -87,7 +88,7 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
     const articleSchema = {
         "@context": "http://schema.org",
         "@type": "Article",
-        "headline": dataHeading,
+        "headline": cleanString(dataHeading),
         "author": {
             "@type": "Person",
             "name": author
@@ -132,10 +133,11 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
                 <title>{dataHeading}</title>
                 {/* <link rel="canonical" href={pageURL} /> */}
                 {/* <meta name="robots" content="index, follow" /> */}
-                
+
                 <script type="application/ld+json">
                     {JSON.stringify(articleSchema)}
                 </script>
+            
                 <script type="application/ld+json">
                     {JSON.stringify(dataSetSchema)}
                 </script>
@@ -192,7 +194,6 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
                             </button>
                         </form>
                     </div>
-
                 </div>
 
 
@@ -232,15 +233,12 @@ export default function DataSets({ bucketUrl, gridDescription, dataHeading, unit
                                     <div className={styles.insightsArticleContent}>
                                         <h3>{item.DataName}</h3>
                                         <div className={styles.insightsArticleCategory}><div className={styles.insightsArticleCategoryText}>{item.category}</div></div>
-
                                     </div>
                                 </Link>
                             </div>
                         ))}
                     </div>
                 </div>
-
-
             </div>
             <Footer />
         </>
@@ -279,6 +277,7 @@ export async function getServerSideProps(context) {
     let dataRows = null;
 
     console.log("granularity: ", granularity);
+    // console.log("Dataformat: "+ updatedTS)
 
 
     if (bucketUrl) {
@@ -325,6 +324,4 @@ export async function getServerSideProps(context) {
             updatedTS: updatedTS
         }
     }
-
-
 }

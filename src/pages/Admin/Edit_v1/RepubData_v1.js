@@ -171,6 +171,7 @@ function RepubData_v1() {
                 {response && (
                     <div className={styles.responseContainer}>
                       <p>{response.Status}</p>
+                      <p>{response.URL}</p>
                     </div>
                 )}
                 {/* </form>*/}

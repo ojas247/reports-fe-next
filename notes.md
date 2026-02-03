@@ -32,6 +32,7 @@ To add a table
 | -------- | -------- |
 | 37699    | 624224   |
 | 22704    | 239792   |
+To add bullet points use this |* Internationl Airport
 For External Hyperlinking put this [external link](https://www.google.com) // TO BE IMPLEMENTED
 
 

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import styles from '../../styles/UtilityComps/reportTile.module.css';
 import Link from 'next/link';
 
-function ReportTile({ index, Tags, reportURL, reportAuthor, reportName, year, sector, sub1, researchType, units, sourceURL, slugURL }) {
+function ReportTile({ index, Tags, reportURL, reportAuthor, reportName, year, sector, sub1, researchType, units, sourceURL, slugURL, publishedTS, updatedTS, granularity }) {
   const [truncated, setTruncated] = useState(true);
   const frontendAPI = process.env.NEXT_PUBLIC_frontendAPI;
 
@@ -58,17 +58,27 @@ function ReportTile({ index, Tags, reportURL, reportAuthor, reportName, year, se
 
           <div className={styles.cardParameters}>
             <div className={styles.rptTileIcon}><i className="bi bi-pencil-square"></i></div>
-            <div><b>Publisher/Author: </b>{reportAuthor?.join(", ") || "N/A"}</div>
+            <div><b>Author(s): </b>{reportAuthor?.join(", ") || "N/A"}</div>
+          </div>
+        </div>
+
+        <div className={styles.cardParametersContainer}>
+          <div className={styles.cardParameters}>
+            <div className={styles.rptTileIcon}>
+              <i className="bi bi-calendar4-week"></i></div>
+            <div><b>Updated On: </b>{publishedTS} </div>
+          </div>
+
+           <div className={styles.cardParameters}>
+            <div className={styles.rptTileIcon}>
+            <i class="bi bi-speedometer2"></i></div>
+            <div><b>Granularity: </b>{granularity || "NA"} </div>
           </div>
         </div>
 
         {(units || sourceURL) && (
         <div className={styles.cardParametersContainer}>
-          {/* <div className={styles.cardParameters}>
-            <div className={styles.rptTileIcon}>
-            <i class="bi bi-speedometer2"></i></div>
-            <div><b>Units: </b>{units} </div>
-          </div> */}
+         
 
           <div className={styles.cardParameters}>
             <div className={styles.rptTileIcon}><i class="bi bi-link-45deg"></i></div>

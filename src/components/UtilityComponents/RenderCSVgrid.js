@@ -58,9 +58,8 @@ export default function CsvGridPage(props) {
     .replace(/'''([^']+)'''/g, '**$1**')  // '''bold''' → **bold**
     .replace(/=([^=]+)=/g, '## $1')  // = xxx = → ## xxx (H2)
     .replace(/==([^=]+)==/g, '### $1')  // == xxx == → ### xxx (H3; change to '## $1' if you want both as H2)
-    .replace(/@link-start\s*(.*?)\s*@link-end\s*@url-start\s*(.*?)\s*@url-end/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">$1</a>');  // Custom links to HTML
-
-
+    .replace(/@link-start\s*(.*?)\s*@link-end\s*@url-start\s*(.*?)\s*@url-end/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">$1</a>')  // Custom links to HTML
+    .replace(/^[ \t]*\|\*\s*(.*)/gm, '* $1') // Look specifically for |* at the start of a line // We use [ \t]* to allow for optional spaces before the |
   return (
     <div className="p-4 space-y-0">
       <h1 className="text-2xl font-bold text-blue-900">{heading}</h1>
@@ -75,6 +74,11 @@ export default function CsvGridPage(props) {
           strong: ({ children }) => <strong className="font-bold">{children}</strong>,  // Bold styling
           p: ({ children }) => <div className="mb-1"> {children}</div>,  // Bullet for paragraphs. Removed a • after <....>• {children}
           br: ({ node }) => <br className="my-1" />,  // Optional: Custom <br /> spacing
+
+          // Add these three specifically for the bullets to show up
+          ul: ({ children }) => <ul className="list-disc ml-6 mb-2 space-y-1">{children}</ul>,
+          ol: ({ children }) => <ol className="list-decimal ml-6 mb-2 space-y-1">{children}</ol>,
+          li: ({ children }) => <li className="mb-1">{children}</li>,
 
           // --- TABLE STYLING ---
           table: ({ children }) => (
@@ -228,3 +232,4 @@ CsvGridPage.propTypes = {
   rows: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)).isRequired,
   bucketUrl: PropTypes.string.isRequired
 };
+
