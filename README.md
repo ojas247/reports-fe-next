@@ -1,4 +1,13 @@
-# MarketReports.in (Synthesis)
+#                                                                                                                                   
+ mmm  mmm                      mm                            mmmmmm                                                               
+ ###  ###                      ##                    ##      ##""""##                                            ##               
+ ########   m#####m   ##m####  ## m##"    m####m   #######   ##    ##   m####m   ##m###m    m####m    ##m####  #######   mm#####m 
+ ## ## ##   " mmm##   ##"      ##m##     ##mmmm##    ##      #######   ##mmmm##  ##"  "##  ##"  "##   ##"        ##      ##mmmm " 
+ ## "" ##  m##"""##   ##       ##"##m    ##""""""    ##      ##  "##m  ##""""""  ##    ##  ##    ##   ##         ##       """"##m 
+ ##    ##  ##mmm###   ##       ##  "#m   "##mmmm#    ##mmm   ##    ##  "##mmmm#  ###mm##"  "##mm##"   ##         ##mmm   #mmmmm## 
+ ""    ""   """" ""   ""       ""   """    """""      """"   ""    """   """""   ## """      """"     ""          """"    """"""  
+                                                                                 ##                                               
+                                                                                                                                  
 
 > **A Community-Driven Macro-Analytics Platform for Investment Analysts, Fund Houses, and Corporate Strategists.**
 
