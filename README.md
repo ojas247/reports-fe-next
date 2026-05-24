@@ -1,9 +1,4 @@
-__  __           _        _   ____                       _       
-|  \/  | __ _ _ _| |_____ | |_|  _ \ ___ _ __   ___  _ __| |_ ___ 
-| |\/| |/ _` | '__| / / _ \| __| |_) / _ \ '_ \ / _ \| '__| __/ __|
-| |  | | (_| | |  |   <  __/ |_|  _ <  __/ |_) | (_) | |  | |_\__ \
-|_|  |_|\__,_|_|  |_|\_\___|\__|_| \_\___| .__/ \___/|_|   \__|___/
-                                         |_|
+# MarketReports.in
                                                                                                                     
 
 > **A Community-Driven Macro-Analytics Platform for Investment Analysts, Fund Houses, and Corporate Strategists.**
