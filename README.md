@@ -50,3 +50,14 @@ Integrates processing layers that generate automated summaries of long-form repo
 ```bash
    git clone [https://github.com/your-username/marketreports-in.git](https://github.com/your-username/marketreports-in.git)
    cd marketreports-in
+
+
+
+DATABASE_URL="your_secure_database_connection"
+   AI_SUMMARY_ENGINE_KEY="your_api_key"
+
+
+# Run your specific stack commands here
+   npm install && npm run dev  # For JavaScript/TypeScript layers
+   # OR
+   cargo run --release         # For low-latency data crunching backends
