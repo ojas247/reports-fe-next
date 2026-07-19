@@ -8,6 +8,7 @@ import styles from "../../../styles/Pages/Admin/publishing.module.css";
 import Image from 'next/image';
 import SubmitGrid from '../../../components/UtilityComponents/SubmitGrid';
 import TextWithGrid from '../../../components/UtilityComponents/SEODataSets/TextWithGrid';
+import TextWithGridImmutable from '../../../components/UtilityComponents/SEODataSets/TextWithGridImmutable';
 import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/SectorHierarchyDropDown';
 import { fetchDataFromPostApi } from '../../api/Api';
 
@@ -24,6 +25,20 @@ function RepubData_v1() {
     const [txtGrdComponents, setTxtGrdComponents] = useState([]);
     const [aggDataFromTxtgrdComponent, setAggDataFromTxtgrdComponent] = useState({});
     const comp = { id: 1, data: {} }
+
+
+    // City options for the dropdown
+    const template_options = {
+        options_list: [
+            "mumbai", 
+            "delhi", 
+            "bangalore", 
+            "hyderabad", 
+            "chennai", 
+            "kolkata", 
+            "pune"
+        ]
+    };
 
 
     /// to fetch ReportList based on the sectorChain ///
@@ -123,10 +138,16 @@ function RepubData_v1() {
                     </button>
                 </div>
                 <div>
-                   
                     <SingleDropDown_v1
                         options={reportList}
                         onSelect={getSelectedReportDetails}
+                    />
+                </div>
+                <div>
+                    <h3>List of Templates Available</h3>
+                    <SingleDropDown_v1
+                        options={template_options}
+                        //onSelect={getSelectedReportDetails}
                     />
                 </div>
               
@@ -144,12 +165,18 @@ function RepubData_v1() {
                 ))} */}
 
                 {Object.keys(oldReportData).length > 0 && (
-                    <TextWithGrid
-                        key={comp.id}
-                        updateData={(data) => getTextWithGridData(comp.id, data)}
-                        sectorSub1Data={SecSubdata}
-                        initialData={oldReportData}
-                    />
+                    <>
+                        <TextWithGrid
+                            key={comp.id}
+                            updateData={(data) => getTextWithGridData(comp.id, data)}
+                            sectorSub1Data={SecSubdata}
+                            initialData={oldReportData}
+                        />
+
+                        <TextWithGridImmutable
+                            initialData={oldReportData}
+                        />
+                    </>
                 )}
 
 

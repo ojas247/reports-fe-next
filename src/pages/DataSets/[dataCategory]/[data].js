@@ -276,7 +276,7 @@ export async function getServerSideProps(context) {
     let headerRow = null;
     let dataRows = null;
 
-    console.log("granularity: ", granularity);
+    // console.log("granularity: ", granularity);
     // console.log("Dataformat: "+ updatedTS)
 
 

@@ -35,7 +35,7 @@ const LoginComp = ({ message }) => {
     })
       .then((response) => {
         // console.log("Token:  ", response.data.clientCode);
-        router.push('/', { state: { username } });
+        router.push('/Research/Data', { state: { username } });
         setSessionToken(response.data.jwt);
         localStorage.setItem('UCC', response.data.clientCode);
 

@@ -13,7 +13,7 @@ export async function fetchDataFromGetApi(urlSlug) {
       });
   
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(`Network response from ${backendAPI}/${urlSlug} was not ok`);
       }
       const data = await response.json();
      // console.log("response api.js:",data);
@@ -35,7 +35,7 @@ export async function fetchDataFromGetApi(urlSlug) {
       });
   
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error(`Network response from ${backendAPI}/${urlSlug} was not ok`);
       }
       const data = await response.json();
       // console.log("response api.js:",data);

@@ -7,6 +7,8 @@ Focus Color (green): #4CAF50
 Backgroud Color (bluish pestal):  rgb(244 245 255) / #F4F5FF
 
 
+################## GitHub ##################
+git push -u github main
 
 ################## DEPLOY ###################
 CREATES a IMAGE IN REGISTRY

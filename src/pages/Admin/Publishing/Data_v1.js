@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import SingleDropDown from "../../../components/UtilityComponents/SingleDropdown";
+import SingleDropDown_v1 from "../../../components/UtilityComponents/SingleDropdown_v1";
 import CascadingDropDown from "../../../components/UtilityComponents/CascadingDropdown";
 import { fetchSetorSubOptions, fetchAuthors, fetchYears, fetchTags } from "../../api/Api";
 import axios from 'axios';
@@ -8,6 +8,19 @@ import Image from 'next/image';
 import SubmitGrid from '../../../components/UtilityComponents/SubmitGrid';
 import TextWithGrid from '../../../components/UtilityComponents/SEODataSets/TextWithGrid';
 import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/SectorHierarchyDropDown';
+
+const template_options = {
+  options_list: [
+    "Item Name - {{item(x)}}",
+    "Date - {{latest0_date}}",
+    "Value of Item on a Date - {{item(2)_latest(0)}}",
+    "Units of data - {{units}}",
+    "Category of tables - {{category}}",
+    "Granularity of data in Tables - {{granularity}}",
+    "Math: Division -  {{ArOps||item(1)_latest(0)/item(1)_latest(1)}}",
+    "Math: Substraction - {{ArOps||item(1)_latest(0)-item(1)_latest(1)}}"
+    ]
+};
 
 function DataPublishingForm() {
   const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
@@ -22,6 +35,7 @@ function DataPublishingForm() {
   const [loading, setLoading] = useState(false);
   const [txtGrdComponents, setTxtGrdComponents] = useState([]);
   const [aggDataFromTxtgrdComponent, setAggDataFromTxtgrdComponent] = useState({});
+  const [selectedCity, setSelectedCity] = useState("");
   // const [apiMessage, setApiMessage] = useState(null);
 
 
@@ -103,13 +117,18 @@ function DataPublishingForm() {
 
   return (
     <div className="flex w-full">
-      <div className="w-1/4 bg-gray-100 p-4 sticky top-0 h-screen">
-        <div className="relative">
-          <button
-            onClick={addTxtGrdComponent}
-            className="absolute top-0 right-0 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
-            Add Component
-          </button>
+      <div className="w-1/4 bg-gray-100 p-4 sticky top-0 h-screen flex flex-col gap-4">
+        <button
+          onClick={addTxtGrdComponent}
+          className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+        >
+          Add Component
+        </button>
+        <div>
+          <h3>List of Templates Available</h3>
+          <SingleDropDown_v1
+            options={template_options}
+          />
         </div>
       </div>
 
