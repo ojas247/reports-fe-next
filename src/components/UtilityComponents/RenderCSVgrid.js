@@ -8,6 +8,15 @@ import rehypeRaw from 'rehype-raw';  // Allows raw HTML in Markdown
 import PropTypes from 'prop-types';
 import { formatGridHeader } from '../../pages/api/UtilFunctions';
 
+const formatIndianNumber = (value) => {
+  if (value == null || value === "") return value;
+  const str = String(value).trim();
+  // Only format plain numbers (skip dates/labels like "2026-05-31")
+  if (!/^-?\d+(\.\d+)?$/.test(str)) return value;
+  const num = Number(str);
+  if (Number.isNaN(num)) return value;
+  return new Intl.NumberFormat("en-IN").format(num);
+};
 
 // Dynamically import DataGrid so it only runs in the browser:
 const DataGrid = dynamic(
@@ -168,7 +177,7 @@ export default function CsvGridPage(props) {
               <tr key={ri} className="even:bg-gray-50">
                 {row.map((cell, ci) => (
                   <td key={ci} className="border px-2 py-1 whitespace-nowrap">
-                    {cell}
+                    {ci === 0 ? cell : formatIndianNumber(cell)}
                   </td>
                 ))}
               </tr>

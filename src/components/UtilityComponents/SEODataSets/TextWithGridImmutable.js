@@ -97,7 +97,11 @@ const TextWithGridImmutable = ({ id, initialData, onRemove }) => {
 
                                         >
 
-                                            {cell}
+                                            {rowIndex === 0 || cellIndex === 0
+
+                                                ? cell
+
+                                                : formatIndianNumber(cell)}
 
                                         </td>
 
