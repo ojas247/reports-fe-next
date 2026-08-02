@@ -28,7 +28,7 @@ const RegisterComp = () => {
     // Encrypt the password before sending//
     // const encryptedPassword = encryptPassword(password);
     CreateUserId(email, password, phone);
-    navigate('/Login', { state: { "message": "User Registered Successfully. Please Login to Continue." } });
+    router.push('/Login');
 
        // Push GTM event
        pushGTMEvent({

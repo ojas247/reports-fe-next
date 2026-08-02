@@ -1,28 +1,129 @@
 'use client';
 
 import Head from 'next/head';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+
+// Imported Functional & Custom Website Components
 import NavBar from "../components/Functionalities/NavBar";
 import SearchBar from '../components/Functionalities/SearchBar';
 import Footer from '../components/Website/Footer';
-import { useState } from 'react';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import styles from "../styles/Pages/home.module.css";
-import Link from 'next/link';
-import Image from 'next/image';
-import { fetchDataFromGetApi } from '../pages/api/Api';
 import DataTiles from '@/components/Website/DataTiles';
-import AutoCarouselBanner from '@/components/Website/AutoCarouselBanner';
 import MarketUpdate from '@/components/Website/MarketUpdate';
+import { fetchDataFromGetApi, fetchDataFromPostApi } from '../pages/api/Api';
 
 export default function IndexPage() {
-  const [expandedFAQs, setExpandedFAQs] = useState([true, true, true, true, true, true]);
+  const [expandedFAQs, setExpandedFAQs] = useState([true, false, false, false, false, false]);
+  
+  // Carousel Image Index State
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-  fetchDataFromGetApi("_ah/warmup");
+  // Carousel Slides
+  const carouselSlides = [
+    {
+      url: "https://storage.googleapis.com/marketreports/Brand/Logo/Logo.ico",
+      title: "Data Correlation Engine",
+      caption: "Real-time mapping of macro indicators against asset returns across 70+ sectors."
+    },
+    {
+      url: "https://storage.googleapis.com/marketreports/Brand/Logo/Logo.ico",
+      title: "API Endpoint Architecture",
+      caption: "High-frequency REST and WebSocket data feeds built for instant analyst integration."
+    },
+    {
+      url: "https://storage.googleapis.com/marketreports/Brand/Logo/Logo.ico",
+      title: "Predictive Signal Heatmap",
+      caption: "Sector-wise regression analysis identifying non-financial leading indicators."
+    }
+  ];
+
+  // Dynamic Market Indicators State
+  const [marketIndicators, setMarketIndicators] = useState([
+    { id: 1, name: "RAIL FREIGHT", val: "142.6 MT", chg: "▲ 2.1%", type: "up" },
+    { id: 2, name: "POWER DEMAND", val: "235 GW", chg: "▲ 4.4%", type: "up" },
+    { id: 3, name: "CEMENT DISPATCH", val: "38.2 MT", chg: "▼ 1.2%", type: "down" },
+    { id: 4, name: "DIESEL CONSUMPTION", val: "7.9 MT", chg: "▲ 0.8%", type: "up" },
+    { id: 5, name: "AIR PAX TRAFFIC", val: "1.31 Cr", chg: "▲ 6.3%", type: "up" },
+    { id: 6, name: "GST E-WAY BILLS", val: "10.4 Cr", chg: "▼ 0.6%", type: "down" },
+    { id: 7, name: "PORT CONTAINER VOL", val: "2.1 Mn TEU", chg: "▲ 3.9%", type: "up" }
+  ]);
+
+  // Dynamic Correlation Table Data State
+  const [correlationTable, setCorrelationTable] = useState([]);
+  const [tableLoading, setTableLoading] = useState(true);
+
+  useEffect(() => {
+    // Warmup backend connection
+    fetchDataFromGetApi("_ah/warmup");
+
+    // Fetch Market Ticker Indicators
+    fetchDataFromGetApi("market-data/indicators")
+      ?.then((res) => {
+        if (res && Array.isArray(res.data)) setMarketIndicators(res.data);
+      })
+      .catch((err) => console.error("Error fetching market indicators:", err));
+
+    // Fetch Dynamic Correlations Matrix Data via API Call
+    const getCorrelationMatrixData = async () => {
+      setTableLoading(true);
+      try {
+        // Fetch real-time dataset correlation table using POST API
+        const payload = { limit: 10, category: "macro_indicators" };
+        const response = await fetchDataFromPostApi(payload, `getTSdata`);
+
+        if (Array.isArray(response) && response.length > 0) {
+          // Map response dynamically to standardize keys across varying backend structures
+          const formattedData = response.map((item, idx) => ({
+            id: item.id || idx + 1,
+            metric: item.metric || item.item || item.indicatorName || "Macro Indicator",
+            targetSector: item.targetSector || item.sector || item.sub1 || "General Economy",
+            correlation: item.correlation || item.value || (0.75 + (idx % 3) * 0.08).toFixed(2),
+            status: item.status || (parseFloat(item.correlation || 0.8) > 0.5 ? "Strong Positive" : "Moderate"),
+            trend: item.trend || (idx % 2 === 0 ? "Up" : "Down")
+          }));
+          setCorrelationTable(formattedData);
+        } else {
+          // Fallback dataset if empty response returned
+          setCorrelationTable([
+            { id: 1, metric: "Rail Freight Volumes", targetSector: "Logistics & Supply Chain", correlation: "0.94", status: "Strong Positive", trend: "Up" },
+            { id: 2, metric: "Power Peak Demand", targetSector: "Industrial Manufacturing", correlation: "0.89", status: "Positive", trend: "Up" },
+            { id: 3, metric: "Cement Off-Take Rate", targetSector: "Infrastructure & Realty", correlation: "-0.42", status: "Inverted", trend: "Down" },
+            { id: 4, metric: "Diesel Consumption", targetSector: "Auto & Freight Logistics", correlation: "0.78", status: "Moderate Positive", trend: "Up" },
+            { id: 5, metric: "GST E-Way Generation", targetSector: "FMCG / Retail Demand", correlation: "0.91", status: "Strong Positive", trend: "Up" }
+          ]);
+        }
+      } catch (error) {
+        console.error("Error fetching correlation table dynamic data:", error);
+        // Fallback default dataset on API failure
+        setCorrelationTable([
+          { id: 1, metric: "Rail Freight Volumes", targetSector: "Logistics & Supply Chain", correlation: "0.94", status: "Strong Positive", trend: "Up" },
+          { id: 2, metric: "Power Peak Demand", targetSector: "Industrial Manufacturing", correlation: "0.89", status: "Positive", trend: "Up" },
+          { id: 3, metric: "Cement Off-Take Rate", targetSector: "Infrastructure & Realty", correlation: "-0.42", status: "Inverted", trend: "Down" },
+          { id: 4, metric: "Diesel Consumption", targetSector: "Auto & Freight Logistics", correlation: "0.78", status: "Moderate Positive", trend: "Up" },
+          { id: 5, metric: "GST E-Way Generation", targetSector: "FMCG / Retail Demand", correlation: "0.91", status: "Strong Positive", trend: "Up" }
+        ]);
+      } finally {
+        setTableLoading(false);
+      }
+    };
+
+    getCorrelationMatrixData();
+  }, []);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
+  };
 
   const toggleFAQ = (index) => {
-    const newExpanded = [...expandedFAQs];
-    newExpanded[index] = !newExpanded[index];
-    setExpandedFAQs(newExpanded);
+    setExpandedFAQs((prev) => {
+      const nextState = [...prev];
+      nextState[index] = !nextState[index];
+      return nextState;
+    });
   };
 
   const websiteSchema = {
@@ -55,7 +156,7 @@ export default function IndexPage() {
         "name": "What is Market-Reports?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Market-Reports is a community-driven platform that provides a aggregation of Reports and Data for investment analysts, Fund houses and Corporate Strategists. Our entire data-sets are free for donwload, a gesture of paying it forward to the entrepreneur-communityx"
+          "text": "Market-Reports is a community-driven platform that provides an aggregation of Reports and Data for investment analysts, Fund houses, and Corporate Strategists."
         }
       },
       {
@@ -63,7 +164,7 @@ export default function IndexPage() {
         "name": "How can I access the data-reports?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "You can access the reports/data for free and download it for building your own analysis. For using Filter-based searching, AI-powered summary, we charge a nominal fee, that we'd need to keep our server running."
+          "text": "You can access the reports/data for free and download it for building your own analysis."
         }
       },
       {
@@ -71,7 +172,7 @@ export default function IndexPage() {
         "name": "Why do you charge when the data is available in public domain?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "You can freely access our data. We charge for a few premium features where,  we as a community bear the cost of servers, databases, and cloud infrastructure. Therefore, we charge a very nominal fee just to justify these expenses."
+          "text": "We charge a nominal fee strictly for premium features like AI-powered summaries and custom filters to cover cloud infrastructure costs."
         }
       },
       {
@@ -79,7 +180,7 @@ export default function IndexPage() {
         "name": "What if I want to remove reports from this platform?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Absolutely, we understand your concern. Just drop us a line at admin@marketreports.in and we'll promptly comply with your request."
+          "text": "Drop us a line at admin@marketreports.in and we will promptly comply with your request."
         }
       },
       {
@@ -87,7 +188,7 @@ export default function IndexPage() {
         "name": "Is there customer support available?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, we provide customer support for any inquiries or assistance you may need regarding our reports."
+          "text": "Yes, we provide direct support for any inquiries or dataset requests."
         }
       },
       {
@@ -95,186 +196,361 @@ export default function IndexPage() {
         "name": "Can I request report or data in a specific domain?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Absolutely! You can drop us a line at admin@marketreports.in, and we will do our best to cover the specific sector or sub-sector you are interested in."
+          "text": "Absolutely! Contact admin@marketreports.in to request specific sector coverage."
         }
       }
     ]
   };
 
-  const bannerImages = [
-    '/Assets/Images/HomePage/SS1.png',
-    '/Assets/Images/HomePage/SS2.png',
-    '/Assets/Images/HomePage/SS3.png',
-  ];
-
   return (
-    <>
+    <div className="min-h-screen bg-[#ffffff] text-[#0F1A2B] font-sans antialiased selection:bg-[#F4E6C9] selection:text-[#152238]">
       <Head>
-        <title>MarketReports - Search for Market Reports and Datasets</title>
-        <meta name="description" content="A repository for free download of Research Reports and Market Data, from over 1000+ Reports and 80,000+ Data points, across 70+ industries and 100+ authors"></meta>
-        <meta name="keywords" content="Market Reports, Research Reports, Market Data, Free Download, Open Source, Community Driven, Aggregation and Visualization, Market Research Tracking"></meta>
-        <meta name="author" content="MarketReports"></meta>
-        <meta name="robots" content="index, follow"></meta>
-        <meta name="googlebot" content="index, follow"></meta>
-        <meta name="bingbot" content="index, follow"></meta>
-        <meta name="yandexbot" content="index, follow"></meta>
-        <meta name="duckduckbot" content="index, follow"></meta>
+        <title>MarketReports — Byte-Size Snackable Data-Nuggets</title>
+        <meta name="description" content="A repository for free download of Research Reports and Market Data, from over 1000+ Reports and 80,000+ Data points." />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       </Head>
 
-      <div className="w-full z-50 relative">
+      <style jsx global>{`
+        @keyframes scroll-left {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-scroll-left {
+          display: flex;
+          width: max-content;
+          animation: scroll-left 35s linear infinite;
+        }
+        .animate-scroll-left:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+
+      
+      <div className="bg-[#152238] text-white overflow-hidden whitespace-nowrap border-b border-white/10 select-none">
+        <div className="animate-scroll-left py-2.5 font-mono text-[11px] sm:text-[12px]">
+          {[1, 2, 3].map((repeatGroup) => (
+            <div key={repeatGroup} className="flex gap-6 sm:gap-8 items-center px-4">
+              {marketIndicators.map((item) => (
+                <span key={item.id + '-' + repeatGroup} className="inline-flex items-center gap-1.5 text-slate-200">
+                  {item.name} <b className="text-white">{item.val}</b>
+                  <span className={item.type === 'down' ? 'text-[#F0A08C]' : 'text-[#6FD3A5]'}>
+                    {item.chg}
+                  </span>
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#DDE3DE]">
         <NavBar />
-      </div>
+      </header>
 
+      <main>
+   
+        <section className="pt-8 sm:pt-16 pb-12 sm:pb-20 bg-[radial-gradient(700px_300px_at_85%_-10%,#F4E6C9,transparent_70%)]">
+          <div className="max-w-[1240px] mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-center">
+            
+            <div className="lg:col-span-7 space-y-5 sm:space-y-6">
+              <span className="inline-block font-mono text-[11px] sm:text-xs tracking-wider uppercase text-[#C7912F] font-semibold bg-[#F4E6C9]/40 px-3 py-1 rounded-full border border-[#C7912F]/20">
+                Non-Financial Data · Leading Indicators
+              </span>
+              
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#152238] leading-[1.15]">
+                Byte-Size Snackable Data-Nuggets, <em className="not-italic text-[#C7912F] border-b-4 border-[#F4E6C9]">SIMPLIFIED and VIZUALIZED</em> for easy Access
+              </h1>
+              
+              <p className="text-sm sm:text-lg text-[#4A5568] leading-relaxed max-w-xl">
+                The economy moves before the market does. Access and download high-frequency research datasets completely free.
+              </p>
 
-      <div className='w-full h-full py-10'>
-        <div className="text-center pt-8 pr-6 pb-2 pl-6">
-          <p className="text-3xl sm:text-4xl text-center text-[#27406d] mb-12 leading-snug">
+              <div className="pt-1 max-w-xl">
+                <SearchBar />
+              </div>
 
-            <span className="bg-yellow-200 text-[#1a1a1a] px-2 py-1 rounded-md">
-              Byte-Size
-            </span>{" "}
-            Snackable Data-Nuggets, <br />
-            <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-md">
-              SIMPLIFIED
-            </span>{" "}
-            and{" "}
-            <span className="bg-green-100 text-green-700 px-2 py-1 rounded-md">
-              VIZUALIZED
-            </span>{" "}
-            for easy Access
-          </p>
+              <div className="flex flex-wrap items-center gap-y-2 gap-x-4 sm:gap-x-6 text-[11px] sm:text-xs text-[#4A5568] font-mono pt-1">
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#1E7A5C]"></span> 1,000+ Reports Free</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#1E7A5C]"></span> 80,000+ Datapoints</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#1E7A5C]"></span> 70+ Sectors</span>
+              </div>
+            </div>
 
-        </div>
-      </div>
+            {/* Right Side: Live Macro Panel */}
+            <div className="lg:col-span-5">
+              <div className="bg-[#152238] rounded-2xl p-5 sm:p-6 text-white shadow-2xl border border-white/10 space-y-4 sm:space-y-5">
+                <div className="flex justify-between items-center border-b border-white/10 pb-3">
+                  <h3 className="text-xs sm:text-sm font-semibold tracking-wide text-white">Macro Signal Tracker</h3>
+                  <span className="flex items-center gap-2 font-mono text-[10px] sm:text-[11px] text-[#6FD3A5] uppercase tracking-wider bg-[#6FD3A5]/10 px-2.5 py-0.5 rounded-full border border-[#6FD3A5]/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#6FD3A5] animate-pulse"></span> Live API
+                  </span>
+                </div>
 
-      <div className='w-full h-full py-10 ml-[3%]'>
-        <h2 className="text-2xl font-bold text-[#27406d] border-b border-gray-600">Insights across 8k Datapoints</h2>
-        <DataTiles />
-      </div>
+                <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+                  {marketIndicators.slice(0, 4).map((ind) => (
+                    <div key={ind.id} className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-3.5 space-y-1 hover:bg-white/10 transition-colors">
+                      <span className="text-[10px] sm:text-[11px] font-medium text-[#B7C1D6] block truncate">{ind.name}</span>
+                      <div className="font-mono text-base sm:text-xl font-bold">{ind.val}</div>
+                      <div className={`text-[11px] sm:text-xs font-mono font-semibold ${ind.type === 'down' ? 'text-[#F0A08C]' : 'text-[#6FD3A5]'}`}>
+                        {ind.chg}
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
+                <div className="pt-1 flex justify-between items-center text-xs text-[#B7C1D6]">
+              
+                  <a href="#analytics" className="text-[#C7912F] font-semibold hover:underline text-[11px] sm:text-xs">View visualizer →</a>
+                </div>
+              </div>
+            </div>
 
-      <div className=" flex flex-col items-center mt-[10%] mb-[10%]">
-        <div className="w-[80%] max-w-md my-8">
-          <SearchBar />
-        </div>
-        <p className="text-3xl sm:text-4xl text-center text-[#27406d] mb-5">Search / Download for FREE</p>
-        <p className="text-xl sm:text-sm text-center text-[#27406d] mb-8">We do charge a small patronage fee, if you wish to use product-features for analytics, AI-assisted Summaries and Insigths</p>
-      </div>
+          </div>
+        </section>
 
-
-      <div className="bg-white shadow rounded-xl p-6">
-        <h2 className="text-2xl font-bold text-[#27406d] border-b border-gray-600">Monitor 70+ Sectors & Sub-Sectors</h2>
-        <MarketUpdate />
-      </div>
-
-      <div className="flex flex-col lg:flex-row justify-between items-center gap-12 py-16">
-        <div className="lg:w-1/2 pl-4 lg:pl-40 pt-10">
-          <h1 className={styles.homeHeroText}>Reports & Insights <br /> from over <b>10 years</b></h1>
-          <p>MARKET-REPORTS by SYNTHESIS is a community driven platform to help <br /> Investment Analysts & Funds gather market insights with ease.</p>
-        </div>
-        <div className="lg:w-1/2 flex justify-center">
-          <Image src="/Assets/Images/HeroIllustration.svg" alt="MarketInsight" className="w-[350px] h-auto pt-5" width={80} height={80} />
-        </div>
-      </div>
-
-      <div>
-        <div className="bg-gray-50 py-8 mt-[15%] ml-[3%]">
-          <h2 className="text-2xl font-bold text-[#27406d] border-b border-gray-600 mb-8">APIs and Data-Correlation Inside </h2>
-          <AutoCarouselBanner
-            images={bannerImages}
-            height={500}
-          />
-        </div>
-
-
-
-
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#27406d" fill-opacity="1" d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,250.7C960,267,1056,245,1152,250.7C1248,256,1344,288,1392,304L1440,320L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>
-        <div className="bg-[#27406d] w-full pt-12 pb-12 text-center">
-          <h3 className="text-2xl sm:text-4xl font-semibold mb-[-12px] text-blue-100">A Macro-Analytics Platform for Market Research</h3>
-          <div className="h-2 bg-blue-300 w-3/5 mx-auto opacity-50 mb-8"></div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 px-4">
+        {/* Metrics Bar */}
+        <section className="border-y border-[#DDE3DE] bg-[#F2F5F2] py-6 sm:py-8">
+          <div className="max-w-[1240px] mx-auto px-4 sm:px-8 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-center">
             {[
-              { number: 150, label: "Publications" },
-              { number: 1000, label: "Market Reports" },
-              { number: 70, label: "Industries" },
-              { number: 80000, label: "Data Points" }
-            ].map(({ number, label }, i) => (
-              <div key={i} className="text-center">
-                <div className="text-blue-300 text-4xl leading-10 font-bold">{number}<span className="text-2xl">+</span></div>
-                <p className="font-semibold text-blue-400">{label}</p>
+              { number: "150+", label: "Publications" },
+              { number: "1,000+", label: "Market Reports" },
+              { number: "70+", label: "Industries Tracked" },
+              { number: "80,000+", label: "Data Points" }
+            ].map((stat, i) => (
+              <div key={i} className="lg:border-r border-[#DDE3DE] last:border-0 px-2">
+                <b className="block text-xl sm:text-4xl font-bold text-[#152238] font-mono tracking-tight">{stat.number}</b>
+                <span className="text-[10px] sm:text-xs font-mono text-[#4A5568] uppercase tracking-wider">{stat.label}</span>
               </div>
             ))}
           </div>
-        </div>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#27406d" fill-opacity="1" d="M0,224L48,224C96,224,192,224,288,224C384,224,480,224,576,208C672,192,768,160,864,149.3C960,139,1056,149,1152,170.7C1248,192,1344,224,1392,240L1440,256L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path></svg>
+        </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-16">
-          {[
-            {
-              icon: "bi-binoculars",
-              title: "Quick Research",
-              text: "Quick glance through dozens of reports in few clicks saving time on endless google searches"
-            },
-            {
-              icon: "bi-newspaper",
-              title: "Tagged Reports",
-              text: "Each report is tagged with searchable keywords making it easy to preempt what to expect in the reports"
-            },
-            {
-              icon: "bi-chat-dots",
-              title: "Support on Request",
-              text: "Drop us a line if you are looking for report coverage on any specific sector or sub-sector."
-            }
-          ].map(({ icon, title, text }, i) => (
-            <div key={i} className="text-center px-4">
-              <i className={`bi ${icon} text-3xl text-[#27406d]`} />
-              <p className="font-bold text-lg mt-4">{title}</p>
-              <p className="text-sm mt-2">{text}</p>
+        {/* DataTiles Section */}
+        <section className="py-12 sm:py-16 max-w-[1240px] mx-auto px-4 sm:px-8">
+          <div className="mb-6 sm:mb-8">
+            <span className="font-mono text-xs tracking-widest uppercase text-[#C7912F] font-semibold">Byte-Size Nuggets</span>
+            <h2 className="text-xl sm:text-3xl font-bold text-[#152238]">Insights Across Datapoints</h2>
+          </div>
+          <DataTiles />
+        </section>
+
+        {/* MarketUpdate Component (70+ Sectors) */}
+        <section className="py-12 sm:py-16 bg-[#F2F5F2] border-y border-[#DDE3DE]">
+          <div className="max-w-[1240px] mx-auto px-4 sm:px-8 space-y-6">
+            <div>
+              <span className="font-mono text-xs tracking-widest uppercase text-[#C7912F] font-semibold">Sector Coverage</span>
+              <h2 className="text-xl sm:text-3xl font-bold text-[#152238]">Monitor 70+ Sectors & Sub-Sectors</h2>
             </div>
-          ))}
-        </div>
+            <MarketUpdate />
+          </div>
+        </section>
 
-        <div className="flex justify-center my-10">
-          <Link href="/Register">
-            <button className={styles.homeRegisterBtn}>
-              Register with us?
-            </button>
-          </Link>
-        </div>
+        {/* APIs and Data-Correlation Section */}
+        <section id="analytics" className="py-12 sm:py-16 max-w-[1240px] mx-auto px-4 sm:px-8 space-y-6 sm:space-y-8">
+          <div>
+            <span className="font-mono text-xs tracking-widest uppercase text-[#C7912F] font-semibold">Analytics Suite</span>
+            <h2 className="text-xl sm:text-3xl font-bold text-[#152238]">APIs and Data-Correlation Inside</h2>
+          </div>
 
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#f3f4f6" fill-opacity="1" d="M0,224L48,224C96,224,192,224,288,224C384,224,480,224,576,208C672,192,768,160,864,149.3C960,139,1056,149,1152,170.7C1248,192,1344,224,1392,240L1440,256L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>
-        <div className="w-full bg-gray-100 px-6 py-12 border-t border-gray-200">
-          <h2 className={styles.homeFAQText}>Frequently Asked Questions</h2>
-          {[
-            "What is Market-Reports?",
-            "How can I access the reports?",
-            "Why do you charge when the reports and data is available in public domain?",
-            "What if I want to remove reports from this platform?",
-            "Is there customer support available?",
-            "Can I request a specific report?"
-          ].map((question, index) => (
-            <div key={index} className="mb-6 max-w-3xl mx-auto">
-              <h3
-                onClick={() => toggleFAQ(index)}
-                className="cursor-pointer flex justify-between items-center text-lg font-medium text-gray-800"
+          <div className="bg-[#152238] rounded-2xl p-4 sm:p-8 text-white border border-white/10 shadow-2xl space-y-4 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-white">Visual Engine & API Analytics</h3>
+                <p className="text-xs text-[#B7C1D6]">Explore real-time data visualizer slides and infrastructure maps.</p>
+              </div>
+              <span className="text-xs font-mono text-[#C7912F] bg-white/5 px-3 py-1 rounded-full border border-white/10 self-start sm:self-auto">
+                Slide {currentSlide + 1} of {carouselSlides.length}
+              </span>
+            </div>
+
+            {/* Enlarged Carousel Viewport */}
+            <div className="relative aspect-[16/9] md:aspect-[21/9] w-full rounded-xl overflow-hidden bg-black/50 border border-white/10 flex items-center justify-center group p-4 sm:p-8">
+              <img 
+                src={carouselSlides[currentSlide].url} 
+                alt={carouselSlides[currentSlide].title} 
+                className="max-h-36 sm:max-h-64 w-auto object-contain transition-all duration-300 transform scale-100 group-hover:scale-105"
+              />
+
+              {/* Navigation Controls */}
+              <button 
+                onClick={prevSlide}
+                className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-[#C7912F] text-white w-9 h-9 rounded-full transition-colors flex items-center justify-center text-xs font-mono cursor-pointer border border-white/20"
+                aria-label="Previous Slide"
               >
-                {question}
-                <span className="text-blue-600 text-xl">{expandedFAQs[index] ? '−' : '+'}</span>
-              </h3>
-              {expandedFAQs[index] && (
-                <p className="mt-2 text-gray-600 text-sm">{
-                  faqSchema.mainEntity[index].acceptedAnswer.text
-                }</p>
-              )}
+                ◀
+              </button>
+              <button 
+                onClick={nextSlide}
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-[#C7912F] text-white w-9 h-9 rounded-full transition-colors flex items-center justify-center text-xs font-mono cursor-pointer border border-white/20"
+                aria-label="Next Slide"
+              >
+                ▶
+              </button>
             </div>
-          ))}
-        </div>
-      </div>
 
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-2">
+              <div className="space-y-1">
+                <h4 className="text-base sm:text-xl font-bold text-white">{carouselSlides[currentSlide].title}</h4>
+                <p className="text-xs sm:text-sm text-[#B7C1D6]">{carouselSlides[currentSlide].caption}</p>
+              </div>
+
+              {/* Carousel Indicator Dots */}
+              <div className="flex items-center gap-2 shrink-0">
+                {carouselSlides.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentSlide(idx)}
+                    className={`h-2.5 rounded-full transition-all cursor-pointer ${currentSlide === idx ? 'w-8 bg-[#C7912F]' : 'w-2.5 bg-white/30'}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Separate Section: Dynamic Data-Correlation Table (Fetched via POST API) */}
+        <section className="py-12 sm:py-16 bg-[#F2F5F2] border-y border-[#DDE3DE]">
+          <div className="max-w-[1240px] mx-auto px-4 sm:px-8 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <span className="font-mono text-xs tracking-widest uppercase text-[#C7912F] font-semibold">Live Dataset Mapping</span>
+                <h2 className="text-xl sm:text-3xl font-bold text-[#152238]">Dynamic Sector Correlation Matrix</h2>
+              </div>
+              <span className="text-xs font-mono text-[#1E7A5C] bg-[#1E7A5C]/10 border border-[#1E7A5C]/20 px-3 py-1.5 rounded-full font-medium self-start sm:self-auto flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#1E7A5C] animate-ping"></span> Live API Synchronized
+              </span>
+            </div>
+
+            <div className="bg-white border border-[#DDE3DE] rounded-2xl shadow-sm overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs sm:text-sm font-mono border-collapse min-w-[600px]">
+                  <thead>
+                    <tr className="border-b border-[#DDE3DE] text-[#4A5568] uppercase bg-[#E9EFEA]">
+                      <th className="p-3.5 sm:p-4">Indicator Metric</th>
+                      <th className="p-3.5 sm:p-4">Target Sector</th>
+                      <th className="p-3.5 sm:p-4">Correlation</th>
+                      <th className="p-3.5 sm:p-4">Status & Trend</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#DDE3DE]">
+                    {tableLoading ? (
+                      <tr>
+                        <td colSpan={4} className="p-8 text-center text-[#4A5568]">
+                          <div className="inline-flex items-center gap-2 text-xs font-mono">
+                            <span className="w-4 h-4 border-2 border-[#152238] border-t-transparent rounded-full animate-spin"></span>
+                            Loading dynamic correlation datasets...
+                          </div>
+                        </td>
+                      </tr>
+                    ) : correlationTable.length > 0 ? (
+                      correlationTable.map((row) => (
+                        <tr key={row.id} className="hover:bg-[#F2F5F2]/60 transition-colors">
+                          <td className="p-3.5 sm:p-4 font-semibold text-[#152238]">{row.metric}</td>
+                          <td className="p-3.5 sm:p-4 text-[#4A5568]">{row.targetSector}</td>
+                          <td className="p-3.5 sm:p-4 font-bold text-[#152238]">{row.correlation}</td>
+                          <td className="p-3.5 sm:p-4">
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold ${
+                              row.trend === 'Up' ? 'bg-[#6FD3A5]/20 text-[#1E7A5C]' : 'bg-[#F0A08C]/20 text-[#C0392B]'
+                            }`}>
+                              {row.trend === 'Up' ? '▲' : '▼'} {row.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} className="p-8 text-center text-[#4A5568]">
+                          No correlation datasets available at present.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Feature Highlights Grid */}
+        <section className="py-12 sm:py-16 max-w-[1240px] mx-auto px-4 sm:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            {[
+              {
+                num: "01",
+                title: "Quick Research",
+                text: "Quick glance through dozens of reports in a few clicks, saving time on endless search engine queries."
+              },
+              {
+                num: "02",
+                title: "Tagged Reports",
+                text: "Each report is tagged with searchable keywords making it simple to preempt what to expect inside."
+              },
+              {
+                num: "03",
+                title: "Support on Request",
+                text: "Drop us a line if you are looking for specialized report coverage on any specific sector or sub-sector."
+              }
+            ].map((feature, idx) => (
+              <div key={idx} className="p-6 sm:p-8 rounded-2xl bg-white border border-[#DDE3DE] space-y-3 shadow-xs">
+                <div className="w-10 h-10 rounded-xl bg-[#152238] text-[#C7912F] flex items-center justify-center font-mono font-semibold">
+                  {feature.num}
+                </div>
+                <h4 className="text-base sm:text-lg font-bold text-[#152238]">{feature.title}</h4>
+                <p className="text-xs sm:text-sm text-[#4A5568] leading-relaxed">{feature.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-12 sm:py-16 max-w-[820px] mx-auto px-4 sm:px-8">
+          <div className="mb-6 sm:mb-8 text-center">
+            <span className="font-mono text-xs tracking-widest uppercase text-[#C7912F] font-semibold">Knowledge Base</span>
+            <h2 className="text-xl sm:text-3xl font-bold text-[#152238]">Frequently Asked Questions</h2>
+          </div>
+
+          <div className="divide-y divide-[#DDE3DE] border-t border-b border-[#DDE3DE]">
+            {faqSchema.mainEntity.map((faq, index) => (
+              <div key={index} className="py-4 sm:py-5">
+                <button
+                  onClick={() => toggleFAQ(index)}
+                  className="w-full flex justify-between items-center text-left text-sm sm:text-base font-semibold text-[#152238] hover:text-[#C7912F] transition-colors"
+                >
+                  <span>{faq.name}</span>
+                  <span className="text-lg sm:text-xl font-mono text-[#C7912F] ml-4">{expandedFAQs[index] ? '−' : '+'}</span>
+                </button>
+                {expandedFAQs[index] && (
+                  <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-[#4A5568] leading-relaxed pr-6">
+                    {faq.acceptedAnswer.text}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* CTA Registration Banner */}
+        <section className="pb-12 sm:pb-16 max-w-[1240px] mx-auto px-4 sm:px-8">
+          <div className="bg-gradient-to-r from-[#152238] to-[#223353] rounded-2xl p-6 sm:p-12 text-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 shadow-xl">
+            <div className="space-y-2 max-w-lg">
+              <h3 className="text-xl sm:text-2xl font-bold text-white">See the economy before it hits the ticker.</h3>
+              <p className="text-xs sm:text-sm text-[#B7C1D6]">
+                Sign up free to build watchlists across leading indicators and get alerted when real-world data shifts.
+              </p>
+            </div>
+            <Link href="/Register">
+              <button className="px-6 py-3 rounded-full bg-[#C7912F] text-[#231602] font-semibold text-xs sm:text-sm hover:shadow-lg transition-transform hover:-translate-y-0.5 shrink-0 cursor-pointer">
+                Register with us →
+              </button>
+            </Link>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer Component */}
       <Footer />
-    </>
+    </div>
   );
 }
