@@ -1,169 +1,116 @@
-'use client'
+'use client';
 
 import React, { useState, useEffect } from 'react';
-import styles from '../../styles/searchFilters.module.css';
-import SingleDropDown from "../UtilityComponents/SingleDropdown"
-import CascadingDropDown from "../UtilityComponents/CascadingDropdown"
-import { useRouter } from 'next/router';
+import SingleDropDown from '../UtilityComponents/SingleDropdown';
+import CascadingDropDown from '../UtilityComponents/CascadingDropdown';
 import { fetchSetorSubOptions, fetchAuthors, fetchYears, fetchTags } from '../../pages/api/Api';
 import Image from 'next/image';
 
-
 const SearchFilters = (props) => {
-  const router = useRouter();
-  const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
-  
-  console.log("Props received:", props);
-  
   const [loading, setLoading] = useState(true);
   const [SecSubdata, setSecSubdata] = useState([]);
   const [Authordata, setAuthordata] = useState([]);
   const [Yeardata, setYeardata] = useState([]);
   const [Tagdata, setTagdata] = useState([]);
 
+  const [filtersState, setFiltersState] = useState({
+    sector_filters: null,
+    author: null,
+    year: null,
+    tags: null,
+  });
+
   useEffect(() => {
     async function getData() {
-      setLoading(true); // Start loader
-      const OptionsSub1actualData = await fetchSetorSubOptions();
-      setSecSubdata(OptionsSub1actualData);
+      setLoading(true);
+      try {
+        const OptionsSub1actualData = await fetchSetorSubOptions();
+        setSecSubdata(OptionsSub1actualData);
 
-      const OptionsAuthorData = await fetchAuthors();
-      setAuthordata(OptionsAuthorData);
+        const OptionsAuthorData = await fetchAuthors();
+        setAuthordata(OptionsAuthorData);
 
-      // const OptionsYearData = await fetchYears();
-      const OptionsYearData = {"options_list":[2022,2021,2018,2020,2024,2023]};
-      setYeardata(OptionsYearData);
+        const OptionsYearData = { options_list: [2024, 2023, 2022, 2021, 2020, 2018] };
+        setYeardata(OptionsYearData);
 
-      const OptionsTagData = await fetchTags();
-      setTagdata(OptionsTagData);
-      setLoading(false); // Stop loader
+        const OptionsTagData = await fetchTags();
+        setTagdata(OptionsTagData);
+      } catch (error) {
+        console.error('Error fetching filter options:', error);
+      } finally {
+        setLoading(false);
+      }
     }
-    getData()
-  }, [])
+    getData();
+  }, []);
+
+  const updateFilterField = (field, value) => {
+    setFiltersState((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleFilters = () => {
+    if (props.onDataSend) {
+      props.onDataSend(filtersState);
+    }
+  };
 
   if (loading) {
     return (
-      <div style={{ width: "80%", marginLeft: "40%" }} >
-        <Image src="/Assets/Gifs/loading.gif" alt="Loading..." width={100} height={80} />
+      <div className="w-full flex items-center justify-center py-6">
+        <Image src="/Assets/Gifs/loading.gif" alt="Loading..." width={80} height={60} />
       </div>
     );
   }
 
-  const filter_options_json = {};
-  const year_placeholder = "Select Year"
-  const author_placeholder = "Select Author"
-
-  const getYear = (data) => {
-    console.log("Coming from child Year", data);
-    filter_options_json['year'] = data;
-  }
-
-  const getAuthor = (data) => {
-    console.log("Coming from child Author", data);
-    filter_options_json['author'] = data;
-  }
-
-  const getSectorFilters = (data) => {
-    console.log("Coming from child Sectors", data);
-    filter_options_json['sector_filters'] = data;
-  }
-
-  const getTags = (data) => {
-    console.log("Coming from child Tags", data);  
-    filter_options_json['tags'] = data;
-  }
-
-  const handleFilters = () => {
-    console.log("filter_options_json:", filter_options_json);
-    props.onDataSend(filter_options_json);
-  };
-
   return (
-    <>
-      <div
-        className="w-full flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-start p-4"
-      >
-        <div>
-          <CascadingDropDown options={SecSubdata} onSelect={getSectorFilters} />
+    <div className="w-full bg-white border border-slate-200/80 rounded-2xl shadow-sm p-4 sm:p-5">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_0.9fr_0.9fr_0.9fr] gap-4 items-end">
+        <div className="col-span-1 lg:col-span-2 min-w-0">
+          <CascadingDropDown
+            options={SecSubdata}
+            onSelect={(val) => updateFilterField('sector_filters', val)}
+          />
         </div>
-  
-        <div className="mt-[-8px] mb-[-9.5px]">
+
+        <div className="min-w-0">
           <SingleDropDown
             options={Authordata}
-            placeholder={author_placeholder}
-            onSelect={getAuthor}
+            placeholder="Select Author"
+            onSelect={(val) => updateFilterField('author', val)}
           />
         </div>
-  
-        <div className="mt-[-8px] mb-[-9.5px]">
+
+        <div className="min-w-0">
           <SingleDropDown
             options={Yeardata}
-            placeholder={year_placeholder}
-            onSelect={getYear}
+            placeholder="Select Year"
+            onSelect={(val) => updateFilterField('year', val)}
           />
         </div>
-  
-        <div className="mt-[-8px] mb-[-9.5px]">
+
+        <div className="min-w-0">
           <SingleDropDown
             options={Tagdata}
             placeholder="Select Tag"
-            onSelect={getTags}
+            onSelect={(val) => updateFilterField('tags', val)}
           />
         </div>
-  
-        <div className="flex pt-[5px]">
-          <button
-            type="button"
-            onClick={handleFilters}
-            className= {styles.GoButton} >
-            Go
-          </button>
-        </div>
       </div>
-    </>
+
+      <div className="mt-4 flex justify-end">
+        <button
+          type="button"
+          onClick={handleFilters}
+          className="w-full sm:w-auto px-8 py-2.5 rounded-full text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 active:scale-[0.98] transition-all duration-150 shadow-sm"
+        >
+          Go
+        </button>
+      </div>
+    </div>
   );
-}
+};
 
 export default SearchFilters;
-
-
-
-
-
-
-  //   function SearchReports() {
-  //     if (router.pathname === '/ReportResult') {
-  //       axios.post(`${backendAPI}/SearchReports`, filter_options_json,
-  //         {
-  //           headers: {
-  //             "Authorization": `Bearer ${token}`,
-  //           }
-  //         })
-  //         .then(res => {
-  //           const ReportFilterProps = res.data;
-  //           if (ReportFilterProps.message === "Invalid Authorization") {
-  //             router.push('/Login');
-  //           }
-  //           else if (ReportFilterProps.message === "Update plan") {
-  //             router.push('/Pricing');
-  //           } else {
-  //             router.push({
-  //               pathname: '/ReportResult',
-  //               query: {
-  //                 appliedFilters: JSON.stringify(filter_options_json)
-  //               }
-  //             });
-  //           }
-  //         });
-  //     } else {
-    
-  //       router.push({
-  //         pathname: '/ReportResult',
-  //         query: {
-  //           appliedFilters: JSON.stringify(filter_options_json)
-  //         }
-  //       });
-  //     }
-  //     }
-    
-  //   SearchReports();

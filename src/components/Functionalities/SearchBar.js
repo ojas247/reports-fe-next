@@ -87,8 +87,6 @@ const SearchBar = () => {
     const handleInputChange = async (e) => {
         const value = e.target.value;
         setQuery(value);
-        // console.log("Query: ", value);
-        
 
         // Push GTM event
         pushGTMEvent({
@@ -120,16 +118,9 @@ const SearchBar = () => {
 
         const fetchSuggestions = async () => {
             try {
-                setLoading(true); // 🟡 Start loading
-                // const tokenString = sessionStorage.getItem("token")? JSON.parse(sessionStorage.getItem("token")).value : null;
-                // const token = tokenString;
+                setLoading(true);
                 const token = "x@dffgfumdflkd76tg8jivdgoolnvll==";
 
-                // const isAuthenticated = await checkAuthentication();
-                // if (!isAuthenticated) {
-                //     router.push('/Login', { state: {} });
-                //     return;
-                // }
                 const response = await axios.get(
                     `${backendAPI}/AlgoliaSearchEndpoint?keyStroke=${query}`,
                     {
@@ -139,12 +130,10 @@ const SearchBar = () => {
                         }
                     }
                 );
-                setSuggestions(response.data); // Set the parsed JSON directly
-                // setShowSuggestions(true);
+                setSuggestions(response.data);
 
                 if (response.data.message === "UpdatePlan") {
                     console.log("UpdatePlan: ", response.data.message);
-                    // Show popup for plan update
                     const confirmed = window.confirm("Your current plan needs to be updated to access this feature. Would you like to update your plan?");
                     if (confirmed) {
                         router.push('/Pricing', { state: {} });
@@ -156,7 +145,7 @@ const SearchBar = () => {
             } catch (error) {
                 console.error("Error fetching suggestions:", error);
             } finally {
-                setLoading(false); // 🟢 Stop loading
+                setLoading(false);
             }
         };
         fetchSuggestions();
@@ -164,7 +153,7 @@ const SearchBar = () => {
 
     const handleClickOutside = (event) => {
         if (suggestionRef.current && !suggestionRef.current.contains(event.target)) {
-            setShowSuggestions(false); // Hide suggestions when clicking outside
+            setShowSuggestions(false);
         }
     };
 
@@ -185,36 +174,40 @@ const SearchBar = () => {
     return (
         <div className="flex flex-col items-center justify-center w-full px-4 py-4 sm:py-0">
             <div ref={suggestionRef} className="relative w-full max-w-[500px]">
-                {/* Search Input */}
+                {/* Search Input - Thin black border on focus */}
                 <input
                     type="text"
                     value={query}
                     onChange={handleInputChange}
                     placeholder="Search Authors, Sectors, Sub-Sectors..."
-                    className=" w-full border-2 border-gray-300 rounded-full pl-4 pr-16 py-2 text-[16px] focus:outline-none focus:border-[#4CAF50] focus:shadow-md transition-all duration-200 placeholder-gray-400 text-gray-800 "
+                    className="w-full border border-slate-300 rounded-full pl-4 pr-28 py-2 text-sm sm:text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 shadow-sm transition-all duration-200"
                 />
 
                 {/* Search Button */}
                 <button
-                    className=" absolute right-1 top-1/2 -translate-y-1/2 bg-[#27406d] text-white border-2 border-[#27406d] rounded-full px-4 py-1.5 text-sm sm:text-base hover:bg-[#162746] hover:border-[#162746] active:bg-[#162746] cursor-pointer transition-all duration-200 flex items-center justify-center ">
+                    onClick={() => query.trim() && SearchReports(`${backendAPI}/AlgoliaSearchEndpoint?keyStroke=${encodeURIComponent(query)}`)}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 bg-[#1e3a5f] hover:bg-[#162c48] active:scale-95 text-white rounded-full px-4 py-1.5 text-xs sm:text-sm font-semibold cursor-pointer shadow-sm transition-all duration-150 flex items-center justify-center"
+                >
                     <i className="bi bi-search text-white"></i>
                     <span className="hidden sm:inline ml-2">Search</span>
                 </button>
 
+                {/* Suggestions Container */}
                 {!loading && suggestions.length > 0 && showSuggestions && (
-                    <ShowSuggestions suggestions={suggestions} suggestionClick={suggestionClick} />
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-slate-200/80 z-50 overflow-hidden">
+                        <ShowSuggestions suggestions={suggestions} suggestionClick={suggestionClick} />
+                    </div>
                 )}
 
                 {/* Loading Indicator */}
                 {loading && (
-                    <div className="absolute w-full text-center py-2 text-gray-500 text-sm bg-white border border-gray-200 rounded-b-md z-[1000]">
-                        <i className="bi bi-arrow-repeat animate-spin mr-2"></i>
+                    <div className="absolute top-full left-0 right-0 mt-2 text-center py-2.5 text-slate-500 text-xs font-medium bg-white border border-slate-200 rounded-xl shadow-lg z-[1000] flex items-center justify-center">
+                        <i className="bi bi-arrow-repeat animate-spin mr-2 text-sm"></i>
                         Loading suggestions...
                     </div>
                 )}
             </div>
         </div>
-
     );
 }
 

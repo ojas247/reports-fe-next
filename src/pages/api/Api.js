@@ -1,49 +1,29 @@
 
 const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
-const USE_MOCK = true;
 
-const mockData = {
-  sectors: [
-    {
-      Sector: "Technology",
-      SubSector: ["AI", "Cloud Computing", "Semiconductors"]
-    },
-    {
-      Sector: "Healthcare",
-      SubSector: ["Pharmaceuticals", "Medical Devices"]
-    }
-  ],
 
-  authors: [
-    { value: "John Doe", label: "John Doe" },
-    { value: "Jane Smith", label: "Jane Smith" }
-  ],
 
-  years: [
-    { value: "2026", label: "2026" },
-    { value: "2025", label: "2025" }
-  ],
-
-  tags: [
-    { value: "Market", label: "Market" },
-    { value: "India", label: "India" },
-    { value: "Economy", label: "Economy" }
-  ]
-};
 
 export async function fetchDataFromGetApi(urlSlug) {
     try {
-      const response = await fetch(`${backendAPI}/${urlSlug}`, {
-        method: "GET",
-        headers: {
-          'Content-Type': 'application/json',
-        },
-       
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Network response from ${backendAPI}/${urlSlug} was not ok`);
-      }
+   const response = await fetch(`${backendAPI}/${urlSlug}`, {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+if (!response.ok) {
+  const text = await response.text();
+
+  console.error("Status:", response.status);
+  console.error("StatusText:", response.statusText);
+  console.error("Response:", text);
+
+  throw new Error(
+    `${response.status} ${response.statusText}\n${text}`
+  );
+}
       const data = await response.json();
      // console.log("response api.js:",data);
       return data;
@@ -77,9 +57,7 @@ export async function fetchDataFromGetApi(urlSlug) {
 
     export async function fetchSetorSubOptions() {
 
-  if (USE_MOCK) {
-    return mockData.sectors;
-  }
+
 
   try {
     const response = await fetch(`${backendAPI}/CRUD/get/Sectors`);

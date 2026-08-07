@@ -1,148 +1,151 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import styles from '../../../styles/searchFilters.module.css';
-import SingleDropDown from "../../UtilityComponents/SingleDropdown"
-import CascadingDropDown from "../../UtilityComponents/CascadingDropdown"
+import SingleDropDown from "../../UtilityComponents/SingleDropdown";
 import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/SectorHierarchyDropDown';
-import { useRouter } from 'next/router';
 import { fetchSetorSubOptions, fetchAuthors, fetchYears, fetchTags } from '../../../pages/api/Api';
-import Image from 'next/image';
 import FactsLoader from '@/components/UtilityComponents/Tools/FactsLoader';
 
-
 const SearchFilters_v1 = (props) => {
-  const router = useRouter();
-  const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
-
-  console.log("Props received:", props);
-  const initialData = {};
   const [loading, setLoading] = useState(true);
   const [SecSubdata, setSecSubdata] = useState([]);
   const [Authordata, setAuthordata] = useState([]);
   const [Yeardata, setYeardata] = useState([]);
   const [Tagdata, setTagdata] = useState([]);
 
+  // Controlled local state for filters
+  const [filtersState, setFiltersState] = useState({
+    author: null,
+    year: null,
+    tags: null,
+    sector_filters: null,
+  });
+
   useEffect(() => {
     async function getData() {
-      setLoading(true); // Start loader
-      const OptionsSub1actualData = await fetchSetorSubOptions();
-      setSecSubdata(OptionsSub1actualData);
+      setLoading(true);
+      try {
+        const OptionsSub1actualData = await fetchSetorSubOptions();
+        setSecSubdata(OptionsSub1actualData);
 
-      const OptionsAuthorData = await fetchAuthors();
-      setAuthordata(OptionsAuthorData);
+        const OptionsAuthorData = await fetchAuthors();
+        setAuthordata(OptionsAuthorData);
 
-      // const OptionsYearData = await fetchYears();
-      const OptionsYearData = { "options_list": [2022, 2021, 2018, 2020, 2024, 2023] };
-      setYeardata(OptionsYearData);
+        const OptionsYearData = { options_list: [2024, 2023, 2022, 2021, 2020, 2018] };
+        setYeardata(OptionsYearData);
 
-      const OptionsTagData = await fetchTags();
-      setTagdata(OptionsTagData);
-      setLoading(false); // Stop loader
+        const OptionsTagData = await fetchTags();
+        setTagdata(OptionsTagData);
+      } catch (error) {
+        console.error('Failed to load filter metadata:', error);
+      } finally {
+        setLoading(false);
+      }
     }
-    getData()
-  }, [])
+    getData();
+  }, []);
+
+  const updateFilterField = (field, value) => {
+    setFiltersState((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleFilters = () => {
+    props.onDataSend(filtersState);
+  };
+
+  const handleReset = () => {
+    const emptyFilters = {
+      author: null,
+      year: null,
+      tags: null,
+      sector_filters: null,
+    };
+    setFiltersState(emptyFilters);
+    props.onDataSend(emptyFilters);
+  };
 
   if (loading) {
     return (
-      <div style={{ width: "80%", marginLeft: "40%" }} >
-        {/* <Image src="/Assets/Gifs/loading.gif" alt="Loading..." width={100} height={80} /> */}
-        <FactsLoader isLoading={loading} />
+      <div className="w-full min-h-[300px] flex items-center justify-center p-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
+        <FactsLoader />
       </div>
     );
   }
 
-  const filter_options_json = {};
-  const year_placeholder = "Select Year"
-  const author_placeholder = "Select Author"
-
-  const getYear = (data) => {
-    console.log("Coming from child Year", data);
-    filter_options_json['year'] = data;
-  }
-
-  const getAuthor = (data) => {
-    console.log("Coming from child Author", data);
-    filter_options_json['author'] = data;
-  }
-
-  const getSectorFilters = (data) => {
-    console.log("Coming from child Sectors", data);
-    filter_options_json['sector_filters'] = data;
-  }
-
-  const getTags = (data) => {
-    console.log("Coming from child Tags", data);
-    filter_options_json['tags'] = data;
-  }
-
-  const handleFilters = () => {
-    console.log("filter_options_json:", filter_options_json);
-    props.onDataSend(filter_options_json);
-  };
-
   return (
-    <>
-      <div className="bg-white rounded-2xl shadow-md p-6 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Sector Hierarchy */}
-          <div className="px-4 py-2 shadow-md rounded-2xl">
-            <SectorHierarchyDropDown
-              preSelectedData={initialData.sectorChain}
-              options={SecSubdata}
-              onSelect={getSectorFilters}
+    <div className="w-full space-y-5">
+      {/* Sector Hierarchy Panel */}
+      <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm space-y-2">
+        <SectorHierarchyDropDown
+          onSelect={(val) => updateFilterField('sector_filters', val)}
+        />
+      </div>
+
+      {/* Dataset Filter Card */}
+      <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
+        <label className="block text-sm font-semibold text-slate-800 tracking-tight">
+          Dataset Category
+        </label>
+
+        <div className="space-y-4">
+          {/* Author Selector */}
+          <div>
+            <SingleDropDown
+              options={Authordata}
+              placeholder="Select Author"
+              onSelect={(val) => updateFilterField('author', val)}
             />
           </div>
 
-          {/* Dataset Filters */}
-          <div className="px-4 py-6 shadow-md rounded-2xl">
-            {/* Dataset Category */}
-            <label className="block text-sm font-medium text-gray-600 mb-1 sm:px-10">
-              Dataset Category
+          {/* Year Selector */}
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5">
+              Year
             </label>
-            <div className="px-0 py-0 sm:px-5 sm:py-0.5 space-y-3">
-              <SingleDropDown
-                options={Authordata}
-                placeholder={author_placeholder}
-                onSelect={getAuthor}
-              />
+            <SingleDropDown
+              options={Yeardata}
+              placeholder="Select Year"
+              onSelect={(val) => updateFilterField('year', val)}
+            />
+          </div>
 
-              {/* Year */}
-              <label className="block text-sm font-medium text-gray-600 mb-1 sm:px-6">
-                Year
-              </label>
-              <SingleDropDown
-                options={Yeardata}
-                placeholder={year_placeholder}
-                onSelect={getYear}
-              />
-
-              {/* Tag */}
-              <label className="block text-sm font-medium text-gray-600 mb-1 sm:px-6">
-                Tag
-              </label>
-              <SingleDropDown
-                options={Tagdata}
-                placeholder="Select Tag"
-                onSelect={getTags}
-              />
-            </div>
+          {/* Tag Selector */}
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1.5">
+              Tag
+            </label>
+            <SingleDropDown
+              options={Tagdata}
+              placeholder="Select Tag"
+              onSelect={(val) => updateFilterField('tags', val)}
+            />
           </div>
         </div>
-
-        <div className="flex pt-[5px]">
-          <button
-            type="button"
-            onClick={handleFilters}
-            className={styles.GoButton}
-          >
-            Go
-          </button>
-        </div>
       </div>
-    </>
-  );
 
-}
+      {/* Footer Controls */}
+      <div className="flex items-center justify-between pt-1">
+        <button
+          type="button"
+          onClick={handleReset}
+          className="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors duration-150"
+        >
+          Clear Filters
+        </button>
+
+        <button
+          type="button"
+          onClick={handleFilters}
+          className="px-7 py-2.5 rounded-full text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 active:scale-95 shadow-sm transition-all duration-150"
+        >
+          Go
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export default SearchFilters_v1;

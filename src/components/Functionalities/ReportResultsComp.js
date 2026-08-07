@@ -1,115 +1,98 @@
 'use client';
-import { useState, useEffect, useRef } from "react";
+
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from 'next/router';
 import ReportTile from "../UtilityComponents/ReportTile";
-import Image from 'next/image';
 import FactsLoader from "../UtilityComponents/Tools/FactsLoader";
 
-
 const ReportResultsComp = (props) => {
-    const isEmpty = (obj) => !obj || Object.keys(obj).length === 0; // Utility function to check if an object is empty
-    const router = useRouter();
-    const hasMounted = useRef(false);
-    const [filteredReportsList, setFilteredReportsList] = useState([]);
-    const [filters, setFilters] = useState({});
-    const [loading, setLoading] = useState(false);
-    const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
+  const isEmpty = (obj) => !obj || Object.keys(obj).length === 0;
+  const router = useRouter();
+  const [filteredReportsList, setFilteredReportsList] = useState([]);
+  const [filters, setFilters] = useState({});
+  const [loading, setLoading] = useState(false);
+  const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
 
-    const SearchReportsList = async () => {
-        if (isEmpty(filters)) return;
+  const SearchReportsList = async () => {
+    if (isEmpty(filters)) return;
 
-        // console.log("Making API call with filters:", filters);
-        const tokenString = sessionStorage.getItem("token");
-        const tokenData = JSON.parse(tokenString);
-        let token = null;
-        if (tokenData !== null) {
-            token = tokenData.value;
-        } else {
-            router.push('/Login');
-        }
-        setLoading(true);
-        try {
-            const response = await axios.post(`${backendAPI}/SearchReports_v1`, filters, {
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "X-ResearchType": props.researchType
-                }
-            });
-            const filteredReportsList = response.data;
-            setFilteredReportsList(filteredReportsList);
+    const tokenString = sessionStorage.getItem("token");
+    const tokenData = tokenString ? JSON.parse(tokenString) : null;
+    let token = null;
 
-            if (filteredReportsList.message === "Invalid Authorization") {
-                router.push('/Login');
-            }
-            else if (filteredReportsList.message === "Update plan") {
-                router.push('/pricing');
-            }
-        } catch (error) {
-            console.error("Error fetching reports:", error);
-        } finally {
-            setLoading(false);
-        }
-
-    };
-
-    useEffect(() => {
-        console.log("RepoResultComp Props: ", props.result)
-        setFilters(props.result);
-    }, [props.result])
-
-    useEffect(() => {
-        if (isEmpty(filters)) {
-            console.log("filters is empty or null, skipping API call");
-            return;
-        }
-        // if (!hasMounted.current) {
-        //     hasMounted.current = true;
-        //     console.log("skip first run");
-        //     return;
-        // }
-        SearchReportsList();
-    }, [filters]);
-
-
-    if (loading) {
-        // return <div>Loading reports...</div>;
-        <FactsLoader isLoading={loading} />
+    if (tokenData !== null) {
+      token = tokenData.value;
+    } else {
+      router.push('/Login');
+      return;
     }
 
-    if (!filteredReportsList || filteredReportsList.length === 0) {
-        return <div className="">
-         No reports found. 
-         Please adjust your filters.
-        </div>;
-    }
+    setLoading(true);
+    try {
+      const response = await axios.post(`${backendAPI}/SearchReports_v1`, filters, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "X-ResearchType": props.researchType
+        }
+      });
 
+      const data = response.data;
+
+      if (data?.message === "Invalid Authorization") {
+        router.push('/Login');
+        return;
+      }
+      if (data?.message === "Update plan") {
+        router.push('/pricing');
+        return;
+      }
+
+      setFilteredReportsList(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+      setFilteredReportsList([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setFilters(props.result || {});
+  }, [props.result]);
+
+  useEffect(() => {
+    if (isEmpty(filters)) return;
+    SearchReportsList();
+  }, [filters]);
+
+  // FIXED: Loading state – properly centered vertically & horizontally across full parent container
+  if (loading) {
     return (
-        <>
-            <ul>
-                {Array.isArray(filteredReportsList) && filteredReportsList.map((item, index) => (
-                    <ReportTile
-                        researchType={props.researchType}
-                        key={index}
-                        reportName={item.ReportName}
-                        index={index}
-                        reportURL={item.ReportUrl}
-                        reportAuthor={item.author}
-                        Tags={item.tags}
-                        year={item.Year}
-                        sector={item.Sector}
-                        sub1={item.Sub1}
-                        units={item.Units}
-                        sourceURL={item.Source}
-                        slugURL = {item.slugURL}
-                        publishedTS = {item.publishedTS}
-                        updatedTS = {item.updatedTS}
-                        granularity = {item.granularity}
-                    />
-                ))}
-            </ul>
-        </>
+      <div className="col-span-full w-full min-h-[400px] flex flex-col items-center justify-center p-8">
+        <FactsLoader />
+      </div>
     );
+  }
+
+  // Empty state
+  if (!filteredReportsList || filteredReportsList.length === 0) {
+    return (
+      <div className="col-span-full w-full min-h-[300px] flex flex-col items-center justify-center p-8 text-center bg-slate-50/50 rounded-xl border border-slate-200/60">
+        <h3 className="text-base font-semibold text-slate-800 mb-1">No reports found</h3>
+        <p className="text-xs text-slate-500">Please adjust your filters and try again.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+      {Array.isArray(filteredReportsList) &&
+        filteredReportsList.map((item, index) => (
+          <ReportTile key={item._id || index} data={item} />
+        ))}
+    </div>
+  );
 };
 
 export default ReportResultsComp;

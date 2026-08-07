@@ -5,81 +5,78 @@ import Link from "next/link";
 import Image from "next/image";
 
 const sampleServices = [
-  { id: 1, name: "Research Data", icon: <i className="bi bi-pie-chart text-blue-900" />, href: "/Research/Data" },
-  { id: 2, name: "Research Reports", icon: <i className="bi bi-newspaper text-blue-900" />, href: "/Research/Reports" },
-  { id: 3, name: "Data Correlation", icon: <i className="bi bi-reception-3 text-blue-900" />, href: "/Research/Correlations" },
-  { id: 4, name: "AI Insights", icon: <i className="bi bi-robot text-blue-900" />, href: "/Research/AI-Insights" },
-  { id: 5, name: "Support", icon: "🛠️", href: "/services/support" },
+  { id: 1, name: "Research Data", icon: "bi-pie-chart", href: "/Research/Data" },
+  { id: 2, name: "Research Reports", icon: "bi-newspaper", href: "/Research/Reports" },
+  { id: 3, name: "Data Correlation", icon: "bi-reception-3", href: "/Research/Correlations" },
+  { id: 4, name: "AI Insights", icon: "bi-robot", href: "/Research/AI-Insights" },
+  { id: 5, name: "Support", icon: "bi-headset", href: "/services/support" },
 ];
 
 export default function CollapsibleSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
-  const toggleMobile = () => setIsMobileOpen(!isMobileOpen);
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* SIDEBAR (Desktop ONLY) */}
-      <aside
-        className={`hidden md:block bg-white shadow-lg transition-all duration-300 ease-in-out 
-        fixed inset-y-0 left-0 z-40 transform w-64 md:relative 
-        ${isCollapsed ? "md:w-16" : "md:w-64"}
-        `}
-      >
-        {/* LOGO */}
-        <div
-          className={`flex items-center justify-center p-4 border-b transition-all
-            ${isCollapsed ? "px-2" : "px-4"}`}
+    <aside
+      className={`hidden md:flex flex-col bg-white border-r border-slate-200/80 sticky top-0 h-screen transition-all duration-300 ease-in-out shrink-0 z-30 ${
+        isCollapsed ? "w-16" : "w-60"
+      }`}
+    >
+      {/* Header Logo */}
+      <div className="h-14 border-b border-slate-100 flex items-center justify-between px-3.5 shrink-0">
+        <Link href="/" className="flex items-center gap-2.5 overflow-hidden">
+          <Image
+            src="/favicon.ico"
+            alt="MarketInsight"
+            width={28}
+            height={28}
+            className="shrink-0"
+          />
+          {!isCollapsed && (
+            <span className="font-bold text-sm tracking-tight text-slate-900 whitespace-nowrap">
+              MarketInsight
+            </span>
+          )}
+        </Link>
+
+        {/* Collapse Toggle Button */}
+        <button
+          onClick={toggleCollapse}
+          className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors focus:outline-none"
+          title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
         >
-          <Link href="/">
-            <Image
-              src="/favicon.ico"
-              alt="MarketInsight"
-              width={isCollapsed ? 32 : 40}
-              height={isCollapsed ? 32 : 40}
-              className="cursor-pointer"
-            />
-          </Link>
-        </div>
+          <i className={`bi ${isCollapsed ? "bi-layout-sidebar-inset" : "bi-layout-sidebar"} text-sm`} />
+        </button>
+      </div>
 
-        {/* Desktop Collapse Button */}
-        <div className="hidden md:flex items-center justify-between p-4 border-b">
-          {!isCollapsed && <h2 className="text-xl font-bold text-gray-800">Services</h2>}
-          <button
-            onClick={toggleCollapse}
-            className="p-2 rounded-lg hover:bg-gray-100"
-          >
-            {isCollapsed ? <i className="bi bi-list" /> : <i className="bi bi-x" />}
-          </button>
-        </div>
+      {/* Services Navigation List */}
+      <nav className="p-2 space-y-1 overflow-y-auto flex-1">
+        {!isCollapsed && (
+          <p className="px-2 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+            Services
+          </p>
+        )}
 
-        {/* Menu List */}
-        <nav className="p-2 overflow-y-auto h-[calc(100vh-120px)]">
-          <ul className="space-y-2">
-            {sampleServices.map((service) => (
-              <li key={service.id}>
-                <a
-                  href={service.href}
-                  className={`flex items-center p-3 rounded-lg hover:bg-blue-50 transition group
-                    ${isCollapsed ? "justify-center" : "justify-start"}`}
-                >
-                  <span className="text-2xl mr-3">{service.icon}</span>
-
-                  {!isCollapsed && (
-                    <span className="text-gray-700 font-medium whitespace-nowrap">
-                      {service.name}
-                    </span>
-                  )}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </aside>
-
-
-    </div>
+        <ul className="space-y-1">
+          {sampleServices.map((service) => (
+            <li key={service.id}>
+              <a
+                href={service.href}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-all ${
+                  isCollapsed ? "justify-center px-0" : ""
+                }`}
+                title={isCollapsed ? service.name : ""}
+              >
+                <i className={`bi ${service.icon} text-base text-slate-500 shrink-0`} />
+                {!isCollapsed && (
+                  <span className="truncate">{service.name}</span>
+                )}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </aside>
   );
 }

@@ -14,15 +14,7 @@ const SingleDropDown = (props) => {
 
 
   return (
-    <div
-      className="
-      m-2
-      w-full sm:w-[190px]
-      text-[12px]
-      pl-0 sm:pl-[13px]
-      flex sm:block
-      flex-col sm:flex-row
-      min-w-full sm:min-w-[180px]">
+    <div className="w-full min-w-0">
       {options ? (
         <Select
           options={options.map((option, index) => ({
@@ -31,18 +23,14 @@ const SingleDropDown = (props) => {
           }))}
           isMulti={props.isMulti}
           placeholder={placeholder}
-          className="w-50 text-sm"
+          className="w-full text-sm"
           onChange={(selectedOptions) => { handleSubmit(selectedOptions); }}
-        // value={props.selectedValue ? props.selectedValue : null}
         />
       ) : (
-        // <p>Loading...</p>
-        <p>
-          <i className="bi bi-exclamation-diamond text-xl sm:text-2xl lg:text-3xl px-6"></i>
-        </p>
-
+        <div className="flex items-center justify-center h-12 rounded-lg border border-slate-200 bg-slate-50 text-slate-500">
+          <i className="bi bi-exclamation-diamond text-lg"></i>
+        </div>
       )}
-
     </div>
   );
 };
