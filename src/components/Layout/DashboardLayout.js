@@ -1,28 +1,39 @@
-import CollapsibleSidebar from "../Website/CollapsibleSidebar";
-import NavBar_PostLogin from "@/components/Website/NavBar_PostLogin";
-import Footer from "@/components/Website/Footer";
+'use client';
+
+import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext';
+import CollapsibleSidebar from '../Website/CollapsibleSidebar';
+import NavBar_PostLogin from '@/components/Website/NavBar_PostLogin';
+import Footer from '@/components/Website/Footer';
+
+function DashboardContent({ children }) {
+  const { isCollapsed } = useSidebar();
+
+  return (
+    <div className="min-h-screen bg-[#f8f9fa] text-slate-900 font-sans antialiased">
+      <CollapsibleSidebar />
+
+      {/* Main content shifts correctly when sidebar collapses */}
+      <div
+        className={`min-h-screen flex flex-col transition-all duration-300 ease-in-out ${
+          isCollapsed ? 'md:ml-[72px]' : 'md:ml-60'
+        }`}
+      >
+        <NavBar_PostLogin />
+        
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          {children}
+        </main>
+
+        <Footer />
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardLayout({ children }) {
   return (
-    <div className="min-h-screen bg-[#f8f9fa] text-slate-900 flex flex-col font-sans antialiased">
-      {/* Upper Workspace Layer */}
-      <div className="flex flex-1 relative overflow-x-hidden">
-        {/* Left Collapsible Sidebar */}
-        <CollapsibleSidebar />
-
-        {/* Right Main Flow */}
-        <div className="flex flex-col flex-1 min-w-0">
-          <NavBar_PostLogin />
-
-          {/* Primary View Area */}
-          <main className="flex-1 p-3 sm:p-6 lg:p-8">
-            {children}
-          </main>
-        </div>
-      </div>
-
-      {/* Global Footer */}
-      <Footer />
-    </div>
+    <SidebarProvider>
+      <DashboardContent>{children}</DashboardContent>
+    </SidebarProvider>
   );
 }

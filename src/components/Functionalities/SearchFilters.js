@@ -112,5 +112,5 @@ const SearchFilters = (props) => {
     </div>
   );
 };
-
+ 
 export default SearchFilters;

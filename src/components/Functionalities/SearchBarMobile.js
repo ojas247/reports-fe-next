@@ -77,60 +77,64 @@ const SearchBar = () => {
     }
 
     useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
+    if (!open) {
+        return;
+    }
 
-        if (query.trim() === '') {
-            setSuggestions([]);
-            setShowSuggestions(false);
-            return;
-        }
+    if (isFirstRender.current) {
+        isFirstRender.current = false;
+        return;
+    }
 
-        const fetchSuggestions = async () => {
-            try {
-                setLoading(true); // 🟡 Start loading
-                // const tokenString = sessionStorage.getItem("token")? JSON.parse(sessionStorage.getItem("token")).value : null;
-                // const token = tokenString;
-                const token = "x@dffgfumdflkd76tg8jivdgoolnvll==";
+    if (query.trim() === '') {
+        setSuggestions([]);
+        setShowSuggestions(false);
+        return;
+    }
 
-                // const isAuthenticated = await checkAuthentication();
-                // if (!isAuthenticated) {
-                //     router.push('/Login', { state: {} });
-                //     return;
-                // }
-                const response = await axios.get(
-                    `${backendAPI}/AlgoliaSearchEndpoint?keyStroke=${query}`,
-                    {
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-                            "Content-Type": "application/json"
-                        }
+    const fetchSuggestions = async () => {
+        try {
+            setLoading(true);
+
+            const token = "x@dffgfumdflkd76tg8jivdgoolnvll==";
+
+            const response = await axios.get(
+                `${backendAPI}/AlgoliaSearchEndpoint?keyStroke=${encodeURIComponent(query)}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
                     }
-                );
-                setSuggestions(response.data); // Set the parsed JSON directly
-                // setShowSuggestions(true);
-
-                if (response.data.message === "UpdatePlan") {
-                    console.log("UpdatePlan: ", response.data.message);
-                    // Show popup for plan update
-                    const confirmed = window.confirm("Your current plan needs to be updated to access this feature. Would you like to update your plan?");
-                    if (confirmed) {
-                        router.push('/Pricing', { state: {} });
-                    }
-                    setShowSuggestions(false);
-                    return;
                 }
-                console.log("Suggestions: ", suggestions);
-            } catch (error) {
-                console.error("Error fetching suggestions:", error);
-            } finally {
-                setLoading(false); // 🟢 Stop loading
+            );
+
+            if (response.data.message === "UpdatePlan") {
+                const confirmed = window.confirm(
+                    "Your current plan needs to be updated to access this feature. Would you like to update your plan?"
+                );
+
+                if (confirmed) {
+                    router.push('/Pricing');
+                }
+
+                setSuggestions([]);
+                setShowSuggestions(false);
+                return;
             }
-        };
-        fetchSuggestions();
-    }, [query]);
+
+            setSuggestions(response.data);
+
+        } catch (error) {
+            console.error("Error fetching suggestions:", error);
+            setSuggestions([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    fetchSuggestions();
+
+}, [query, open]);
 
     const handleClickOutside = (event) => {
         if (suggestionRef.current && !suggestionRef.current.contains(event.target)) {
@@ -153,73 +157,136 @@ const SearchBar = () => {
     }, [suggestions]);
 
     return (
-        <div className="flex flex-col items-center justify-center w-full px-4 py-4 sm:py-0">
-            <div ref={suggestionRef} className="relative w-full max-w-[500px]">
+    <div className="relative w-9 h-9 shrink-0">
 
-                {/* MOBILE SEARCH CONTAINER */}
-                <div className="md:hidden fixed top-4 right-4 z-50">
-                    <div className="relative flex items-center">
-                        {/* EXPANDABLE INPUT - Animates from icon position */}
-                        <input
-                            type="text"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Search..."
-                            className={`
-                                absolute right-12 top-1/2 -translate-y-1/2
-                                bg-white border-2 border-gray-300 rounded-full pl-4 pr-12 py-2
-                                focus:border-green-600 outline-none text-[16px] placeholder-gray-400 text-gray-800
-                                transition-all duration-300 ease-in-out
-                                ${open
-                                    ? "w-[calc(80vw-80px)] opacity-100 shadow-lg"  // Expand to near-full width
-                                    : "w-0 opacity-0 pointer-events-none"
-                                }
-            `}
-                            onClick={(e) => e.stopPropagation()}  // Prevent click from bubbling to close
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    // Trigger search logic here
-                                    setOpen(false);
-                                }
-                            }}
-                        />
-                        {/* SEARCH ICON BUTTON - Stays fixed, triggers expand */}
-                        <button
-                            className="p-1 rounded-full bg-blue flex items-center justify-center relative z-5"
-                            onClick={() => {
-                                if (open) {
-                                    // Trigger search if open
-                                    // Add your search logic here
-                                    setOpen(false);
-                                } else {
-                                    setOpen(true);
-                                }
-                            }}
-                        >
-                            <i className={`bi ${open ? "bi-x-lg" : "bi-search"} text-xl text-gray-600`}></i>
-                        </button>
+        {/* Search wrapper */}
+        <div
+            ref={suggestionRef}
+            className="relative w-full h-full"
+        >
 
-                    </div>
+            {/* SEARCH BUTTON */}
+            <button
+                type="button"
+                className="
+                    relative z-[1002]
+                    w-9 h-9
+                    rounded-full
+                    flex items-center justify-center
+                    shrink-0
+                    hover:bg-slate-100
+                    transition-colors
+                "
+                onClick={() => {
+                    setOpen(!open);
+
+                    if (open) {
+                        setQuery('');
+                        setSuggestions([]);
+                        setShowSuggestions(false);
+                    }
+                }}
+                aria-label={open ? "Close search" : "Search"}
+            >
+                <i
+                    className={`bi ${
+                        open ? "bi-x-lg" : "bi-search"
+                    } text-lg text-gray-600`}
+                />
+            </button>
+
+
+            {/* EXPANDED SEARCH INPUT */}
+            {open && (
+               <div
+    className="
+        absolute
+        right-0
+        top-0
+        z-[1001]
+        w-[calc(100vw-110px)]
+        max-w-[380px]
+    "
+>
+                    <input
+                        autoFocus
+                        type="text"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Search..."
+                        className="
+                            w-full
+                            h-12
+                            rounded-full
+                            border
+                            border-green-600
+                            bg-white
+                            px-5
+                            pr-12
+                            text-[16px]
+                            text-slate-700
+                            placeholder-slate-400
+                            shadow-lg
+                            outline-none
+                            focus:border-green-600
+                        "
+                    />
                 </div>
+            )}
 
 
-                <div className='px-10 py-5'>
-                    {!loading && suggestions.length > 0 && showSuggestions && (
-                        <ShowSuggestions suggestions={suggestions} suggestionClick={suggestionClick} />
-                    )}
+            {/* SUGGESTIONS */}
+            {open && !loading && suggestions.length > 0 && showSuggestions && (
+                <div
+                    className="
+                        absolute
+                        right-0
+                        top-[52px]
+                        z-[1000]
+                        w-[calc(100vw-64px)]
+                        max-w-[380px]
+                        bg-white
+                        border
+                        border-slate-200
+                        rounded-lg
+                        shadow-xl
+                        overflow-hidden
+                    "
+                >
+                
                 </div>
+            )}
 
-                {/* Loading Indicator */}
-                {loading && (
-                    <div className="absolute w-full text-center py-2 text-gray-500 text-sm bg-white border border-gray-200 rounded-b-md z-[1000]">
-                        <i className="bi bi-arrow-repeat animate-spin mr-2"></i>
-                        Loading suggestions...
-                    </div>
-                )}
-            </div>
+
+            {/* LOADING */}
+            {open && loading && (
+                <div
+                    className="
+                        absolute
+                        right-0
+                        top-[52px]
+                        z-[1000]
+                        w-[calc(100vw-64px)]
+                        max-w-[380px]
+                        bg-white
+                        border
+                        border-slate-200
+                        rounded-lg
+                        shadow-xl
+                        text-center
+                        py-3
+                        text-gray-500
+                        text-sm
+                    "
+                >
+                    <i className="bi bi-arrow-repeat animate-spin mr-2"></i>
+                    Loading suggestions...
+                </div>
+            )}
+
         </div>
-
-    );
+    </div>
+);
 }
 
 export default SearchBar;
