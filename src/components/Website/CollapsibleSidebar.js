@@ -52,7 +52,7 @@ export default function CollapsibleSidebar() {
                 />
               </div>
               <span className="font-bold text-[15px] tracking-tight text-slate-900 whitespace-nowrap">
-                MarketInsight
+                MarketReports
               </span>
             </Link>
 

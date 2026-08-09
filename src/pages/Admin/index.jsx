@@ -9,7 +9,9 @@ import CrawlerBoard from './CrawlerBoard/Data';
 import RepubData_v1 from './Edit_v1/RepubData_v1';
 import Data_v1 from './Publishing/Data_v1';
 import SectorHierarchyManager from './Publishing/SectorHierarchyManager';
-
+import CompanyPublishing from './Publishing/CompanyPublishing';
+import PublishStagingData from './Publishing/StagingData';
+import Authors from './Authors/Authors';
 export default function AdminLayout() {
   // 'dashboard' is the home view; selecting a page switches the workspace directly
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -41,6 +43,14 @@ export default function AdminLayout() {
       badgeColor: 'bg-slate-100 text-slate-600 border-slate-200',
     },
     {
+      id: 'publish_staging',
+      title: 'Publish Staging Data',
+      description: 'Inspect, edit staging metrics, and publish staging datasets directly to production.',
+      icon: 'bi-database-gear',
+      badge: 'Staging',
+      badgeColor: 'bg-amber-50 text-amber-700 border-amber-200',
+    },
+    {
       id: 'publishing',
       title: 'Publishing Data',
       description: 'Upload files, assign metadata, and directly publish structured market datasets.',
@@ -53,13 +63,22 @@ export default function AdminLayout() {
       icon: 'bi-diagram-3',
     },
     {
-      id: 'metadata_manager',
+      id: 'authors',
       title: 'Tag & Author Addition',
       description: 'Manage global taxonomy tags, author profiles, and content metadata references.',
       icon: 'bi-tags',
       badge: 'New',
       badgeColor: 'bg-amber-50 text-amber-700 border-amber-200',
     },
+    {
+  id: 'company_publishing',
+  title: 'Company Publishing',
+  description:
+    'Create and publish company intelligence mappings including raw materials, output products, and market indicators.',
+  icon: 'bi-building-up',
+  badge: 'New',
+  badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
+},
   ];
 
   return (
@@ -78,10 +97,8 @@ export default function AdminLayout() {
               height={30}
               priority
             />
-            
           </Link>
         </div>
-
 
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-2 px-2.5 py-1 bg-slate-50 border border-slate-200/60 rounded-full">
@@ -126,7 +143,7 @@ export default function AdminLayout() {
               </button>
 
               <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">
-                Module: {activeTab.replace('_', ' ')}
+                Module: {activeTab.replace(/_/g, ' ')}
               </span>
             </div>
           )}
@@ -196,17 +213,14 @@ export default function AdminLayout() {
 
           {activeTab === 'republish' && <RepubData_v1 />}
 
+          {activeTab === 'publish_staging' && <PublishStagingData />}
+
           {activeTab === 'publishing' && <Data_v1 />}
+          {activeTab === 'company_publishing' && <CompanyPublishing />}
 
           {activeTab === 'sector_hierarchy' && <SectorHierarchyManager />}
 
-          {activeTab === 'metadata_manager' && (
-            <PlaceholderView 
-              title="Tag & Author Addition" 
-              icon="bi-tags" 
-              subtitle="Add new publishing tags, manage author aliases, and update taxonomy indexes."
-            />
-          )}
+         {activeTab === 'authors' && <Authors />}
 
         </div>
       </main>
