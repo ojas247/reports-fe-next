@@ -5,20 +5,151 @@ import { fetchDataFromGetApi } from '../../api/Api';
 
 const ITEMS_PER_PAGE = 15;
 
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_backendAPI || 'http://localhost:8080'
+).replace(/\/$/, '');
+
+const TABS = {
+  AUTHORS: 'authors',
+  TAGS: 'tags',
+  LINKAGES: 'linkages',
+};
+
+const LINKAGE_CATEGORIES = [
+  {
+    value: 'raw_materials',
+    label: 'Raw Materials',
+  },
+  {
+    value: 'operating_cost',
+    label: 'Operating Cost',
+  },
+  {
+    value: 'capital_expenditure',
+    label: 'Capital Expenditure',
+  },
+  {
+    value: 'other',
+    label: 'Other',
+  },
+];
+
 export default function Authors() {
+  const [activeTab, setActiveTab] = useState(TABS.AUTHORS);
+
+
+
   const [authors, setAuthors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortDirection, setSortDirection] = useState('asc');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [authorsLoading, setAuthorsLoading] = useState(true);
+  const [authorsError, setAuthorsError] = useState('');
+  const [authorSearch, setAuthorSearch] = useState('');
+  const [authorSort, setAuthorSort] = useState('asc');
+  const [authorPage, setAuthorPage] = useState(1);
+  const [newAuthor, setNewAuthor] = useState('');
+  const [addingAuthor, setAddingAuthor] = useState(false);
+
+  /* ---------------------------------------------------------
+     TAGS
+  --------------------------------------------------------- */
+
+  const [tags, setTags] = useState([]);
+  const [tagsLoading, setTagsLoading] = useState(false);
+  const [tagsError, setTagsError] = useState('');
+  const [tagSearch, setTagSearch] = useState('');
+  const [tagSort, setTagSort] = useState('asc');
+  const [tagPage, setTagPage] = useState(1);
+  const [newTag, setNewTag] = useState('');
+  const [addingTag, setAddingTag] = useState(false);
+
+  /* ---------------------------------------------------------
+     LINKAGES
+  --------------------------------------------------------- */
+
+  const [linkages, setLinkages] = useState([]);
+  const [linkagesLoading, setLinkagesLoading] = useState(false);
+  const [linkagesError, setLinkagesError] = useState('');
+  const [linkageSearch, setLinkageSearch] = useState('');
+  const [linkageSort, setLinkageSort] = useState('asc');
+  const [linkagePage, setLinkagePage] = useState(1);
+
+  const [linkageCategory, setLinkageCategory] = useState(
+    'raw_materials'
+  );
+
+  const [newLinkage, setNewLinkage] = useState({
+    displayName: '',
+    category: '',
+    tagCategory: '',
+    dataName: '',
+    tsItemName: '',
+  });
+
+  const [addingLinkage, setAddingLinkage] = useState(false);
+
+  /* ---------------------------------------------------------
+     COMMON STATUS
+  --------------------------------------------------------- */
+
+  const [successMessage, setSuccessMessage] = useState('');
+  const [requestError, setRequestError] = useState('');
+
+  const showSuccess = (message) => {
+    setSuccessMessage(message);
+    setRequestError('');
+
+    setTimeout(() => {
+      setSuccessMessage('');
+    }, 3500);
+  };
+
+  const showError = (message) => {
+    setRequestError(message);
+    setSuccessMessage('');
+  };
+
+
+
+  const postData = async (endpoint, body) => {
+    const response = await fetch(
+      `${API_BASE_URL}/${endpoint.replace(/^\//, '')}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    let responseData = null;
+
+    try {
+      responseData = await response.json();
+    } catch {
+      responseData = null;
+    }
+
+    if (!response.ok) {
+      const message =
+        responseData?.message ||
+        responseData?.error ||
+        `Request failed with status ${response.status}`;
+
+      throw new Error(message);
+    }
+
+    return responseData;
+  };
+
+
 
   const fetchAuthors = async () => {
     try {
-      setLoading(true);
-      setError('');
+      setAuthorsLoading(true);
+      setAuthorsError('');
 
-      const response = await fetchDataFromGetApi('CRUD/get/Authors');
+      const response =
+        await fetchDataFromGetApi('CRUD/get/Authors');
 
       console.log('Authors API Response:', response);
 
@@ -42,39 +173,366 @@ export default function Authors() {
 
           if (author && typeof author === 'object') {
             return (
+              author.Authors ||
+              author.authors ||
               author.name ||
               author.author ||
               author.authorName ||
               author.title ||
               ''
-            ).toString().trim();
+            )
+              .toString()
+              .trim();
           }
 
           return '';
         })
         .filter(Boolean);
 
-      const uniqueAuthors = [...new Set(normalizedAuthors)];
-
-      setAuthors(uniqueAuthors);
-      setCurrentPage(1);
+      setAuthors([...new Set(normalizedAuthors)]);
+      setAuthorPage(1);
     } catch (err) {
       console.error('Failed to fetch authors:', err);
 
-      setError(err?.message || 'Failed to load authors.');
+      setAuthorsError(
+        err?.message || 'Failed to load authors.'
+      );
+
       setAuthors([]);
-      setCurrentPage(1);
     } finally {
-      setLoading(false);
+      setAuthorsLoading(false);
     }
   };
+
+  const handleAddAuthor = async (event) => {
+    event.preventDefault();
+
+    const value = newAuthor.trim();
+
+    if (!value) {
+      showError('Author name is required.');
+      return;
+    }
+
+    try {
+      setAddingAuthor(true);
+      setRequestError('');
+
+      await postData('CRUD/post/Authors', {
+        Authors: value,
+      });
+
+      setNewAuthor('');
+
+      showSuccess(`Author "${value}" added successfully.`);
+
+      await fetchAuthors();
+    } catch (err) {
+      console.error('Failed to add author:', err);
+
+      showError(
+        err?.message || 'Failed to add author.'
+      );
+    } finally {
+      setAddingAuthor(false);
+    }
+  };
+
+
+
+  const fetchTags = async () => {
+    try {
+      setTagsLoading(true);
+      setTagsError('');
+
+      const response =
+        await fetchDataFromGetApi('CRUD/get/Tags');
+
+      console.log('Tags API Response:', response);
+
+      let records = [];
+
+      if (Array.isArray(response)) {
+        records = response;
+      } else if (Array.isArray(response?.options_list)) {
+        records = response.options_list;
+      } else if (Array.isArray(response?.tags)) {
+        records = response.tags;
+      } else if (Array.isArray(response?.Tags)) {
+        records = response.Tags;
+      } else if (Array.isArray(response?.data)) {
+        records = response.data;
+      } else if (response && typeof response === 'object') {
+        records = Object.values(response);
+      }
+
+      const normalizedTags = records
+        .flat()
+        .map((tag) => {
+          if (typeof tag === 'string') {
+            return tag.trim();
+          }
+
+          if (tag && typeof tag === 'object') {
+            return (
+              tag.Tags ||
+              tag.tags ||
+              tag.name ||
+              tag.tag ||
+              tag.title ||
+              tag.year ||
+              ''
+            )
+              .toString()
+              .trim();
+          }
+
+          return '';
+        })
+        .filter(Boolean);
+
+      setTags([...new Set(normalizedTags)]);
+      setTagPage(1);
+    } catch (err) {
+      console.error('Failed to fetch tags:', err);
+
+      setTagsError(
+        err?.message || 'Failed to load tags.'
+      );
+
+      setTags([]);
+    } finally {
+      setTagsLoading(false);
+    }
+  };
+
+  const handleAddTag = async (event) => {
+    event.preventDefault();
+
+    const value = newTag.trim();
+
+    if (!value) {
+      showError('Tag name is required.');
+      return;
+    }
+
+    try {
+      setAddingTag(true);
+      setRequestError('');
+
+      await postData('CRUD/post/Tags', {
+        Tags: value,
+      });
+
+      setNewTag('');
+
+      showSuccess(`Tag "${value}" added successfully.`);
+
+      await fetchTags();
+    } catch (err) {
+      console.error('Failed to add tag:', err);
+
+      showError(
+        err?.message || 'Failed to add tag.'
+      );
+    } finally {
+      setAddingTag(false);
+    }
+  };
+
+
+
+ const fetchLinkages = async (category = linkageCategory) => {
+  try {
+    setLinkagesLoading(true);
+    setLinkagesError('');
+
+    const endpoint =
+      `CRUD/get/Linkages?category=${encodeURIComponent(category)}`;
+
+    const response = await fetchDataFromGetApi(endpoint);
+
+    console.log('Linkages API Response:', response);
+
+    let records = [];
+
+   
+
+    if (Array.isArray(response)) {
+      records = response;
+    } else if (Array.isArray(response?.options_list)) {
+      records = response.options_list;
+    } else if (Array.isArray(response?.linkages)) {
+      records = response.linkages;
+    } else if (Array.isArray(response?.Linkages)) {
+      records = response.Linkages;
+    } else if (Array.isArray(response?.data)) {
+      records = response.data;
+    }
+
+    const normalizedLinkages = records
+      .filter(Boolean)
+      .map((item) => {
+        if (typeof item === 'string') {
+          return {
+            displayName: item,
+            category,
+            tagCategory: '',
+            dataName: '',
+            tsItemName: '',
+          };
+        }
+
+        return {
+          ...item,
+
+          // API uses snake_case
+          displayName:
+            item.display_name ||
+            item.displayName ||
+            item.DisplayName ||
+            item.name ||
+            '',
+
+          category:
+            item.category ||
+            category ||
+            '',
+
+          // Support both possible API formats
+          tagCategory:
+            item.tag_category ||
+            item.tagCategory ||
+            item.TagCategory ||
+            '',
+
+          // API returns "key"
+          dataName:
+            item.key ||
+            item.data_name ||
+            item.dataName ||
+            item.DataName ||
+            '',
+
+          tsItemName:
+            item.ts_item_name ||
+            item.tsItemName ||
+            item.TsItemName ||
+            '',
+        };
+      });
+
+    console.log(
+      'Normalized Linkages:',
+      normalizedLinkages
+    );
+
+    setLinkages(normalizedLinkages);
+    setLinkagePage(1);
+  } catch (err) {
+    console.error(
+      'Failed to fetch linkages:',
+      err
+    );
+
+    setLinkagesError(
+      err?.message ||
+        'Failed to load linkages.'
+    );
+
+    setLinkages([]);
+  } finally {
+    setLinkagesLoading(false);
+  }
+};
+
+  const handleAddLinkage = async (event) => {
+    event.preventDefault();
+
+    const displayName =
+      newLinkage.displayName.trim();
+
+    if (!displayName) {
+      showError('Display Name is required.');
+      return;
+    }
+
+    if (!newLinkage.category) {
+      showError('Category is required.');
+      return;
+    }
+
+    try {
+      setAddingLinkage(true);
+      setRequestError('');
+
+      const payload = {
+        displayName,
+        category: newLinkage.category,
+        tagCategory:
+          newLinkage.tagCategory.trim(),
+        dataName:
+          newLinkage.dataName.trim(),
+        tsItemName:
+          newLinkage.tsItemName.trim(),
+      };
+
+      await postData(
+        'CRUD/post/Linkages',
+        payload
+      );
+
+      setNewLinkage({
+        displayName: '',
+        category: newLinkage.category,
+        tagCategory: '',
+        dataName: '',
+        tsItemName: '',
+      });
+
+      showSuccess(
+        `Linkage "${displayName}" added successfully.`
+      );
+
+      await fetchLinkages(newLinkage.category);
+    } catch (err) {
+      console.error('Failed to add linkage:', err);
+
+      showError(
+        err?.message || 'Failed to add linkage.'
+      );
+    } finally {
+      setAddingLinkage(false);
+    }
+  };
+
+ 
 
   useEffect(() => {
     fetchAuthors();
   }, []);
 
+  useEffect(() => {
+    if (activeTab === TABS.TAGS && tags.length === 0) {
+      fetchTags();
+    }
+
+    if (
+      activeTab === TABS.LINKAGES &&
+      linkages.length === 0
+    ) {
+      fetchLinkages(linkageCategory);
+    }
+  }, [activeTab]);
+
+  /* =========================================================
+     AUTHORS TABLE
+  ========================================================= */
+
   const filteredAuthors = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
+    const term = authorSearch
+      .trim()
+      .toLowerCase();
 
     if (!term) {
       return authors;
@@ -83,71 +541,174 @@ export default function Authors() {
     return authors.filter((author) =>
       author.toLowerCase().includes(term)
     );
-  }, [authors, searchTerm]);
+  }, [authors, authorSearch]);
 
   const sortedAuthors = useMemo(() => {
     return [...filteredAuthors].sort((a, b) => {
-      const result = a.localeCompare(b, undefined, {
-        sensitivity: 'base',
-        numeric: true,
-      });
+      const result = a.localeCompare(
+        b,
+        undefined,
+        {
+          sensitivity: 'base',
+          numeric: true,
+        }
+      );
 
-      return sortDirection === 'asc' ? result : -result;
+      return authorSort === 'asc'
+        ? result
+        : -result;
     });
-  }, [filteredAuthors, sortDirection]);
+  }, [filteredAuthors, authorSort]);
 
-  const totalPages = Math.max(
+  const authorTotalPages = Math.max(
     1,
-    Math.ceil(sortedAuthors.length / ITEMS_PER_PAGE)
+    Math.ceil(
+      sortedAuthors.length / ITEMS_PER_PAGE
+    )
   );
-
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [currentPage, totalPages]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
 
   const paginatedAuthors = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const start =
+      (authorPage - 1) * ITEMS_PER_PAGE;
 
     return sortedAuthors.slice(
-      startIndex,
-      startIndex + ITEMS_PER_PAGE
+      start,
+      start + ITEMS_PER_PAGE
     );
-  }, [sortedAuthors, currentPage]);
+  }, [sortedAuthors, authorPage]);
 
-  const startResult =
-    sortedAuthors.length === 0
-      ? 0
-      : (currentPage - 1) * ITEMS_PER_PAGE + 1;
+  /* =========================================================
+     TAGS TABLE
+  ========================================================= */
 
-  const endResult = Math.min(
-    currentPage * ITEMS_PER_PAGE,
-    sortedAuthors.length
-  );
+  const filteredTags = useMemo(() => {
+    const term = tagSearch
+      .trim()
+      .toLowerCase();
 
-  const handleSort = () => {
-    setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-    setCurrentPage(1);
-  };
-
-  const goToPage = (page) => {
-    if (page < 1 || page > totalPages) {
-      return;
+    if (!term) {
+      return tags;
     }
 
-    setCurrentPage(page);
-  };
+    return tags.filter((tag) =>
+      tag.toLowerCase().includes(term)
+    );
+  }, [tags, tagSearch]);
 
-  const getPageNumbers = () => {
+  const sortedTags = useMemo(() => {
+    return [...filteredTags].sort((a, b) => {
+      const result = a.localeCompare(
+        b,
+        undefined,
+        {
+          sensitivity: 'base',
+          numeric: true,
+        }
+      );
+
+      return tagSort === 'asc'
+        ? result
+        : -result;
+    });
+  }, [filteredTags, tagSort]);
+
+  const tagTotalPages = Math.max(
+    1,
+    Math.ceil(
+      sortedTags.length / ITEMS_PER_PAGE
+    )
+  );
+
+  const paginatedTags = useMemo(() => {
+    const start =
+      (tagPage - 1) * ITEMS_PER_PAGE;
+
+    return sortedTags.slice(
+      start,
+      start + ITEMS_PER_PAGE
+    );
+  }, [sortedTags, tagPage]);
+
+  /* =========================================================
+     LINKAGES TABLE
+  ========================================================= */
+
+  const filteredLinkages = useMemo(() => {
+    const term = linkageSearch
+      .trim()
+      .toLowerCase();
+
+    if (!term) {
+      return linkages;
+    }
+
+    return linkages.filter((item) =>
+      [
+        item.displayName,
+        item.category,
+        item.tagCategory,
+        item.dataName,
+        item.tsItemName,
+      ]
+        .join(' ')
+        .toLowerCase()
+        .includes(term)
+    );
+  }, [linkages, linkageSearch]);
+
+  const sortedLinkages = useMemo(() => {
+    return [...filteredLinkages].sort(
+      (a, b) => {
+        const result =
+          (a.displayName || '').localeCompare(
+            b.displayName || '',
+            undefined,
+            {
+              sensitivity: 'base',
+              numeric: true,
+            }
+          );
+
+        return linkageSort === 'asc'
+          ? result
+          : -result;
+      }
+    );
+  }, [filteredLinkages, linkageSort]);
+
+  const linkageTotalPages = Math.max(
+    1,
+    Math.ceil(
+      sortedLinkages.length /
+        ITEMS_PER_PAGE
+    )
+  );
+
+  const paginatedLinkages = useMemo(() => {
+    const start =
+      (linkagePage - 1) *
+      ITEMS_PER_PAGE;
+
+    return sortedLinkages.slice(
+      start,
+      start + ITEMS_PER_PAGE
+    );
+  }, [sortedLinkages, linkagePage]);
+
+
+
+  const getPageNumbers = (
+    currentPage,
+    totalPages
+  ) => {
     const pages = [];
 
     if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) {
+      for (
+        let i = 1;
+        i <= totalPages;
+        i++
+      ) {
         pages.push(i);
       }
 
@@ -160,14 +721,24 @@ export default function Authors() {
       pages.push('...');
     }
 
-    const start = Math.max(2, currentPage - 1);
-    const end = Math.min(totalPages - 1, currentPage + 1);
+    const start = Math.max(
+      2,
+      currentPage - 1
+    );
+
+    const end = Math.min(
+      totalPages - 1,
+      currentPage + 1
+    );
 
     for (let i = start; i <= end; i++) {
       pages.push(i);
     }
 
-    if (currentPage < totalPages - 3) {
+    if (
+      currentPage <
+      totalPages - 3
+    ) {
       pages.push('...');
     }
 
@@ -176,330 +747,1211 @@ export default function Authors() {
     return pages;
   };
 
-  if (loading && authors.length === 0) {
-    return (
-      <div className="space-y-4">
-        <div className="bg-white border border-slate-200/80 rounded-xl shadow-2xs overflow-hidden">
-          <div className="px-4 py-2.5 bg-slate-900 text-white text-xs font-semibold">
-            Authors Registry
-          </div>
+  const renderPagination = (
+    currentPage,
+    totalPages,
+    setPage,
+    totalItems
+  ) => {
+    const startResult =
+      totalItems === 0
+        ? 0
+        : (currentPage - 1) *
+            ITEMS_PER_PAGE +
+          1;
 
-          <div className="px-4 py-12 text-center">
-            <div className="inline-flex items-center gap-2 text-[10px] font-mono text-slate-500 tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              FETCHING AUTHORS...
-            </div>
-          </div>
+    const endResult = Math.min(
+      currentPage * ITEMS_PER_PAGE,
+      totalItems
+    );
+
+    return (
+      <div className="px-4 py-3 bg-[#f8f9fa] border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="text-[10px] font-mono text-slate-400">
+          SHOWING{' '}
+          <span className="text-slate-600 font-semibold">
+            {startResult}
+          </span>{' '}
+          –{' '}
+          <span className="text-slate-600 font-semibold">
+            {endResult}
+          </span>{' '}
+          OF{' '}
+          <span className="text-slate-600 font-semibold">
+            {totalItems}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() =>
+              setPage(currentPage - 1)
+            }
+            disabled={currentPage === 1}
+            className="w-7 h-7 rounded-md border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition"
+          >
+            <i className="bi bi-chevron-left text-[10px]" />
+          </button>
+
+          {getPageNumbers(
+            currentPage,
+            totalPages
+          ).map((page, index) =>
+            page === '...' ? (
+              <span
+                key={`ellipsis-${index}`}
+                className="w-7 h-7 flex items-center justify-center text-[10px] text-slate-400"
+              >
+                ...
+              </span>
+            ) : (
+              <button
+                key={page}
+                type="button"
+                onClick={() =>
+                  setPage(page)
+                }
+                className={`w-7 h-7 rounded-md border text-[10px] font-mono transition ${
+                  currentPage === page
+                    ? 'bg-slate-900 border-slate-900 text-white'
+                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                }`}
+              >
+                {page}
+              </button>
+            )
+          )}
+
+          <button
+            type="button"
+            onClick={() =>
+              setPage(currentPage + 1)
+            }
+            disabled={
+              currentPage === totalPages
+            }
+            className="w-7 h-7 rounded-md border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition"
+          >
+            <i className="bi bi-chevron-right text-[10px]" />
+          </button>
         </div>
       </div>
     );
-  }
+  };
+
+  /* =========================================================
+     INPUT STYLE
+  ========================================================= */
+
+  const inputClass =
+    'w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-[11px] text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 placeholder-slate-400';
+
+  /* =========================================================
+     RENDER
+  ========================================================= */
 
   return (
     <div className="space-y-4">
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-200/80 rounded-xl p-4 shadow-2xs">
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-200/80 rounded-xl p-4 shadow-sm">
 
         <div className="flex items-center gap-3">
+
           <div className="w-9 h-9 rounded-lg bg-slate-900 text-white flex items-center justify-center font-mono text-xs font-bold">
-            AU
+            CR
           </div>
 
           <div>
             <div className="flex items-center gap-2">
+
               <h1 className="text-sm font-semibold tracking-tight text-slate-900">
-                Authors
+                Content Registry
               </h1>
 
               <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] font-mono text-slate-600">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 LIVE
               </span>
+
             </div>
 
             <p className="text-xs text-slate-500 mt-0.5">
-              Manage and inspect registered publishing authors
+              Manage authors, tags and data linkages
             </p>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2 w-full md:w-auto">
-
-          <div className="relative w-full md:w-72">
-            <i className="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[11px]" />
-
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search authors..."
-              className="w-full pl-8 pr-8 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-slate-400 transition"
-            />
-
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={() => setSearchTerm('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
-              >
-                <i className="bi bi-x-circle-fill text-[11px]" />
-              </button>
-            )}
-          </div>
-
-          <button
-            type="button"
-            onClick={fetchAuthors}
-            disabled={loading}
-            className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 active:bg-black text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5 shrink-0 disabled:opacity-50"
-          >
-            <i className={`bi ${loading ? 'bi-arrow-repeat animate-spin' : 'bi-arrow-clockwise'} text-[11px]`} />
-            {loading ? 'Fetching...' : 'Refresh'}
-          </button>
 
         </div>
+
       </div>
 
-      <div className="bg-white border border-slate-200/80 rounded-xl shadow-2xs overflow-hidden">
+      {/* TABS */}
+      <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm overflow-hidden">
 
-        <div className="px-4 py-2.5 bg-slate-900 text-white text-xs font-semibold flex items-center justify-between">
-
-          <div className="flex items-center gap-2">
-            <span>Authors Registry</span>
-
-            <span className="px-1.5 py-0.5 rounded bg-white/10 text-[9px] font-mono text-slate-300">
-              {authors.length} TOTAL
-            </span>
-          </div>
+        <div className="flex border-b border-slate-200 bg-[#f8f9fa]">
 
           <button
             type="button"
-            onClick={handleSort}
-            disabled={sortedAuthors.length === 0}
-            className="flex items-center gap-1.5 text-[10px] font-mono text-slate-300 hover:text-white transition disabled:opacity-50"
+            onClick={() =>
+              setActiveTab(TABS.AUTHORS)
+            }
+            className={`px-5 py-3 text-xs font-semibold border-b-2 transition ${
+              activeTab === TABS.AUTHORS
+                ? 'text-slate-900 border-slate-900 bg-white'
+                : 'text-slate-500 border-transparent hover:text-slate-800'
+            }`}
           >
-            <span>
-              {sortDirection === 'asc' ? 'A → Z' : 'Z → A'}
-            </span>
+            <i className="bi bi-person mr-2" />
+            Authors
+          </button>
 
-            <i
-              className={`bi ${
-                sortDirection === 'asc'
-                  ? 'bi-sort-alpha-down'
-                  : 'bi-sort-alpha-up'
-              }`}
-            />
+          <button
+            type="button"
+            onClick={() =>
+              setActiveTab(TABS.TAGS)
+            }
+            className={`px-5 py-3 text-xs font-semibold border-b-2 transition ${
+              activeTab === TABS.TAGS
+                ? 'text-slate-900 border-slate-900 bg-white'
+                : 'text-slate-500 border-transparent hover:text-slate-800'
+            }`}
+          >
+            <i className="bi bi-tags mr-2" />
+            Tags
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              setActiveTab(TABS.LINKAGES)
+            }
+            className={`px-5 py-3 text-xs font-semibold border-b-2 transition ${
+              activeTab === TABS.LINKAGES
+                ? 'text-slate-900 border-slate-900 bg-white'
+                : 'text-slate-500 border-transparent hover:text-slate-800'
+            }`}
+          >
+            <i className="bi bi-diagram-3 mr-2" />
+            Linkages
           </button>
 
         </div>
 
-        {error ? (
-          <div className="px-4 py-12 text-center">
+        {/* =================================================
+            AUTHORS TAB
+        ================================================= */}
 
-            <div className="w-10 h-10 mx-auto rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center">
-              <i className="bi bi-exclamation-triangle text-amber-600" />
-            </div>
-
-            <p className="text-xs font-semibold text-slate-700 mt-3">
-              Unable to load authors
-            </p>
-
-            <p className="text-[10px] text-slate-400 font-mono mt-1 max-w-lg mx-auto">
-              {error}
-            </p>
-
-            <button
-              type="button"
-              onClick={fetchAuthors}
-              className="mt-4 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-medium hover:bg-slate-800"
-            >
-              Retry
-            </button>
-
-          </div>
-        ) : paginatedAuthors.length > 0 ? (
-
+        {activeTab === TABS.AUTHORS && (
           <div>
 
-            <div className="overflow-x-auto">
+            {/* ADD AUTHOR */}
+            <div className="border-b border-slate-100">
 
-              <table className="w-full border-collapse">
+              <div className="px-4 py-2.5 bg-slate-900 text-white text-xs font-semibold">
+                1 · Add Author
+              </div>
 
-                <thead>
-                  <tr className="bg-[#f8f9fa] border-b border-slate-200/80">
+              <form
+                onSubmit={handleAddAuthor}
+                className="p-4"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2">
 
-                    <th className="w-16 px-4 py-2.5 text-left text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
-                      #
-                    </th>
+                  <input
+                    type="text"
+                    value={newAuthor}
+                    onChange={(e) =>
+                      setNewAuthor(
+                        e.target.value
+                      )
+                    }
+                    placeholder="Enter author name..."
+                    className={inputClass}
+                  />
 
-                    <th className="px-4 py-2.5 text-left text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
-                      Author
-                    </th>
+                  <button
+                    type="submit"
+                    disabled={addingAuthor}
+                    className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-medium transition disabled:opacity-50"
+                  >
+                    {addingAuthor
+                      ? 'Adding...'
+                      : 'Add Author'}
+                  </button>
 
-                  
+                </div>
+              </form>
 
-                  </tr>
-                </thead>
+            </div>
 
-                <tbody className="divide-y divide-slate-100">
+            {/* AUTHOR LIST */}
+            <div>
 
-                  {paginatedAuthors.map((author, index) => {
+              <div className="px-4 py-2.5 bg-slate-900 text-white text-xs font-semibold flex items-center justify-between">
 
-                    const rowNumber =
-                      (currentPage - 1) * ITEMS_PER_PAGE + index + 1;
+                <div className="flex items-center gap-2">
+                  <span>
+                    2 · Authors Registry
+                  </span>
 
-                    return (
-                      <tr
-                        key={`${author}-${rowNumber}`}
-                        className="group hover:bg-slate-50 transition-colors"
-                      >
+                  <span className="px-1.5 py-0.5 rounded bg-white/10 text-[9px] font-mono text-slate-300">
+                    {authors.length} TOTAL
+                  </span>
+                </div>
 
-                        <td className="px-4 py-3 text-[10px] font-mono text-slate-400">
-                          {String(rowNumber).padStart(2, '0')}
-                        </td>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setAuthorSort(
+                      (prev) =>
+                        prev === 'asc'
+                          ? 'desc'
+                          : 'asc'
+                    )
+                  }
+                  disabled={
+                    authors.length === 0
+                  }
+                  className="flex items-center gap-1.5 text-[10px] font-mono text-slate-300 hover:text-white disabled:opacity-50"
+                >
+                  {authorSort === 'asc'
+                    ? 'A → Z'
+                    : 'Z → A'}
 
-                        <td className="px-4 py-3">
+                  <i
+                    className={`bi ${
+                      authorSort === 'asc'
+                        ? 'bi-sort-alpha-down'
+                        : 'bi-sort-alpha-up'
+                    }`}
+                  />
+                </button>
 
-                          <div className="flex items-center gap-3">
+              </div>
 
+              <div className="px-4 py-3 flex flex-col md:flex-row gap-2 justify-between">
 
-                            <span
-                              className="text-xs font-medium text-slate-700 group-hover:text-slate-900 truncate"
-                              title={author}
-                            >
-                              {author}
-                            </span>
+                <div className="relative w-full md:w-80">
 
-                          </div>
+                  <i className="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[11px]" />
 
-                        </td>
+                  <input
+                    type="text"
+                    value={authorSearch}
+                    onChange={(e) => {
+                      setAuthorSearch(
+                        e.target.value
+                      );
+                      setAuthorPage(1);
+                    }}
+                    placeholder="Search authors..."
+                    className={`${inputClass} pl-8`}
+                  />
 
-                       
+                </div>
+
+                <button
+                  type="button"
+                  onClick={fetchAuthors}
+                  disabled={authorsLoading}
+                  className="px-3 py-1.5 bg-slate-900 text-white rounded-md text-xs font-medium hover:bg-slate-800 disabled:opacity-50"
+                >
+                  <i
+                    className={`bi ${
+                      authorsLoading
+                        ? 'bi-arrow-repeat animate-spin'
+                        : 'bi-arrow-clockwise'
+                    } mr-1.5`}
+                  />
+                  {authorsLoading
+                    ? 'Fetching...'
+                    : 'Refresh'}
+                </button>
+
+              </div>
+
+              {authorsError ? (
+                <div className="px-4 py-12 text-center">
+
+                  <i className="bi bi-exclamation-triangle text-amber-500 text-xl" />
+
+                  <p className="text-xs font-semibold text-slate-700 mt-3">
+                    Unable to load authors
+                  </p>
+
+                  <p className="text-[10px] font-mono text-slate-400 mt-1">
+                    {authorsError}
+                  </p>
+
+                  <button
+                    onClick={fetchAuthors}
+                    className="mt-4 px-3 py-1.5 bg-slate-900 text-white rounded-md text-[10px]"
+                  >
+                    Retry
+                  </button>
+
+                </div>
+              ) : paginatedAuthors.length > 0 ? (
+
+                <div className="overflow-x-auto">
+
+                  <table className="w-full border-collapse">
+
+                    <thead>
+                      <tr className="bg-[#f8f9fa] border-y border-slate-200/80">
+
+                        <th className="w-16 px-4 py-2.5 text-left text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
+                          #
+                        </th>
+
+                        <th className="px-4 py-2.5 text-left text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                          Author
+                        </th>
 
                       </tr>
-                    );
-                  })}
+                    </thead>
 
-                </tbody>
+                    <tbody className="divide-y divide-slate-100">
 
-              </table>
+                      {paginatedAuthors.map(
+                        (author, index) => {
 
-            </div>
+                          const rowNumber =
+                            (authorPage - 1) *
+                              ITEMS_PER_PAGE +
+                            index +
+                            1;
 
-            <div className="px-4 py-3 bg-[#f8f9fa] border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                          return (
+                            <tr
+                              key={`${author}-${rowNumber}`}
+                              className="hover:bg-slate-50 transition-colors"
+                            >
 
-              <div className="text-[10px] font-mono text-slate-400">
-                SHOWING{' '}
-                <span className="text-slate-600 font-semibold">
-                  {startResult}
+                              <td className="px-4 py-3 text-[10px] font-mono text-slate-400">
+                                {String(
+                                  rowNumber
+                                ).padStart(
+                                  2,
+                                  '0'
+                                )}
+                              </td>
+
+                              <td className="px-4 py-3 text-xs font-medium text-slate-700">
+                                {author}
+                              </td>
+
+                            </tr>
+                          );
+                        }
+                      )}
+
+                    </tbody>
+
+                  </table>
+
+                  {renderPagination(
+                    authorPage,
+                    authorTotalPages,
+                    setAuthorPage,
+                    sortedAuthors.length
+                  )}
+
+                </div>
+
+              ) : (
+
+                <div className="px-4 py-14 text-center">
+
+                  <i className="bi bi-person-x text-slate-400 text-xl" />
+
+                  <p className="text-xs font-semibold text-slate-600 mt-3">
+                    NO AUTHORS FOUND
+                  </p>
+
+                  <p className="text-[10px] font-mono text-slate-400 mt-1">
+                    {authorSearch
+                      ? `No authors match "${authorSearch}".`
+                      : 'The Authors API returned no records.'}
+                  </p>
+
+                </div>
+
+              )}
+
+              <div className="px-4 py-2 bg-[#f8f9fa] border-t border-slate-100 text-[10px] font-mono text-slate-400 flex items-center justify-between">
+
+                <span>
+                  GET /CRUD/get/Authors
                 </span>
-                {' – '}
-                <span className="text-slate-600 font-semibold">
-                  {endResult}
+
+                <span>
+                  {authors.length} AUTHORS
                 </span>
-                {' OF '}
-                <span className="text-slate-600 font-semibold">
-                  {sortedAuthors.length}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-1">
-
-                <button
-                  type="button"
-                  onClick={() => goToPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="w-7 h-7 rounded-md border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                >
-                  <i className="bi bi-chevron-left text-[10px]" />
-                </button>
-
-                {getPageNumbers().map((page, index) =>
-                  page === '...' ? (
-                    <span
-                      key={`ellipsis-${index}`}
-                      className="w-7 h-7 flex items-center justify-center text-[10px] text-slate-400"
-                    >
-                      ...
-                    </span>
-                  ) : (
-                    <button
-                      key={page}
-                      type="button"
-                      onClick={() => goToPage(page)}
-                      className={`w-7 h-7 rounded-md border text-[10px] font-mono transition ${
-                        currentPage === page
-                          ? 'bg-slate-900 border-slate-900 text-white'
-                          : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-900'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  )
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => goToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="w-7 h-7 rounded-md border border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                >
-                  <i className="bi bi-chevron-right text-[10px]" />
-                </button>
 
               </div>
 
             </div>
 
           </div>
-
-        ) : (
-
-          <div className="px-4 py-14 text-center">
-
-            <div className="w-10 h-10 mx-auto rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center">
-              <i className="bi bi-person-x text-slate-400" />
-            </div>
-
-            <p className="text-xs font-semibold text-slate-600 mt-3">
-              NO AUTHORS FOUND
-            </p>
-
-            <p className="text-[10px] text-slate-400 font-mono mt-1">
-              {searchTerm
-                ? `No authors match "${searchTerm}".`
-                : 'The Authors API returned no records.'}
-            </p>
-
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={() => setSearchTerm('')}
-                className="mt-3 text-[10px] font-medium text-slate-600 hover:text-slate-900 underline"
-              >
-                Clear filter
-              </button>
-            )}
-
-          </div>
-
         )}
 
-        <div className="px-4 py-2 bg-[#f8f9fa] border-t border-slate-100 text-[10px] font-mono text-slate-400 flex items-center justify-between">
+        {/* =================================================
+            TAGS TAB
+        ================================================= */}
 
-          <span>
-            GET /CRUD/get/Authors
-          </span>
+        {activeTab === TABS.TAGS && (
+          <div>
 
-          <span>
-            {sortedAuthors.length !== authors.length
-              ? `FILTERED ${sortedAuthors.length} / ${authors.length}`
-              : `${authors.length} AUTHORS`}
-          </span>
+            {/* ADD TAG */}
+            <div className="border-b border-slate-100">
 
-        </div>
+              <div className="px-4 py-2.5 bg-slate-900 text-white text-xs font-semibold">
+                1 · Add Tag
+              </div>
+
+              <form
+                onSubmit={handleAddTag}
+                className="p-4"
+              >
+
+                <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2">
+
+                  <input
+                    type="text"
+                    value={newTag}
+                    onChange={(e) =>
+                      setNewTag(
+                        e.target.value
+                      )
+                    }
+                    placeholder="Enter tag name..."
+                    className={inputClass}
+                  />
+
+                  <button
+                    type="submit"
+                    disabled={addingTag}
+                    className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-medium disabled:opacity-50"
+                  >
+                    {addingTag
+                      ? 'Adding...'
+                      : 'Add Tag'}
+                  </button>
+
+                </div>
+
+              </form>
+
+            </div>
+
+            {/* TAG LIST */}
+            <div>
+
+              <div className="px-4 py-2.5 bg-slate-900 text-white text-xs font-semibold flex items-center justify-between">
+
+                <div className="flex items-center gap-2">
+                  <span>
+                    2 · Tags Registry
+                  </span>
+
+                  <span className="px-1.5 py-0.5 rounded bg-white/10 text-[9px] font-mono text-slate-300">
+                    {tags.length} TOTAL
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setTagSort(
+                      (prev) =>
+                        prev === 'asc'
+                          ? 'desc'
+                          : 'asc'
+                    )
+                  }
+                  className="text-[10px] font-mono text-slate-300 hover:text-white"
+                >
+                  {tagSort === 'asc'
+                    ? 'A → Z'
+                    : 'Z → A'}
+                </button>
+
+              </div>
+
+              <div className="px-4 py-3 flex flex-col md:flex-row justify-between gap-2">
+
+                <div className="relative w-full md:w-80">
+
+                  <i className="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[11px]" />
+
+                  <input
+                    type="text"
+                    value={tagSearch}
+                    onChange={(e) => {
+                      setTagSearch(
+                        e.target.value
+                      );
+                      setTagPage(1);
+                    }}
+                    placeholder="Search tags..."
+                    className={`${inputClass} pl-8`}
+                  />
+
+                </div>
+
+                <button
+                  type="button"
+                  onClick={fetchTags}
+                  disabled={tagsLoading}
+                  className="px-3 py-1.5 bg-slate-900 text-white rounded-md text-xs font-medium hover:bg-slate-800 disabled:opacity-50"
+                >
+                  <i
+                    className={`bi ${
+                      tagsLoading
+                        ? 'bi-arrow-repeat animate-spin'
+                        : 'bi-arrow-clockwise'
+                    } mr-1.5`}
+                  />
+                  {tagsLoading
+                    ? 'Fetching...'
+                    : 'Refresh'}
+                </button>
+
+              </div>
+
+              {tagsError ? (
+                <div className="px-4 py-12 text-center">
+
+                  <i className="bi bi-exclamation-triangle text-amber-500 text-xl" />
+
+                  <p className="text-xs font-semibold text-slate-700 mt-3">
+                    Unable to load tags
+                  </p>
+
+                  <p className="text-[10px] font-mono text-slate-400 mt-1">
+                    {tagsError}
+                  </p>
+
+                  <button
+                    onClick={fetchTags}
+                    className="mt-4 px-3 py-1.5 bg-slate-900 text-white rounded-md text-[10px]"
+                  >
+                    Retry
+                  </button>
+
+                </div>
+              ) : paginatedTags.length > 0 ? (
+
+                <div className="overflow-x-auto">
+
+                  <table className="w-full border-collapse">
+
+                    <thead>
+                      <tr className="bg-[#f8f9fa] border-y border-slate-200/80">
+
+                        <th className="w-16 px-4 py-2.5 text-left text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
+                          #
+                        </th>
+
+                        <th className="px-4 py-2.5 text-left text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                          Tag
+                        </th>
+
+                      </tr>
+                    </thead>
+
+                    <tbody className="divide-y divide-slate-100">
+
+                      {paginatedTags.map(
+                        (tag, index) => {
+
+                          const rowNumber =
+                            (tagPage - 1) *
+                              ITEMS_PER_PAGE +
+                            index +
+                            1;
+
+                          return (
+                            <tr
+                              key={`${tag}-${rowNumber}`}
+                              className="hover:bg-slate-50 transition-colors"
+                            >
+
+                              <td className="px-4 py-3 text-[10px] font-mono text-slate-400">
+                                {String(
+                                  rowNumber
+                                ).padStart(
+                                  2,
+                                  '0'
+                                )}
+                              </td>
+
+                              <td className="px-4 py-3">
+
+                                <span className="inline-flex items-center px-2 py-1 rounded-md bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700">
+                                  {tag}
+                                </span>
+
+                              </td>
+
+                            </tr>
+                          );
+                        }
+                      )}
+
+                    </tbody>
+
+                  </table>
+
+                  {renderPagination(
+                    tagPage,
+                    tagTotalPages,
+                    setTagPage,
+                    sortedTags.length
+                  )}
+
+                </div>
+
+              ) : (
+
+                <div className="px-4 py-14 text-center">
+
+                  <i className="bi bi-tags text-slate-400 text-xl" />
+
+                  <p className="text-xs font-semibold text-slate-600 mt-3">
+                    NO TAGS FOUND
+                  </p>
+
+                  <p className="text-[10px] font-mono text-slate-400 mt-1">
+                    {tagSearch
+                      ? `No tags match "${tagSearch}".`
+                      : 'The Tags API returned no records.'}
+                  </p>
+
+                </div>
+
+              )}
+
+              <div className="px-4 py-2 bg-[#f8f9fa] border-t border-slate-100 text-[10px] font-mono text-slate-400 flex items-center justify-between">
+
+                <span>
+                  GET /CRUD/get/Tags
+                </span>
+
+                <span>
+                  {tags.length} TAGS
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+  
+
+        {activeTab === TABS.LINKAGES && (
+          <div>
+
+            {/* ADD LINKAGE */}
+            <div className="border-b border-slate-100">
+
+              <div className="px-4 py-2.5 bg-slate-900 text-white text-xs font-semibold flex items-center justify-between">
+
+                <span>
+                  1 · Add Linkage
+                </span>
+
+                <span className="font-mono text-[10px] text-slate-300">
+                  POST /CRUD/post/Linkages
+                </span>
+
+              </div>
+
+              <form
+                onSubmit={handleAddLinkage}
+                className="p-4"
+              >
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                  {/* DISPLAY NAME */}
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 mb-1">
+                      Display Name
+                    </label>
+
+                    <input
+                      type="text"
+                      value={
+                        newLinkage.displayName
+                      }
+                      onChange={(e) =>
+                        setNewLinkage(
+                          (prev) => ({
+                            ...prev,
+                            displayName:
+                              e.target.value,
+                          })
+                        )
+                      }
+                      placeholder="e.g. Crude Oil"
+                      className={inputClass}
+                    />
+                  </div>
+
+                  {/* CATEGORY */}
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 mb-1">
+                      Category
+                    </label>
+
+                    <select
+                      value={
+                        newLinkage.category
+                      }
+                      onChange={(e) =>
+                        setNewLinkage(
+                          (prev) => ({
+                            ...prev,
+                            category:
+                              e.target.value,
+                          })
+                        )
+                      }
+                      className={inputClass}
+                    >
+                      {LINKAGE_CATEGORIES.map(
+                        (item) => (
+                          <option
+                            key={item.value}
+                            value={item.value}
+                          >
+                            {item.label}
+                          </option>
+                        )
+                      )}
+                    </select>
+                  </div>
+
+                  {/* TAG CATEGORY */}
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 mb-1">
+                      Tag Category
+                    </label>
+
+                    <input
+                      type="text"
+                      value={
+                        newLinkage.tagCategory
+                      }
+                      onChange={(e) =>
+                        setNewLinkage(
+                          (prev) => ({
+                            ...prev,
+                            tagCategory:
+                              e.target.value,
+                          })
+                        )
+                      }
+                      placeholder="e.g. Energy Cost"
+                      className={inputClass}
+                    />
+                  </div>
+
+                  {/* DATA NAME */}
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 mb-1">
+                      Data Name
+                    </label>
+
+                    <input
+                      type="text"
+                      value={
+                        newLinkage.dataName
+                      }
+                      onChange={(e) =>
+                        setNewLinkage(
+                          (prev) => ({
+                            ...prev,
+                            dataName:
+                              e.target.value,
+                          })
+                        )
+                      }
+                      placeholder="Data name"
+                      className={inputClass}
+                    />
+                  </div>
+
+                  {/* TS ITEM NAME */}
+                  <div className="md:col-span-2">
+
+                    <label className="block text-[10px] font-semibold text-slate-500 mb-1">
+                      TS Item Name
+                    </label>
+
+                    <input
+                      type="text"
+                      value={
+                        newLinkage.tsItemName
+                      }
+                      onChange={(e) =>
+                        setNewLinkage(
+                          (prev) => ({
+                            ...prev,
+                            tsItemName:
+                              e.target.value,
+                          })
+                        )
+                      }
+                      placeholder="Time-series item name"
+                      className={inputClass}
+                    />
+
+                  </div>
+
+                </div>
+
+                <div className="flex justify-end mt-3">
+
+                  <button
+                    type="submit"
+                    disabled={addingLinkage}
+                    className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-md text-xs font-medium disabled:opacity-50"
+                  >
+                    {addingLinkage
+                      ? 'Adding...'
+                      : 'Add Linkage'}
+                  </button>
+
+                </div>
+
+              </form>
+
+            </div>
+
+            {/* LINKAGES LIST */}
+            <div>
+
+              <div className="px-4 py-2.5 bg-slate-900 text-white text-xs font-semibold flex items-center justify-between">
+
+                <div className="flex items-center gap-2">
+
+                  <span>
+                    2 · Linkages Registry
+                  </span>
+
+                  <span className="px-1.5 py-0.5 rounded bg-white/10 text-[9px] font-mono text-slate-300">
+                    {linkages.length} TOTAL
+                  </span>
+
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setLinkageSort(
+                      (prev) =>
+                        prev === 'asc'
+                          ? 'desc'
+                          : 'asc'
+                    )
+                  }
+                  className="text-[10px] font-mono text-slate-300 hover:text-white"
+                >
+                  {linkageSort === 'asc'
+                    ? 'A → Z'
+                    : 'Z → A'}
+                </button>
+
+              </div>
+
+              {/* FILTERS */}
+              <div className="px-4 py-3 grid grid-cols-1 md:grid-cols-[1fr_220px_auto] gap-2">
+
+                <div className="relative">
+
+                  <i className="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[11px]" />
+
+                  <input
+                    type="text"
+                    value={linkageSearch}
+                    onChange={(e) => {
+                      setLinkageSearch(
+                        e.target.value
+                      );
+                      setLinkagePage(1);
+                    }}
+                    placeholder="Search linkages..."
+                    className={`${inputClass} pl-8`}
+                  />
+
+                </div>
+
+                <select
+                  value={linkageCategory}
+                  onChange={(e) => {
+                    const category =
+                      e.target.value;
+
+                    setLinkageCategory(
+                      category
+                    );
+
+                    setNewLinkage(
+                      (prev) => ({
+                        ...prev,
+                        category,
+                      })
+                    );
+
+                    setLinkagePage(1);
+
+                    fetchLinkages(category);
+                  }}
+                  className={inputClass}
+                >
+                  {LINKAGE_CATEGORIES.map(
+                    (item) => (
+                      <option
+                        key={item.value}
+                        value={item.value}
+                      >
+                        {item.label}
+                      </option>
+                    )
+                  )}
+                </select>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    fetchLinkages(
+                      linkageCategory
+                    )
+                  }
+                  disabled={linkagesLoading}
+                  className="px-3 py-1.5 bg-slate-900 text-white rounded-md text-xs font-medium hover:bg-slate-800 disabled:opacity-50"
+                >
+                  <i
+                    className={`bi ${
+                      linkagesLoading
+                        ? 'bi-arrow-repeat animate-spin'
+                        : 'bi-arrow-clockwise'
+                    } mr-1.5`}
+                  />
+
+                  {linkagesLoading
+                    ? 'Fetching...'
+                    : 'Refresh'}
+                </button>
+
+              </div>
+
+              {linkagesError ? (
+                <div className="px-4 py-12 text-center">
+
+                  <i className="bi bi-exclamation-triangle text-amber-500 text-xl" />
+
+                  <p className="text-xs font-semibold text-slate-700 mt-3">
+                    Unable to load linkages
+                  </p>
+
+                  <p className="text-[10px] font-mono text-slate-400 mt-1">
+                    {linkagesError}
+                  </p>
+
+                  <button
+                    onClick={() =>
+                      fetchLinkages(
+                        linkageCategory
+                      )
+                    }
+                    className="mt-4 px-3 py-1.5 bg-slate-900 text-white rounded-md text-[10px]"
+                  >
+                    Retry
+                  </button>
+
+                </div>
+              ) : paginatedLinkages.length > 0 ? (
+
+                <div className="overflow-x-auto">
+
+                  <table className="w-full border-collapse min-w-[900px]">
+
+                    <thead>
+
+                      <tr className="bg-[#f8f9fa] border-y border-slate-200/80">
+
+                        <th className="w-14 px-4 py-2.5 text-left text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
+                          #
+                        </th>
+
+                        <th className="px-4 py-2.5 text-left text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                          Display Name
+                        </th>
+
+                        <th className="px-4 py-2.5 text-left text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                          Category
+                        </th>
+
+                        <th className="px-4 py-2.5 text-left text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                          Tag Category
+                        </th>
+
+                        <th className="px-4 py-2.5 text-left text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                          Data Name
+                        </th>
+
+                        <th className="px-4 py-2.5 text-left text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                          TS Item Name
+                        </th>
+
+                      </tr>
+
+                    </thead>
+
+                    <tbody className="divide-y divide-slate-100">
+
+                      {paginatedLinkages.map(
+                        (item, index) => {
+
+                          const rowNumber =
+                            (linkagePage - 1) *
+                              ITEMS_PER_PAGE +
+                            index +
+                            1;
+
+                          return (
+                            <tr
+                              key={`${item.displayName}-${rowNumber}`}
+                              className="hover:bg-slate-50 transition-colors"
+                            >
+
+                              <td className="px-4 py-3 text-[10px] font-mono text-slate-400">
+                                {String(
+                                  rowNumber
+                                ).padStart(
+                                  2,
+                                  '0'
+                                )}
+                              </td>
+
+                              <td className="px-4 py-3 text-xs font-semibold text-slate-700">
+                                {item.displayName ||
+                                  '—'}
+                              </td>
+
+                              <td className="px-4 py-3">
+
+                                <span className="inline-flex px-2 py-1 rounded-md bg-slate-50 border border-slate-200 text-[10px] font-mono text-slate-600">
+                                  {item.category ||
+                                    '—'}
+                                </span>
+
+                              </td>
+
+                              <td className="px-4 py-3 text-xs text-slate-600">
+                                {item.tagCategory ||
+                                  '—'}
+                              </td>
+
+                              <td className="px-4 py-3 text-xs text-slate-600">
+                                {item.dataName ||
+                                  '—'}
+                              </td>
+
+                              <td className="px-4 py-3 text-xs text-slate-600">
+                                {item.tsItemName ||
+                                  '—'}
+                              </td>
+
+                            </tr>
+                          );
+                        }
+                      )}
+
+                    </tbody>
+
+                  </table>
+
+                  {renderPagination(
+                    linkagePage,
+                    linkageTotalPages,
+                    setLinkagePage,
+                    sortedLinkages.length
+                  )}
+
+                </div>
+
+              ) : (
+
+                <div className="px-4 py-14 text-center">
+
+                  <i className="bi bi-diagram-3 text-slate-400 text-xl" />
+
+                  <p className="text-xs font-semibold text-slate-600 mt-3">
+                    NO LINKAGES FOUND
+                  </p>
+
+                  <p className="text-[10px] font-mono text-slate-400 mt-1">
+                    {linkageSearch
+                      ? `No linkages match "${linkageSearch}".`
+                      : `No linkages found for ${linkageCategory}.`}
+                  </p>
+
+                </div>
+
+              )}
+
+              <div className="px-4 py-2 bg-[#f8f9fa] border-t border-slate-100 text-[10px] font-mono text-slate-400 flex items-center justify-between">
+
+                <span>
+                  GET /CRUD/get/Linkages?category=
+                  {linkageCategory}
+                </span>
+
+                <span>
+                  {linkages.length} LINKAGES
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+        )}
 
       </div>
+
+      {/* STATUS */}
+      {(successMessage || requestError) && (
+        <div
+          className={`px-4 py-2.5 rounded-lg border text-[10px] font-mono flex items-center gap-2 ${
+            requestError
+              ? 'bg-amber-50 border-amber-200 text-amber-700'
+              : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+          }`}
+        >
+
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${
+              requestError
+                ? 'bg-amber-500'
+                : 'bg-emerald-500'
+            }`}
+          />
+
+          {requestError ||
+            successMessage}
+
+        </div>
+      )}
+
     </div>
   );
 }
