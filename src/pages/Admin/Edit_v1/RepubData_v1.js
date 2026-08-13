@@ -20,6 +20,10 @@ function RepubData_v1() {
   const [loading, setLoading] = useState(false);
   const [aggDataFromTxtgrdComponent, setAggDataFromTxtgrdComponent] = useState({});
   const [aggPageData, setAggPageData] = useState({});
+  
+  // Validation tracking state
+  const [isFormValid, setIsFormValid] = useState(true);
+  const [validationError, setValidationError] = useState('');
 
   const comp = { id: 1 };
 
@@ -70,6 +74,7 @@ function RepubData_v1() {
       const payload = { ...sectorChain, data: data.value };
       const Report_Data = await fetchDataFromPostApi(payload, 'GetReportEntity_v1');
       setOldReportData(Report_Data || {});
+      setValidationError(''); // Reset validation messages
     } catch (err) {
       console.error("Error fetching report entity details:", err);
     } finally {
@@ -101,12 +106,16 @@ function RepubData_v1() {
     }
   };
 
-  // Callback to sync child TextWithGrid data
-  const getTextWithGridData = (id, data) => {
+  // Callback to sync child TextWithGrid data and track validation state
+  const getTextWithGridData = (id, data, isValid = true) => {
     setAggDataFromTxtgrdComponent((prevData) => ({
       ...prevData,
       [`txtGrid_${id}`]: data,
     }));
+    
+    // Update parent validation status from child evaluation
+    setIsFormValid(isValid);
+    if (isValid) setValidationError('');
   };
 
   // Keep state sync updated for submission payload
@@ -120,11 +129,29 @@ function RepubData_v1() {
     setSectorChain({ sectorChain: data });
   };
 
-  // Form submission handler
+  // Form submission handler with hard validation enforcement
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Explicit Validation Check prior to submitting
+    const childPayload = aggDataFromTxtgrdComponent[`txtGrid_${comp.id}`] || {};
+    
+    const missingFields = [];
+    if (!childPayload.dataName?.trim()) missingFields.push("Data Name");
+    if (!childPayload.units) missingFields.push("Units");
+    if (!childPayload.granularity) missingFields.push("Granularity");
+    if (!childPayload.isTSData || childPayload.isTSData.length === 0) missingFields.push("Is Time Series");
+    if (!childPayload.geo || childPayload.geo.length === 0) missingFields.push("Geography");
+
+    if (missingFields.length > 0) {
+      setIsFormValid(false);
+      setValidationError(`Validation Error: Please fill in all mandatory fields: ${missingFields.join(', ')}.`);
+      return; // Stop submission
+    }
+
     setLoading(true);
     setResponse(null);
+    setValidationError('');
 
     axios.post(`${backendAPI}/RePublishing/Data_v1`, aggPageData, {
       headers: {
@@ -147,6 +174,8 @@ function RepubData_v1() {
     setOldReportData({});
     setAggDataFromTxtgrdComponent({});
     setResponse(null);
+    setValidationError('');
+    setIsFormValid(true);
   };
 
   return (
@@ -241,12 +270,24 @@ function RepubData_v1() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="px-4 py-1.5 text-xs font-mono font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+                disabled={!isFormValid}
+                className={`px-4 py-1.5 text-xs font-mono font-semibold text-white rounded-lg transition shadow-xs flex items-center gap-1.5 ${
+                  isFormValid 
+                    ? "bg-slate-900 hover:bg-slate-800 cursor-pointer" 
+                    : "bg-slate-300 cursor-not-allowed opacity-70"
+                }`}
               >
                 <span>⭱ RePublish Data</span>
               </button>
             </div>
           </div>
+
+          {/* Validation Warning Alert */}
+          {validationError && (
+            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs font-mono text-rose-800 flex items-center justify-between">
+              <span>{validationError}</span>
+            </div>
+          )}
 
           {/* Dataset Views Container */}
           {Object.keys(oldReportData).length > 0 ? (
@@ -264,7 +305,7 @@ function RepubData_v1() {
                 </div>
                 <TextWithGrid
                   key={oldReportData?.dataName || comp.id}
-                  updateData={(data) => getTextWithGridData(comp.id, data)}
+                  updateData={(data, isValid) => getTextWithGridData(comp.id, data, isValid)}
                   sectorSub1Data={SecSubdata}
                   initialData={oldReportData}
                 />

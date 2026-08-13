@@ -15,47 +15,74 @@ const ReportResultsComp = (props) => {
   const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
 
   const SearchReportsList = async () => {
-    if (isEmpty(filters)) return;
+  if (isEmpty(filters)) return;
 
-    const tokenString = sessionStorage.getItem("token");
-    const tokenData = tokenString ? JSON.parse(tokenString) : null;
-    let token = null;
+  const tokenString = sessionStorage.getItem("token");
+  const tokenData = tokenString ? JSON.parse(tokenString) : null;
+  let token = null;
 
-    if (tokenData !== null) {
-      token = tokenData.value;
-    } else {
+  if (tokenData !== null) {
+    token = tokenData.value;
+  } else {
+    router.push('/Login');
+    return;
+  }
+
+  // Build API payload explicitly.
+  // Do NOT send null/unused filters.
+  const payload = {
+    sector_filters: filters.sector_filters || {},
+  };
+
+  if (filters.author) {
+    payload.author = filters.author;
+  }
+
+  if (filters.year != null) {
+    payload.year = filters.year;
+  }
+
+  if (filters.tags != null) {
+    payload.tags = filters.tags;
+  }
+
+  console.log("API Payload:", payload);
+
+  setLoading(true);
+
+  try {
+    const response = await axios.post(
+      `${backendAPI}/SearchReports_v1`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "X-ResearchType": props.researchType,
+        },
+      }
+    );
+
+    const data = response.data;
+
+    if (data?.message === "Invalid Authorization") {
       router.push('/Login');
       return;
     }
 
-    setLoading(true);
-    try {
-      const response = await axios.post(`${backendAPI}/SearchReports_v1`, filters, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "X-ResearchType": props.researchType
-        }
-      });
-
-      const data = response.data;
-
-      if (data?.message === "Invalid Authorization") {
-        router.push('/Login');
-        return;
-      }
-      if (data?.message === "Update plan") {
-        router.push('/pricing');
-        return;
-      }
-
-      setFilteredReportsList(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Error fetching reports:", error);
-      setFilteredReportsList([]);
-    } finally {
-      setLoading(false);
+    if (data?.message === "Update plan") {
+      router.push('/pricing');
+      return;
     }
-  };
+
+    setFilteredReportsList(Array.isArray(data) ? data : []);
+
+  } catch (error) {
+    console.error("Error fetching reports:", error);
+    setFilteredReportsList([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     setFilters(props.result || {});

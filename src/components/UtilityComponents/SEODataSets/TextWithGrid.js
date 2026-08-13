@@ -142,7 +142,11 @@ const TextWithGrid = (props) => {
     props.updateData(componentData);
   }, [componentData]);
 
-  const isTSDataSelected = componentData.isTSData && componentData.isTSData.length > 0;
+  // Validation States for Mandatory Fields
+  const isUnitsSelected = Boolean(componentData.units);
+  const isGranularitySelected = Boolean(componentData.granularity);
+  const isTSDataSelected = Boolean(componentData.isTSData && componentData.isTSData.length > 0);
+  const isGeoSelected = Boolean(componentData.geo && componentData.geo.length > 0);
 
   return (
     <div className="space-y-6 text-slate-900 font-sans pb-28 overflow-visible">
@@ -336,15 +340,16 @@ const TextWithGrid = (props) => {
         </div>
       </div>
 
-      {/* Dataset Configurations (Elevated z-index and bottom padding so dropdowns expand fully) */}
+      {/* Dataset Configurations */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-slate-100 relative z-50">
         
-        {/* Units */}
+        {/* Units (MANDATORY FIELD) */}
         <div className="space-y-1.5 relative z-50">
-          <label htmlFor="units" className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 font-mono">
-            Units
+          <label htmlFor="units" className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 font-mono flex items-center gap-1">
+            <span>Units</span>
+            <span className="text-rose-500 font-bold">*</span>
           </label>
-          <div className="text-slate-900 font-medium">
+          <div className="text-slate-900 font-medium rounded-lg">
             <SingleDropDown
               options={UnitsData}
               isMulti={false}
@@ -354,12 +359,13 @@ const TextWithGrid = (props) => {
           </div>
         </div>
 
-        {/* Granularity */}
+        {/* Granularity (MANDATORY FIELD) */}
         <div className="space-y-1.5 relative z-50">
-          <label htmlFor="granularity" className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 font-mono">
-            Granularity
+          <label htmlFor="granularity" className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 font-mono flex items-center gap-1">
+            <span>Granularity</span>
+            <span className="text-rose-500 font-bold">*</span>
           </label>
-          <div className="text-slate-900 font-medium">
+          <div className="text-slate-900 font-medium rounded-lg">
             <SingleDropDown
               options={GranularityData}
               isMulti={false}
@@ -375,7 +381,7 @@ const TextWithGrid = (props) => {
             <span>Is Time Series</span>
             <span className="text-rose-500 font-bold">*</span>
           </label>
-          <div className={`text-slate-900 font-medium rounded-lg ${!isTSDataSelected ? ' ring-rose-400' : ''}`}>
+          <div className="text-slate-900 font-medium rounded-lg">
             <SingleDropDown
               options={isTSData}
               isMulti={true}
@@ -383,15 +389,15 @@ const TextWithGrid = (props) => {
               onSelect={(data) => getDropDownData("isTSData", data)}
             />
           </div>
-          
         </div>
 
-        {/* Geography */}
+        {/* Geography (MANDATORY FIELD) */}
         <div className="space-y-1.5 relative z-50">
-          <label htmlFor="geo" className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 font-mono">
-            Geography
+          <label htmlFor="geo" className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 font-mono flex items-center gap-1">
+            <span>Geography</span>
+            <span className="text-rose-500 font-bold">*</span>
           </label>
-          <div className="text-slate-900 font-medium">
+          <div className="text-slate-900 font-medium rounded-lg">
             <SingleDropDown
               options={GeoData}
               isMulti={true}
