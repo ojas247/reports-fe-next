@@ -405,7 +405,7 @@ export default function IndexPage() {
         .animate-scroll-left {
           display: flex;
           width: max-content;
-          animation: scroll-left 35s linear infinite;
+          animation: scroll-left 85s linear infinite;
         }
 
         .animate-scroll-left:hover {

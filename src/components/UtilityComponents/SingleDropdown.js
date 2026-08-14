@@ -1,36 +1,100 @@
-// // 'use client';
+'use client';
 
-import { useState } from 'react';
+import React from 'react';
 import Select from 'react-select';
 
-const SingleDropDown = (props) => {
-  const options = props.options.options_list;
-  const placeholder = props.placeholder;
+const SingleDropDown = ({
+  options = [],
+  isMulti = false,
+  placeholder = 'Select...',
+  value,
+  onSelect,
+}) => {
 
+  // Support both:
+  // options={[...]}
+  // and
+  // options={{ options_list: [...] }}
 
-  const handleSubmit = (e) => {
-    props.onSelect(e);
-  };
+  const rawOptions = Array.isArray(options)
+    ? options
+    : options?.options_list || [];
 
+  const selectOptions = rawOptions.map((option) => {
+
+    if (typeof option === 'string') {
+      return {
+        value: option,
+        label: option,
+      };
+    }
+
+    return {
+      value:
+        option?.value ||
+        option?.name ||
+        option?.label ||
+        '',
+      label:
+        option?.label ||
+        option?.name ||
+        option?.value ||
+        '',
+    };
+  }).filter((option) => option.value);
 
   return (
     <div className="w-full min-w-0">
-      {options ? (
-        <Select
-          options={options.map((option, index) => ({
-            value: option,
-            label: option
-          }))}
-          isMulti={props.isMulti}
-          placeholder={placeholder}
-          className="w-full text-sm"
-          onChange={(selectedOptions) => { handleSubmit(selectedOptions); }}
-        />
-      ) : (
-        <div className="flex items-center justify-center h-12 rounded-lg border border-slate-200 bg-slate-50 text-slate-500">
-          <i className="bi bi-exclamation-diamond text-lg"></i>
-        </div>
-      )}
+
+      <Select
+        options={selectOptions}
+
+        isMulti={isMulti}
+
+        value={value || (isMulti ? [] : null)}
+
+        onChange={(selected) => {
+          onSelect?.(selected);
+        }}
+
+        placeholder={placeholder}
+
+        isClearable
+
+        closeMenuOnSelect={!isMulti}
+
+        hideSelectedOptions={false}
+
+        className="w-full text-sm"
+
+        classNamePrefix="market-select"
+
+        styles={{
+          control: (base) => ({
+            ...base,
+            minHeight: '38px',
+            borderColor: '#e2e8f0',
+            boxShadow: 'none',
+            fontSize: '11px',
+          }),
+
+          multiValue: (base) => ({
+            ...base,
+            fontSize: '10px',
+          }),
+
+          multiValueLabel: (base) => ({
+            ...base,
+            fontSize: '10px',
+          }),
+
+          option: (base) => ({
+            ...base,
+            fontSize: '11px',
+          }),
+        }}
+      />
+
     </div>
   );
 };

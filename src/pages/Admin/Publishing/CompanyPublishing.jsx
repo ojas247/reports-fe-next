@@ -6,9 +6,7 @@ import SingleDropDown from '../../../components/UtilityComponents/SingleDropdown
 import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/SectorHierarchyDropDown';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-/* ============================================================
-   HELPERS
-   ============================================================ */
+
 
 const getBackendUrl = () => {
   return (
@@ -142,43 +140,41 @@ const normalizeLinkages = (response) => {
 };
 
 
-/* ============================================================
-   FETCH DATA ITEMS WIDGET
-   Mirrors Correlations.jsx listOfDatasets_v1 / listOfDataItems usage
-   ============================================================ */
+
 
 function FetchDataItemsWidget({
   sectorOptions,
-  selectedItems,
+  selectedItems = [],
   onAddItems,
   placeholder = 'Select data items...',
 }) {
-  const [selectedSector, setSelectedSector] = useState('');
-  const [selectedSub1, setSelectedSub1] = useState('');
 
   const [listOfDatasets, setListOfDatasets] = useState([]);
-  const [selectedDSName, setSelectedDSName] = useState([]);
-
+const [selectedDSName, setSelectedDSName] = useState('');
   const [listOfDataItems, setListOfDataItems] = useState([]);
+
+  // Items currently selected in the dropdown
   const [selectedOptions, setSelectedOptions] = useState([]);
 
   const [loadingDatasets, setLoadingDatasets] = useState(false);
   const [loadingDataItems, setLoadingDataItems] = useState(false);
 
- 
+
+  /* ============================================================
+     SECTOR → DATASET
+     ============================================================ */
 
   const getSectorFilters = async (data) => {
+
     try {
-      // Match Correlations: only proceed when data is a non-empty object
+
       if (!data || Object.keys(data).length === 0) {
         return;
       }
 
-      if (data.sector) setSelectedSector(data.sector);
-      if (data.sub1) setSelectedSub1(data.sub1);
-
       setListOfDatasets([]);
       setListOfDataItems([]);
+
       setSelectedDSName([]);
       setSelectedOptions([]);
 
@@ -190,94 +186,156 @@ function FetchDataItemsWidget({
       );
 
       setListOfDatasets(response || []);
+
     } catch (error) {
+
       console.error(
         'Error fetching dataset categories:',
         error
       );
+
       setListOfDatasets([]);
+
     } finally {
+
       setLoadingDatasets(false);
+
     }
   };
 
 
+  /* ============================================================
+     DATASET → DATA ITEMS
+     ============================================================ */
+
+ const getItemFilter = async (data) => {
+  try {
+    if (!data) {
+      return;
+    }
+
+    /*
+     * Store the currently selected Dataset Category.
+     *
+     * Example:
+     * "Indian Agriculture"
+     */
+    const datasetName =
+      typeof data === 'string'
+        ? data
+        : data?.value ||
+          data?.label ||
+          data?.name ||
+          '';
+
+    if (!datasetName) {
+      return;
+    }
+
+    setSelectedDSName(datasetName);
+
+    setListOfDataItems([]);
+    setSelectedOptions([]);
+
+    setLoadingDataItems(true);
+
+    /*
+     * API still expects Dataset Category as an array
+     * for listOfDataItems.
+     */
+    const response = await fetchDataFromPostApi(
+      [data],
+      'listOfDataItems'
+    );
+
+    setListOfDataItems(response || []);
+
+  } catch (error) {
+
+    console.error(
+      'Error fetching data items:',
+      error
+    );
+
+    setListOfDataItems([]);
+
+  } finally {
+
+    setLoadingDataItems(false);
+
+  }
+};
 
 
-  const getItemFilter = async (data) => {
-    try {
-      if (!data) {
-        return;
+  /* ============================================================
+     MULTIPLE DATA ITEMS
+     ============================================================ */
+
+ const getDataSetFilter = (newOptions) => {
+
+  const options = Array.isArray(newOptions)
+    ? newOptions
+    : [];
+
+  setSelectedOptions(options);
+
+  /*
+   * No Dataset Category selected yet.
+   */
+  if (!selectedDSName) {
+    return;
+  }
+
+  /*
+   * Convert every selected Data Item into:
+   *
+   * {
+   *   DataSet: "Indian Agriculture",
+   *   DataItem: "Rural Population"
+   * }
+   */
+  const mappings = options
+    .map((option) => {
+
+      const dataItem =
+        typeof option === 'string'
+          ? option
+          : option?.value ||
+            option?.label ||
+            option?.name ||
+            '';
+
+      if (!dataItem) {
+        return null;
       }
 
-      // Match Correlations: setSelectedDSName([data])
-      const dsPayload = [data];
-      setSelectedDSName(dsPayload);
+      return {
+        DataSet: selectedDSName,
+        DataItem: dataItem.toString().trim(),
+      };
 
-      setListOfDataItems([]);
-      setSelectedOptions([]);
+    })
+    .filter(Boolean);
 
-      setLoadingDataItems(true);
-
-      // Match Correlations: fetchDataFromPostApi(selectedDSName, 'listOfDataItems')
-      const response = await fetchDataFromPostApi(
-        dsPayload,
-        'listOfDataItems'
-      );
-
-      setListOfDataItems(response || []);
-    } catch (error) {
-      console.error(
-        'Error fetching data items:',
-        error
-      );
-      setListOfDataItems([]);
-    } finally {
-      setLoadingDataItems(false);
-    }
-  };
-
-
-  /* ----------------------------------------------------------
-     DATA ITEMS
-     ---------------------------------------------------------- */
-
-  const getDataSetFilter = (newOptions) => {
-    const options = newOptions || [];
-
-    setSelectedOptions(options);
-
-    const values = options
-      .map((option) => {
-        if (typeof option === 'string') {
-          return option;
-        }
-
-        return (
-          option?.value ||
-          option?.label ||
-          option?.name ||
-          ''
-        );
-      })
-      .filter(Boolean);
-
-    if (values.length > 0) {
-      onAddItems(values);
-    }
-  };
-
+  /*
+   * Send complete objects to parent.
+   */
+  if (mappings.length > 0) {
+    onAddItems(mappings);
+  }
+};
 
   return (
+
     <div className="space-y-2">
 
-      {/* ------------------------------------------------------
-          STEP 1 — SECTOR / SUB-SECTOR
-      ------------------------------------------------------ */}
+      {/* ======================================================
+          SECTOR / SUB-SECTOR
+          ====================================================== */}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
 
-        <div className="md:col-span-1">
+        <div>
 
           <label className="block text-[9px] font-mono font-semibold text-slate-500 uppercase tracking-wide mb-1">
             Sector / Sub-Sector
@@ -291,11 +349,11 @@ function FetchDataItemsWidget({
         </div>
 
 
-        {/* ----------------------------------------------------
-            STEP 2 — DATASET CATEGORY
-        ---------------------------------------------------- */}
+        {/* ====================================================
+            DATASET CATEGORY
+            ==================================================== */}
 
-        <div className="md:col-span-1">
+        <div>
 
           <label className="block text-[9px] font-mono font-semibold text-slate-500 uppercase tracking-wide mb-1">
             Dataset Category
@@ -304,6 +362,7 @@ function FetchDataItemsWidget({
           <SingleDropDown
             options={listOfDatasets}
             onSelect={getItemFilter}
+            placeholder="Select dataset category..."
           />
 
           {loadingDatasets && (
@@ -315,11 +374,9 @@ function FetchDataItemsWidget({
         </div>
 
 
-        {/* ----------------------------------------------------
-            STEP 3 — DATA ITEMS
-        ---------------------------------------------------- */}
 
-        <div className="md:col-span-1">
+
+        <div>
 
           <label className="block text-[9px] font-mono font-semibold text-slate-500 uppercase tracking-wide mb-1">
             Data Items
@@ -327,8 +384,13 @@ function FetchDataItemsWidget({
 
           <SingleDropDown
             isMulti={true}
+
             options={listOfDataItems}
+
+            value={selectedOptions}
+
             onSelect={getDataSetFilter}
+
             placeholder={placeholder}
           />
 
@@ -343,57 +405,19 @@ function FetchDataItemsWidget({
       </div>
 
 
-      {/* ------------------------------------------------------
-          CURRENT SELECTION
-      ------------------------------------------------------ */}
-
-      {selectedOptions.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 pt-1">
-
-          {selectedOptions.map(
-            (option) => {
-
-              const value =
-                typeof option === 'string'
-                  ? option
-                  : option?.value ||
-                    option?.label ||
-                    option?.name;
-
-              if (!value) {
-                return null;
-              }
-
-              return (
-                <span
-                  key={value}
-                  className="inline-flex items-center gap-1.5 bg-slate-900 text-white px-2 py-1 rounded-md text-[9px] font-mono"
-                >
-                  <i className="bi bi-graph-up text-[8px] text-emerald-400" />
-
-                  {value}
-                </span>
-              );
-            }
-          )}
-
-        </div>
-      )}
+   
 
     </div>
+
   );
 }
 
 
-/* ============================================================
-   COMPANY PUBLISHING
-   ============================================================ */
+
 
 export default function CompanyPublishing() {
 
-  /* ==========================================================
-     COMPANY CONFIGURATION
-     ========================================================== */
+
 
   const [companyName, setCompanyName] =
     useState('');
@@ -1714,9 +1738,7 @@ export default function CompanyPublishing() {
       </div>
 
 
-      {/* ======================================================
-          COMPANY INTELLIGENCE MAPPING
-      ====================================================== */}
+     
 
       <div className="bg-white border border-slate-200/80 rounded-xl shadow-2xs overflow-hidden">
 
@@ -1810,10 +1832,6 @@ export default function CompanyPublishing() {
 
       </div>
 
-
-      {/* ======================================================
-          LINKAGE MAPPING
-      ====================================================== */}
 
       <div className="bg-white border border-slate-200/80 rounded-xl shadow-2xs overflow-hidden">
 
