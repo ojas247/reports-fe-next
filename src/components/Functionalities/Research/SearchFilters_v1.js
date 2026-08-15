@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import SingleDropDown from "../../UtilityComponents/SingleDropdown";
+import SingleDropDown_v1 from "../../UtilityComponents/SingleDropdown_v1";
 import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/SectorHierarchyDropDown';
 import { fetchSetorSubOptions, fetchAuthors, fetchYears, fetchTags } from '../../../pages/api/Api';
 import FactsLoader from '@/components/UtilityComponents/Tools/FactsLoader';
@@ -13,7 +13,6 @@ const SearchFilters_v1 = (props) => {
   const [Yeardata, setYeardata] = useState([]);
   const [Tagdata, setTagdata] = useState([]);
 
-  // Controlled local state for filters
   const [filtersState, setFiltersState] = useState({
     author: null,
     year: null,
@@ -69,31 +68,34 @@ const SearchFilters_v1 = (props) => {
 
   if (loading) {
     return (
-      <div className="w-full min-h-[300px] flex items-center justify-center p-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
+      <div className="w-full min-h-[300px] flex items-center justify-center p-6 bg-white rounded-xl border border-slate-200/80 shadow-2xs">
         <FactsLoader />
       </div>
     );
   }
 
   return (
-    <div className="w-full space-y-5">
+    <div className="w-full space-y-4 sm:space-y-5">
       {/* Sector Hierarchy Panel */}
-      <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm space-y-2">
+      <div className="bg-white rounded-xl border border-slate-200/80 shadow-2xs p-4 sm:p-5">
         <SectorHierarchyDropDown
           onSelect={(val) => updateFilterField('sector_filters', val)}
         />
       </div>
 
       {/* Dataset Filter Card */}
-      <div className="p-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm space-y-4">
-        <label className="block text-sm font-semibold text-slate-800 tracking-tight">
+      <div className="bg-white rounded-xl border border-slate-200/80 shadow-2xs p-4 sm:p-5 space-y-4 sm:space-y-5">
+        <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-600">
           Dataset Category
-        </label>
+        </h3>
 
-        <div className="space-y-4">
+        <div className="space-y-4 sm:space-y-5">
           {/* Author Selector */}
           <div>
-            <SingleDropDown
+            <label className="block text-xs font-medium text-slate-600 mb-1.5">
+              Select Author
+            </label>
+            <SingleDropDown_v1
               options={Authordata}
               placeholder="Select Author"
               onSelect={(val) => updateFilterField('author', val)}
@@ -105,7 +107,7 @@ const SearchFilters_v1 = (props) => {
             <label className="block text-xs font-medium text-slate-600 mb-1.5">
               Year
             </label>
-            <SingleDropDown
+            <SingleDropDown_v1
               options={Yeardata}
               placeholder="Select Year"
               onSelect={(val) => updateFilterField('year', val)}
@@ -117,7 +119,7 @@ const SearchFilters_v1 = (props) => {
             <label className="block text-xs font-medium text-slate-600 mb-1.5">
               Tag
             </label>
-            <SingleDropDown
+            <SingleDropDown_v1
               options={Tagdata}
               placeholder="Select Tag"
               onSelect={(val) => updateFilterField('tags', val)}
@@ -127,20 +129,22 @@ const SearchFilters_v1 = (props) => {
       </div>
 
       {/* Footer Controls */}
-      <div className="flex items-center justify-between pt-1">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 pt-1">
         <button
           type="button"
           onClick={handleReset}
-          className="px-4 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors duration-150"
+          className="px-4 py-2.5 sm:py-2 text-xs font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors duration-150 order-2 sm:order-1"
         >
+          <i className="bi bi-arrow-counterclockwise mr-1.5"></i>
           Clear Filters
         </button>
 
         <button
           type="button"
           onClick={handleFilters}
-          className="px-7 py-2.5 rounded-full text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 active:scale-95 shadow-sm transition-all duration-150"
+          className="px-6 sm:px-8 py-2.5 rounded-lg text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 active:scale-[0.98] shadow-sm transition-all duration-150 order-1 sm:order-2 flex items-center justify-center gap-2"
         >
+          <i className="bi bi-search text-xs"></i>
           Go
         </button>
       </div>

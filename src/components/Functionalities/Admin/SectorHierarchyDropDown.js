@@ -9,7 +9,6 @@ export default function SectorHierarchyDropDown(props) {
     ]);
     const [selectedPath, setSelectedPath] = useState([]);
   
-    // Fetch items from backend
     const fetchItems = async (parentKind, parentName, parentPath, childKind) => {
       let payload = {};
   
@@ -27,10 +26,9 @@ export default function SectorHierarchyDropDown(props) {
       return data.items?.map((item) => item.name) || [];
     };
   
-    // Load top-level Sectors on mount
     useEffect(() => {
       const loadSectors = async () => {
-        const sectors = await fetchItems(); // empty payload fetches sectors
+        const sectors = await fetchItems();
         setDropdowns([{ level: "Sector", options_list: sectors }]);
         setSelectedPath([]);
       };
@@ -48,13 +46,10 @@ export default function SectorHierarchyDropDown(props) {
         props.onSelect(pathObject);
       }, [dropdowns, selectedPath]);
       
-  
-    // Handle selection in any dropdown
     const handleSelect = async (levelIndex, selected) => {
         const chosenValue = selected ? selected.value : null;
       
         if (!chosenValue) {
-          // Handle clear
           const newDropdowns = dropdowns.slice(0, Math.max(levelIndex, 1)); 
           const newPath = selectedPath.slice(0, Math.max(levelIndex, 1));
           setDropdowns(newDropdowns);
@@ -62,15 +57,12 @@ export default function SectorHierarchyDropDown(props) {
           return;
         }
       
-        // Update path
         const newPath = [...selectedPath];
         newPath[levelIndex] = chosenValue;
         setSelectedPath(newPath);
       
-        // Reset deeper dropdowns if higher one changes
         const newDropdowns = dropdowns.slice(0, levelIndex + 1);
       
-        // Parent info
         const parent = newDropdowns[levelIndex];
         const parentKind = parent.level;
         const parentName = chosenValue;
@@ -79,7 +71,6 @@ export default function SectorHierarchyDropDown(props) {
           .map((name, idx) => `${dropdowns[idx].level}/${name}`)
           .join("/");
       
-        // Ask backend what children exist
         const childKind =
           levelIndex === 0 ? "Sub1" : `Sub${levelIndex + 1}`;
       
@@ -100,31 +91,36 @@ export default function SectorHierarchyDropDown(props) {
         setDropdowns(newDropdowns);
       };
       
-  
     return (
-      <div className="p-4">
-        <h2 className="block text-sm font-medium text-gray-600 mb-1 sm:px-6">Sector Hierarchy Dropdowns</h2>
+      <div className="w-full">
+        <h2 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-600 mb-3">
+          Taxonomy Hierarchy
+        </h2>
   
-        <div className="flex flex-row flex-wrap px-0 py-2" >
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3">
           {dropdowns.map((dropdown, idx) => (
-            <SingleDropDown_v1
-              key={idx}
-              options={{ options_list: dropdown.options_list }}
-              placeholder={`Select ${dropdown.level}`}
-              onSelect={(selected) => handleSelect(idx, selected)}
-            />
+            <div key={idx} className="w-full sm:flex-1 min-w-[140px]">
+              <SingleDropDown_v1
+                options={{ options_list: dropdown.options_list }}
+                placeholder={`Select ${dropdown.level}`}
+                onSelect={(selected) => handleSelect(idx, selected)}
+              />
+            </div>
           ))}
         </div>
   
-        <div className="mt-4 text-sm text-gray-700">
-          <strong>Selected Sector:</strong>{" "}
-          {selectedPath
-            .map((p, i) =>
-              dropdowns[i] ? `${p}` : p
-            )
-            .join(" > ")}
+        <div className="mt-4 text-xs text-slate-500 font-mono">
+          <span className="font-semibold text-slate-700">Selected Path:</span>{" "}
+          {selectedPath.length > 0 ? (
+            selectedPath
+              .map((p, i) =>
+                dropdowns[i] ? `${p}` : p
+              )
+              .join(" › ")
+          ) : (
+            <span className="text-slate-400">No selection</span>
+          )}
         </div>
       </div>
     );
-  
 }

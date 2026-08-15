@@ -9,7 +9,7 @@ function DashboardContent({ children }) {
   const { isCollapsed } = useSidebar();
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] text-slate-900 font-sans antialiased">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased">
       <CollapsibleSidebar />
 
       {/* Main content shifts correctly when sidebar collapses */}

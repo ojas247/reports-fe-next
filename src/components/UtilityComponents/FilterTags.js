@@ -5,7 +5,6 @@ import React from 'react';
 const FilterTags = ({ applied_filters = {} }) => {
   const data = applied_filters;
 
-  // Safe Extraction Utilities
   const extractValues = (items) => {
     if (!items) return [];
     if (Array.isArray(items)) {
@@ -28,14 +27,18 @@ const FilterTags = ({ applied_filters = {} }) => {
   const hasAnyFilters = sector || sub1.length > 0 || authors.length > 0 || years.length > 0 || tags.length > 0;
 
   if (!hasAnyFilters) {
-    return null;
+    return (
+      <div className="w-full py-4 text-center">
+        <p className="text-xs text-slate-400">No filters applied</p>
+      </div>
+    );
   }
 
   return (
-    <div className="w-full flex flex-wrap items-center gap-2 py-2">
+    <div className="w-full flex flex-wrap items-center gap-2 py-1">
       {/* Sector Pill */}
       {sector && (
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200 shadow-xs">
+        <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200 shadow-xs">
           <span className="text-slate-400 mr-1.5 font-normal">Sector:</span>
           {sector}
         </span>
@@ -45,9 +48,9 @@ const FilterTags = ({ applied_filters = {} }) => {
       {sub1.map((sub, idx) => (
         <span
           key={`sub1-${idx}`}
-          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200 shadow-xs"
+          className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200 shadow-xs"
         >
-          <span className="text-slate-400 mr-1.5 font-normal">Sub-Sector:</span>
+          <span className="text-slate-400 mr-1.5 font-normal">Sub:</span>
           {sub}
         </span>
       ))}
@@ -56,7 +59,7 @@ const FilterTags = ({ applied_filters = {} }) => {
       {authors.map((author, idx) => (
         <span
           key={`author-${idx}`}
-          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-sky-50 text-sky-800 border border-sky-200/80 shadow-xs"
+          className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-sky-50 text-sky-800 border border-sky-200/80 shadow-xs"
         >
           <span className="text-sky-500 mr-1.5 font-normal">Author:</span>
           {author}
@@ -67,7 +70,7 @@ const FilterTags = ({ applied_filters = {} }) => {
       {years.map((year, idx) => (
         <span
           key={`year-${idx}`}
-          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-xs"
+          className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-xs"
         >
           <span className="text-emerald-500 mr-1.5 font-normal">Year:</span>
           {year}
@@ -78,7 +81,7 @@ const FilterTags = ({ applied_filters = {} }) => {
       {tags.map((tag, idx) => (
         <span
           key={`tag-${idx}`}
-          className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-800 border border-indigo-200/80 shadow-xs"
+          className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-800 border border-indigo-200/80 shadow-xs"
         >
           <span className="text-indigo-400 mr-1.5 font-normal">Tag:</span>
           {tag}

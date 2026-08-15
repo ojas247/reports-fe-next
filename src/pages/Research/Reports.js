@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ReportResultsComp from '../../components/Functionalities/ReportResultsComp';
 import SearchFilters from '../../components/Functionalities/SearchFilters';
@@ -8,13 +8,13 @@ import FilterTags from '../../components/UtilityComponents/FilterTags';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import { isSessionTokenValid } from '../../pages/api/UtilFunctions';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import styles from '../../styles/Pages/reports.module.css';
 
 export default function Reports() {
   const router = useRouter();
   const [appliedFilters, setAppliedFilters] = useState({});
   const [isToggled, setIsToggled] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const auth = isSessionTokenValid();
@@ -23,7 +23,9 @@ export default function Reports() {
     if (!auth) {
       alert('Please login to access product-based services.');
       router.push('/Login');
+      return;
     }
+    setLoading(false);
   }, [router]);
 
   const getAppliedFiltersFromChild = (filters) => {
@@ -35,35 +37,55 @@ export default function Reports() {
     setIsToggled((prevState) => !prevState);
   };
 
+  if (loading || !isAuthenticated) {
+    return (
+      <DashboardLayout>
+        <div className="flex w-full h-screen bg-slate-50 overflow-hidden font-sans text-slate-900">
+          <div className="flex-1 flex flex-col items-center justify-center p-6">
+            <div className="w-5 h-5 border-2 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+            <p className="text-xs font-mono mt-3 text-slate-500 tracking-wider">
+              AUTHENTICATING...
+            </p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
-      <div className={`${styles.resultBodyContainer || ''} w-full min-h-screen bg-slate-50/50 p-4 sm:p-6 lg:p-8 space-y-6`}>
-        {/* Search & Filter Header Bar */}
-        <div className={`${styles.searchRow || ''} w-full flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-sm`}>
-          <div className={`${styles.searchToggle || ''} flex items-center gap-2`}>
-            <button
-              type="button"
-              onClick={handleToggle}
-              className="md:hidden p-2 text-slate-600 hover:text-slate-900 border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors"
-              aria-label="Toggle Filters"
-            >
-              <i className={`bi ${isToggled ? 'bi-x-lg' : 'bi-funnel'} text-lg`}></i>
-            </button>
-          </div>
-          
-          <div className="w-full">
-            <SearchFilters onDataSend={getAppliedFiltersFromChild} />
-          </div>
-        </div>
+      <div className="flex w-full bg-slate-50 overflow-hidden font-sans text-slate-900">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/50">
+          <div className="max-w-7xl mx-auto space-y-5 sm:space-y-6">
+            
+            {/* Page Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-200/80 pb-4">
+              <div>
+                <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+                  Research Reports
+                </h1>
+                <p className="text-xs text-slate-500 mt-1">
+                  Search and filter research reports across sectors.
+                </p>
+              </div>
+            </div>
 
-        {/* Filter Tags Bar */}
-        <div className={`${styles.filterTags || ''} w-full`}>
-          <FilterTags applied_filters={appliedFilters} />
-        </div>
+            {/* Search & Filter Section */}
+            <div className="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-5 shadow-2xs">
+              <SearchFilters onDataSend={getAppliedFiltersFromChild} />
+            </div>
 
-        {/* Results Body */}
-        <div className={`${styles.resultContainer || ''} w-full bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-6`}>
-          <ReportResultsComp researchType="Reports" result={appliedFilters} />
+            {/* Filter Tags */}
+            <div className="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-5 shadow-2xs">
+              <FilterTags applied_filters={appliedFilters} />
+            </div>
+
+            {/* Results Container */}
+            <div className="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-5 shadow-2xs min-h-[420px]">
+              <ReportResultsComp researchType="Reports" result={appliedFilters} />
+            </div>
+
+          </div>
         </div>
       </div>
     </DashboardLayout>

@@ -13,7 +13,7 @@ const SingleDropDown_v1 = (props) => {
 
   if (!mounted) {
     return (
-      <div className="w-full h-[42px] bg-slate-100 rounded-lg animate-pulse" />
+      <div className="w-full h-[42px] bg-slate-100 rounded-xl animate-pulse" />
     );
   }
 

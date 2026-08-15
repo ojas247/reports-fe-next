@@ -21,12 +21,12 @@ export default function CollapsibleSidebar() {
 
   return (
     <aside
-      className={`hidden md:flex flex-col bg-white border-r border-slate-200 fixed top-0 left-0 h-screen z-40 transition-all duration-300 ease-in-out ${
+      className={`hidden md:flex flex-col bg-white border-r border-slate-200/80 fixed top-0 left-0 h-screen z-40 transition-all duration-300 ease-in-out ${
         isCollapsed ? "w-[72px]" : "w-60"
       }`}
     >
       {/* ========== HEADER ========== */}
-      <div className="h-14 border-b border-slate-100 flex items-center shrink-0 px-3">
+      <div className="h-14 border-b border-slate-200/80 flex items-center shrink-0 px-3">
         {isCollapsed ? (
           <div className="w-full flex items-center justify-center">
             <div className="w-9 h-9 rounded-lg bg-[#1e3a5f] flex items-center justify-center">
@@ -61,7 +61,7 @@ export default function CollapsibleSidebar() {
               className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
               title="Collapse sidebar"
             >
-        <i className="bi bi-list text-base" />
+              <i className="bi bi-list text-base" />
             </button>
           </div>
         )}
@@ -129,7 +129,7 @@ export default function CollapsibleSidebar() {
 
       {/* ========== FOOTER ========== */}
       {!isCollapsed && (
-        <div className="p-3 border-t border-slate-100 text-center">
+        <div className="p-3 border-t border-slate-200/80 text-center">
           <span className="text-[11px] text-slate-400">© 2026 MarketInsight</span>
         </div>
       )}
