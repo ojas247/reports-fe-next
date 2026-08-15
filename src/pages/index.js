@@ -53,209 +53,141 @@ export default function IndexPage() {
     }
   ];
 
-  useEffect(() => {
-    const getTickertapeData = async () => {
-      setTickertapeLoading(true);
+ useEffect(() => {
+  const getTickertapeData = async () => {
+    setTickertapeLoading(true);
 
-      try {
-        const response = await fetchDataFromGetApi("tickertape");
+    try {
+      const response = await fetchDataFromGetApi("tickertape");
 
-        const data = Array.isArray(response)
-          ? response
-          : Array.isArray(response?.data)
-            ? response.data
-            : [];
+      const data = Array.isArray(response)
+        ? response
+        : Array.isArray(response?.data)
+          ? response.data
+          : [];
 
-        const formattedData = data.map((item, index) => {
-          const change = Number(
-            item.perChange ??
-            item.percentChange ??
-            item.changePercent ??
-            item.percentageChange ??
-            0
-          );
+      const formattedData = data.map((item, index) => {
+        const change = Number(
+          item.perChange ??
+          item.percentChange ??
+          item.changePercent ??
+          item.percentageChange ??
+          0
+        );
 
-          const value =
-            item.value ??
-            item.price ??
-            item.currentValue ??
-            item.lastPrice ??
-            item.currentPrice ??
-            item.val ??
-            null;
+        const value =
+          item.value ??
+          item.price ??
+          item.currentValue ??
+          item.lastPrice ??
+          item.currentPrice ??
+          item.val ??
+          null;
 
-          return {
-            id: item.id ?? index + 1,
-            name:
-              item.displayName ??
-              item.item ??
-              item.name ??
-              "Market Indicator",
-            val:
-              value !== null && value !== undefined
-                ? String(value)
-                : null,
-            chg: `${change >= 0 ? "▲" : "▼"} ${Math.abs(change)}%`,
-            type: change >= 0 ? "up" : "down",
-            raw: item
-          };
-        });
-
-        setTickertapeData(formattedData);
-        console.log("Tickertape data:", formattedData);
-      } catch (error) {
-        console.error("Error fetching Tickertape data:", error);
-        setTickertapeData([]);
-      } finally {
-        setTickertapeLoading(false);
-      }
-    };
-
-    getTickertapeData();
-
-    fetchDataFromGetApi("_ah/warmup");
-
-    const getCorrelationMatrixData = async () => {
-      setTableLoading(true);
-
-      try {
-        const payload = {
-          limit: 10,
-          category: "macro_indicators"
+        return {
+          id: item.id ?? index + 1,
+          name:
+            item.displayName ??
+            item.item ??
+            item.name ??
+            "Market Indicator",
+          val:
+            value !== null && value !== undefined
+              ? String(value)
+              : null,
+          chg: `${change >= 0 ? "▲" : "▼"} ${Math.abs(change)}%`,
+          type: change >= 0 ? "up" : "down",
+          raw: item
         };
+      });
 
-        const response = await fetchDataFromPostApi(
-          payload,
-          "getTSdata"
-        );
+      setTickertapeData(formattedData);
+      console.log("Tickertape data:", formattedData);
+    } catch (error) {
+      console.error("Error fetching Tickertape data:", error);
+      setTickertapeData([]);
+    } finally {
+      setTickertapeLoading(false);
+    }
+  };
 
-        if (Array.isArray(response) && response.length > 0) {
-          const formattedData = response.map((item, idx) => ({
-            id: item.id || idx + 1,
-            metric:
-              item.metric ||
-              item.item ||
-              item.indicatorName ||
-              "Macro Indicator",
-            targetSector:
-              item.targetSector ||
-              item.sector ||
-              item.sub1 ||
-              "General Economy",
-            correlation:
-              item.correlation ||
-              item.value ||
-              (0.75 + (idx % 3) * 0.08).toFixed(2),
-            status:
-              item.status ||
-              (parseFloat(item.correlation || 0.8) > 0.5
-                ? "Strong Positive"
-                : "Moderate"),
-            trend:
-              item.trend ||
-              (idx % 2 === 0 ? "Up" : "Down")
-          }));
+  getTickertapeData();
 
-          setCorrelationTable(formattedData);
-        } else {
-          setCorrelationTable([
-            {
-              id: 1,
-              metric: "Rail Freight Volumes",
-              targetSector: "Logistics & Supply Chain",
-              correlation: "0.94",
-              status: "Strong Positive",
-              trend: "Up"
-            },
-            {
-              id: 2,
-              metric: "Power Peak Demand",
-              targetSector: "Industrial Manufacturing",
-              correlation: "0.89",
-              status: "Positive",
-              trend: "Up"
-            },
-            {
-              id: 3,
-              metric: "Cement Off-Take Rate",
-              targetSector: "Infrastructure & Realty",
-              correlation: "-0.42",
-              status: "Inverted",
-              trend: "Down"
-            },
-            {
-              id: 4,
-              metric: "Diesel Consumption",
-              targetSector: "Auto & Freight Logistics",
-              correlation: "0.78",
-              status: "Moderate Positive",
-              trend: "Up"
-            },
-            {
-              id: 5,
-              metric: "GST E-Way Generation",
-              targetSector: "FMCG / Retail Demand",
-              correlation: "0.91",
-              status: "Strong Positive",
-              trend: "Up"
-            }
-          ]);
-        }
-      } catch (error) {
-        console.error(
-          "Error fetching correlation table dynamic data:",
-          error
-        );
+  // REMOVED: fetchDataFromGetApi("_ah/warmup");
+  // This call was causing CORS errors
 
-        setCorrelationTable([
-          {
-            id: 1,
-            metric: "Rail Freight Volumes",
-            targetSector: "Logistics & Supply Chain",
-            correlation: "0.94",
-            status: "Strong Positive",
-            trend: "Up"
-          },
-          {
-            id: 2,
-            metric: "Power Peak Demand",
-            targetSector: "Industrial Manufacturing",
-            correlation: "0.89",
-            status: "Positive",
-            trend: "Up"
-          },
-          {
-            id: 3,
-            metric: "Cement Off-Take Rate",
-            targetSector: "Infrastructure & Realty",
-            correlation: "-0.42",
-            status: "Inverted",
-            trend: "Down"
-          },
-          {
-            id: 4,
-            metric: "Diesel Consumption",
-            targetSector: "Auto & Freight Logistics",
-            correlation: "0.78",
-            status: "Moderate Positive",
-            trend: "Up"
-          },
-          {
-            id: 5,
-            metric: "GST E-Way Generation",
-            targetSector: "FMCG / Retail Demand",
-            correlation: "0.91",
-            status: "Strong Positive",
-            trend: "Up"
-          }
-        ]);
-      } finally {
-        setTableLoading(false);
-      }
-    };
+  // const getCorrelationMatrixData = async () => {
+  //   setTableLoading(true);
 
-    getCorrelationMatrixData();
-  }, []);
+  //   try {
+  //     const payload = {
+  //       limit: 10,
+  //       category: "macro_indicators"
+  //     };
+
+  //     const response = await fetchDataFromPostApi(
+  //       payload,
+  //       "getTSdata"
+  //     );
+
+  //     if (Array.isArray(response) && response.length > 0) {
+  //       const formattedData = response.map((item, idx) => ({
+  //         id: item.id || idx + 1,
+  //         metric:
+  //           item.metric ||
+  //           item.item ||
+  //           item.indicatorName ||
+  //           "Macro Indicator",
+  //         targetSector:
+  //           item.targetSector ||
+  //           item.sector ||
+  //           item.sub1 ||
+  //           "General Economy",
+  //         correlation:
+  //           item.correlation ||
+  //           item.value ||
+  //           (0.75 + (idx % 3) * 0.08).toFixed(2),
+  //         status:
+  //           item.status ||
+  //           (parseFloat(item.correlation || 0.8) > 0.5
+  //             ? "Strong Positive"
+  //             : "Moderate"),
+  //         trend:
+  //           item.trend ||
+  //           (idx % 2 === 0 ? "Up" : "Down")
+  //       }));
+
+  //       setCorrelationTable(formattedData);
+  //     } else {
+  //       // Fallback data
+  //       setCorrelationTable([
+  //         {
+  //           id: 1,
+  //           metric: "Rail Freight Volumes",
+  //           targetSector: "Logistics & Supply Chain",
+  //           correlation: "0.94",
+  //           status: "Strong Positive",
+  //           trend: "Up"
+  //         },
+  //         // ... rest of fallback data
+  //       ]);
+  //     }
+  //   } catch (error) {
+  //     console.error(
+  //       "Error fetching correlation table dynamic data:",
+  //       error
+  //     );
+  //     // Set fallback data on error
+  //     setCorrelationTable([
+  //       // ... fallback data
+  //     ]);
+  //   } finally {
+  //     setTableLoading(false);
+  //   }
+  // };
+
+  // getCorrelationMatrixData();
+}, []);
 
   const nextSlide = () => {
     setCurrentSlide(
