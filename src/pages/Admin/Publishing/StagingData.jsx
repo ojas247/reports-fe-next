@@ -1,8 +1,25 @@
+'use client';
+
 import { useState, useMemo } from 'react';
-import { fetchDataFromGetApi, fetchDataFromPostApi } from '../../api/Api';
-import { AgGridReact, AgGridProvider } from 'ag-grid-react';
-import { AllEnterpriseModule } from 'ag-grid-enterprise';
-import { themeQuartz } from 'ag-grid-community';
+import {
+  fetchDataFromGetApi,
+  fetchDataFromPostApi,
+} from '../../api/Api';
+
+import {
+  AgGridReact,
+  AgGridProvider,
+} from 'ag-grid-react';
+
+import {
+  AllEnterpriseModule,
+} from 'ag-grid-enterprise';
+
+import {
+  themeQuartz,
+} from 'ag-grid-community';
+
+import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/SectorHierarchyDropDown';
 
 export const config = {
   unstable_runtimeJS: true,
@@ -30,8 +47,10 @@ export default function PublishStagingData() {
   const [source, setSource] = useState('AR');
 
   const [stagingData, setStagingData] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [publishing, setPublishing] = useState(false);
+
   const [fetchError, setFetchError] = useState(null);
 
   const [statusMessage, setStatusMessage] = useState(
@@ -39,13 +58,16 @@ export default function PublishStagingData() {
   );
 
   const [companyName, setCompanyName] = useState('');
-  const [sectorHierarchy, setSectorHierarchy] = useState('');
+
+
+  const [sectorHierarchy, setSectorHierarchy] = useState({});
+
   const [units, setUnits] = useState('');
   const [granularity, setGranularity] = useState('');
-  const [dataName, setDataName] = useState('');
 
   const [formValues, setFormValues] = useState({});
 
+  
   const normalizeData = (record) => {
     if (!record || typeof record !== 'object') {
       return [];
@@ -57,7 +79,11 @@ export default function PublishStagingData() {
       try {
         data = JSON.parse(data);
       } catch (error) {
-        console.error('Unable to parse staging data:', error);
+        console.error(
+          'Unable to parse staging data:',
+          error
+        );
+
         return [];
       }
     }
@@ -76,6 +102,7 @@ export default function PublishStagingData() {
 
     return [data];
   };
+
 
   const rawApiRows = useMemo(() => {
     const rows = [];
@@ -99,57 +126,72 @@ export default function PublishStagingData() {
         node.id ||
         `${metricName}-${recordIndex}-${rows.length}`;
 
-      const hasValue =
-        node.value !== undefined &&
-        node.value !== null;
+      const children = Array.isArray(node.children)
+        ? node.children
+        : [];
 
-      const hasMetricData =
-        node.name ||
-        node.label ||
-        node.title ||
-        node.id ||
-        hasValue ||
-        node.units;
+      const hasChildren = children.length > 0;
 
-      if (hasMetricData) {
-        rows.push({
-          name: metricName,
-          id: metricId,
-          units: node.units || '—',
-          value: hasValue ? node.value : '',
-          path: parentPath,
-          recordIndex,
-          hasChildren:
-            Array.isArray(node.children) &&
-            node.children.length > 0,
-        });
+     
+      if (!hasChildren) {
+        const hasValue =
+          node.value !== undefined &&
+          node.value !== null;
+
+        const hasMetricData =
+          node.name ||
+          node.label ||
+          node.title ||
+          node.id ||
+          hasValue ||
+          node.units;
+
+        if (hasMetricData) {
+          rows.push({
+            name: metricName,
+            id: metricId,
+            units: node.units || '—',
+            value: hasValue
+              ? node.value
+              : '',
+            path: parentPath,
+            recordIndex,
+            hasChildren: false,
+          });
+        }
+
+        return;
       }
 
-      if (Array.isArray(node.children)) {
-        node.children.forEach((child) => {
-          extractMetrics(
-            child,
-            metricName
-              ? `${parentPath}${parentPath ? ' → ' : ''}${metricName}`
-              : parentPath,
-            recordIndex
-          );
-        });
-      }
-    };
-
-    stagingData.forEach((record, recordIndex) => {
-      normalizeData(record).forEach((node) => {
+     
+      children.forEach((child) => {
         extractMetrics(
-          node,
-          '',
+          child,
+          metricName
+            ? `${parentPath}${parentPath ? ' → ' : ''}${metricName}`
+            : parentPath,
           recordIndex
         );
       });
-    });
+    };
+
+    stagingData.forEach(
+      (record, recordIndex) => {
+        normalizeData(record).forEach(
+          (node) => {
+            extractMetrics(
+              node,
+              '',
+              recordIndex
+            );
+          }
+        );
+      }
+    );
 
     return rows;
   }, [stagingData]);
+
 
   const tableRows = useMemo(() => {
     const rows = [];
@@ -173,7 +215,9 @@ export default function PublishStagingData() {
         node.id ||
         `${name}-${recordIndex}-${rows.length}`;
 
-      const children = Array.isArray(node.children)
+      const children = Array.isArray(
+        node.children
+      )
         ? node.children
             .map((child) =>
               cloneNode(
@@ -185,19 +229,34 @@ export default function PublishStagingData() {
             .filter(Boolean)
         : [];
 
+      
+      const originalValue =
+        node.value !== undefined &&
+        node.value !== null
+          ? node.value
+          : '';
+
       const row = {
         ...node,
+
         name,
         id,
-        units: node.units || '',
-        value:
-          node.value !== undefined &&
-          node.value !== null
-            ? node.value
-            : '',
+
+        units:
+          node.units || '',
+
+        value: originalValue,
+
         children,
-        path: [...parentPath, name],
-        hasChildren: children.length > 0,
+
+        path: [
+          ...parentPath,
+          name,
+        ],
+
+        hasChildren:
+          children.length > 0,
+
         recordIndex,
       };
 
@@ -208,21 +267,24 @@ export default function PublishStagingData() {
 
     const roots = [];
 
-    stagingData.forEach((record, recordIndex) => {
-      const data = normalizeData(record);
+    stagingData.forEach(
+      (record, recordIndex) => {
+        const data =
+          normalizeData(record);
 
-      data.forEach((node) => {
-        const row = cloneNode(
-          node,
-          [],
-          recordIndex
-        );
+        data.forEach((node) => {
+          const row = cloneNode(
+            node,
+            [],
+            recordIndex
+          );
 
-        if (row) {
-          roots.push(row);
-        }
-      });
-    });
+          if (row) {
+            roots.push(row);
+          }
+        });
+      }
+    );
 
     return roots;
   }, [stagingData]);
@@ -230,6 +292,7 @@ export default function PublishStagingData() {
   const gridRows = useMemo(() => {
     return tableRows;
   }, [tableRows]);
+
 
   const getYearHeader = () => {
     const possibleYear =
@@ -246,6 +309,7 @@ export default function PublishStagingData() {
     return 'Value';
   };
 
+ 
   const updateNestedValue = (
     nodes,
     targetId,
@@ -274,6 +338,7 @@ export default function PublishStagingData() {
     });
   };
 
+  
   const setTableRowsForPublish = (
     targetId,
     newValue
@@ -307,6 +372,7 @@ export default function PublishStagingData() {
 
         return {
           ...record,
+
           data: dataIsArray
             ? updatedData
             : updatedData[0],
@@ -315,14 +381,24 @@ export default function PublishStagingData() {
     });
   };
 
-  const handleGridValueChange = (params) => {
+  
+  const handleGridValueChange = (
+    params
+  ) => {
     const node = params.data;
 
     if (!node) {
       return;
     }
 
-    if (node.value === params.newValue) {
+    if (node.hasChildren) {
+      return;
+    }
+
+    if (
+      node.value ===
+      params.newValue
+    ) {
       return;
     }
 
@@ -331,28 +407,41 @@ export default function PublishStagingData() {
       params.newValue
     );
 
-    setFormValues((previous) => ({
-      ...previous,
-      [`metric_${node.id}`]:
-        params.newValue,
-    }));
+    setFormValues(
+      (previous) => ({
+        ...previous,
+
+        [`metric_${node.id}`]:
+          params.newValue,
+      })
+    );
 
     setStatusMessage(
       'Staging value edited. Changes will be included when published.'
     );
   };
 
+  /*
+   * Editable table input change.
+   */
   const handleInputChange = (
     row,
     value
   ) => {
+    if (row.hasChildren) {
+      return;
+    }
+
     const fieldKey =
       `metric_${row.id}`;
 
-    setFormValues((previous) => ({
-      ...previous,
-      [fieldKey]: value,
-    }));
+    setFormValues(
+      (previous) => ({
+        ...previous,
+
+        [fieldKey]: value,
+      })
+    );
 
     setTableRowsForPublish(
       row.id,
@@ -364,329 +453,501 @@ export default function PublishStagingData() {
     );
   };
 
+ 
+  const handleSectorHierarchyChange = (
+    pathObject
+  ) => {
+    const cleanPath = {};
+
+    if (
+      pathObject &&
+      typeof pathObject === 'object'
+    ) {
+      Object.entries(
+        pathObject
+      ).forEach(
+        ([key, value]) => {
+          if (
+            value !== null &&
+            value !== undefined &&
+            value !== ''
+          ) {
+            cleanPath[key] = value;
+          }
+        }
+      );
+    }
+
+    setSectorHierarchy(
+      cleanPath
+    );
+  };
+
+ 
   const columnDefs = useMemo(() => {
     return [
       {
         headerName: 'Units',
+
         field: 'units',
+
         width: 150,
+
         minWidth: 120,
+
         maxWidth: 180,
-        cellClass: 'units-cell',
-        valueFormatter: (params) => {
-          return params.value || '';
-        },
+
+        cellClass:
+          'units-cell',
+
+        valueFormatter:
+          (params) => {
+            return params.value || '';
+          },
       },
+
       {
-        headerName: getYearHeader(),
+        headerName:
+          getYearHeader(),
+
         field: 'value',
+
         width: 220,
+
         minWidth: 180,
+
         flex: 0.35,
-        editable: (params) =>
-          !params.node.hasChildren(),
-        cellClass: (params) => {
-          return params.node.hasChildren()
-            ? 'financial-value-parent'
-            : 'financial-value';
-        },
-        valueFormatter: (params) => {
-          if (
-            params.value === null ||
-            params.value === undefined ||
-            params.value === ''
-          ) {
-            return '';
-          }
 
-          if (
-            typeof params.value === 'number'
-          ) {
-            return params.value.toLocaleString(
-              'en-IN'
+        editable: (params) => {
+          return !params.data?.hasChildren;
+        },
+
+        cellClass:
+          (params) => {
+            return params.data?.hasChildren
+              ? 'financial-value-parent'
+              : 'financial-value';
+          },
+
+        valueFormatter:
+          (params) => {
+            if (
+              params.value === null ||
+              params.value === undefined ||
+              params.value === ''
+            ) {
+              return '';
+            }
+
+           
+            if (
+              typeof params.value ===
+              'number'
+            ) {
+              return params.value.toLocaleString(
+                'en-IN'
+              );
+            }
+
+            return String(
+              params.value
             );
-          }
-
-          return String(params.value);
-        },
+          },
       },
     ];
   }, [stagingData]);
 
-  const autoGroupColumnDef = useMemo(() => {
-    return {
-      headerName: 'Parameter',
-      field: 'name',
-      flex: 1,
-      minWidth: 420,
-      cellRenderer:
-        'agGroupCellRenderer',
-      cellRendererParams: {
-        suppressCount: true,
-      },
-      cellClass: (params) => {
-        return params.node.hasChildren()
-          ? 'financial-parent'
-          : 'financial-child';
-      },
-    };
-  }, []);
+  const autoGroupColumnDef =
+    useMemo(() => {
+      return {
+        headerName:
+          'Parameter',
 
-  const defaultColDef = useMemo(() => {
-    return {
-      sortable: false,
-      resizable: true,
-      suppressHeaderMenuButton: true,
-    };
-  }, []);
+        field: 'name',
 
-  const handleFetchData = async () => {
-    const trimmedScriptId =
-      scriptId.trim();
+        flex: 1,
 
-    if (!trimmedScriptId) {
-      setFetchError(
-        'Script ID is required.'
-      );
+        minWidth: 420,
 
-      setStatusMessage(
-        'Enter a Script ID before fetching.'
-      );
+        cellRenderer:
+          'agGroupCellRenderer',
 
-      return;
-    }
+        cellRendererParams: {
+          suppressCount: true,
+        },
 
-    try {
-      setLoading(true);
-      setFetchError(null);
-      setStagingData([]);
-      setFormValues({});
+        cellClass:
+          (params) => {
+            return params.data?.hasChildren
+              ? 'financial-parent'
+              : 'financial-child';
+          },
+      };
+    }, []);
 
-      setStatusMessage(
-        `Fetching staging data for ${trimmedScriptId} (${source})...`
-      );
+  const defaultColDef =
+    useMemo(() => {
+      return {
+        sortable: false,
+        resizable: true,
+        suppressHeaderMenuButton: true,
+      };
+    }, []);
 
-      const endpoint =
-        `getStagingData?scriptID=${encodeURIComponent(
-          trimmedScriptId
-        )}` +
-        `&source=${encodeURIComponent(
-          source
-        )}`;
+  
+  const handleFetchData =
+    async () => {
+      const trimmedScriptId =
+        scriptId.trim();
 
-      console.log(
-        'GET:',
-        endpoint
-      );
-
-      const data =
-        await fetchDataFromGetApi(
-          endpoint
+      if (!trimmedScriptId) {
+        setFetchError(
+          'Script ID is required.'
         );
 
-      console.log(
-        'Staging API response:',
-        data
-      );
-
-      const records =
-        Array.isArray(data)
-          ? data
-          : data
-            ? [data]
-            : [];
-
-      if (records.length === 0) {
-        setStagingData([]);
-        setFormValues({});
-
         setStatusMessage(
-          `No staging records found for ${trimmedScriptId} (${source}).`
+          'Enter a Script ID before fetching.'
         );
 
         return;
       }
 
-      setStagingData(records);
+      try {
+        setLoading(true);
 
-      const initialInputs = {};
+        setFetchError(null);
 
-      const extractNodes = (
-        node
-      ) => {
+        setStagingData([]);
+
+        setFormValues({});
+
+        setStatusMessage(
+          `Fetching staging data for ${trimmedScriptId} (${source})...`
+        );
+
+        const endpoint =
+          `getStagingData?scriptID=${encodeURIComponent(
+            trimmedScriptId
+          )}` +
+          `&source=${encodeURIComponent(
+            source
+          )}`;
+
+        console.log(
+          'GET:',
+          endpoint
+        );
+
+        const data =
+          await fetchDataFromGetApi(
+            endpoint
+          );
+
+        console.log(
+          'Staging API response:',
+          data
+        );
+
+        const records =
+          Array.isArray(data)
+            ? data
+            : data
+              ? [data]
+              : [];
+
         if (
-          !node ||
-          typeof node !== 'object'
+          records.length === 0
         ) {
+          setStagingData([]);
+
+          setFormValues({});
+
+          setStatusMessage(
+            `No staging records found for ${trimmedScriptId} (${source}).`
+          );
+
           return;
         }
 
-        const fieldKey =
-          node.id ||
-          node.name ||
-          'unnamed_metric';
-
-        if (
-          node.value !== undefined &&
-          node.value !== null
-        ) {
-          initialInputs[
-            `metric_${fieldKey}`
-          ] = node.value;
-        }
-
-        if (
-          Array.isArray(node.children)
-        ) {
-          node.children.forEach(
-            extractNodes
-          );
-        }
-      };
-
-      records.forEach((record) => {
-        normalizeData(record).forEach(
-          extractNodes
+        setStagingData(
+          records
         );
-      });
 
-      setFormValues(
-        initialInputs
-      );
+        const initialInputs =
+          {};
 
-      setStatusMessage(
-        `Loaded ${records.length} staging record(s) for ${trimmedScriptId} (${source}).`
-      );
-    } catch (err) {
-      console.error(
-        'Failed to fetch staging data:',
-        err
-      );
+       
+        const extractNodes =
+          (node) => {
+            if (
+              !node ||
+              typeof node !==
+                'object'
+            ) {
+              return;
+            }
 
-      setFetchError(
-        err?.message ||
-          'Error connecting to staging API.'
-      );
+            const children =
+              Array.isArray(
+                node.children
+              )
+                ? node.children
+                : [];
 
-      setStatusMessage(
-        'Fetch failed. Check API server or API connection.'
-      );
+            
+            if (
+              children.length === 0 &&
+              node.value !==
+                undefined &&
+              node.value !== null
+            ) {
+              const fieldKey =
+                node.id ||
+                node.name ||
+                'unnamed_metric';
 
-      setStagingData([]);
-      setFormValues({});
-    } finally {
-      setLoading(false);
-    }
-  };
+              initialInputs[
+                `metric_${fieldKey}`
+              ] = node.value;
+            }
 
- const handlePublish = async () => {
-  if (!scriptId.trim()) {
-    setStatusMessage('Script ID is required.');
-    return;
-  }
+            children.forEach(
+              extractNodes
+            );
+          };
 
-  if (!source.trim()) {
-    setStatusMessage('Source is required.');
-    return;
-  }
+        records.forEach(
+          (record) => {
+            normalizeData(
+              record
+            ).forEach(
+              extractNodes
+            );
+          }
+        );
 
-  if (!stagingData.length) {
-    setStatusMessage('No staging data available to publish.');
-    return;
-  }
+        setFormValues(
+          initialInputs
+        );
 
-  try {
-    setPublishing(true);
-    setFetchError(null);
-    setStatusMessage('Publishing staging data...');
+        setStatusMessage(
+          `Loaded ${records.length} staging record(s) for ${trimmedScriptId} (${source}).`
+        );
+      } catch (err) {
+        console.error(
+          'Failed to fetch staging data:',
+          err
+        );
 
-    const payload = {
-      scriptID: scriptId.trim(),
-      source: source.trim(),
-      companyName: companyName.trim(),
-      sectorHierarchy,
-      units,
-      granularity,
-      dataName: dataName.trim(),
-      updatedValues: formValues,
-      stagingData,
+        setFetchError(
+          err?.message ||
+            'Error connecting to staging API.'
+        );
+
+        setStatusMessage(
+          'Fetch failed. Check API server or API connection.'
+        );
+
+        setStagingData([]);
+
+        setFormValues({});
+      } finally {
+        setLoading(false);
+      }
     };
 
-    console.log('POST /Publishing/TSData');
-    console.log('Publish Payload:', payload);
+ 
+  const handlePublish =
+    async () => {
+      if (!scriptId.trim()) {
+        setStatusMessage(
+          'Script ID is required.'
+        );
 
-    const response = await fetchDataFromPostApi(
-      payload,
-      'Publishing/TSData'
-    );
+        return;
+      }
 
-    console.log('Publish Response:', response);
+      if (!source.trim()) {
+        setStatusMessage(
+          'Source is required.'
+        );
 
-    setStatusMessage('Data published successfully.');
-    alert('Data published successfully! ✓');
-  } catch (error) {
-    console.error('Publish error:', error);
+        return;
+      }
 
-    setFetchError(
-      error?.message || 'Failed to publish staging data.'
-    );
+      if (
+        !stagingData.length
+      ) {
+        setStatusMessage(
+          'No staging data available to publish.'
+        );
 
-    setStatusMessage(
-      'Publishing failed. Check the backend endpoint.'
-    );
+        return;
+      }
 
-    alert(
-      error?.message ||
-        'Error publishing staging data ❌'
-    );
-  } finally {
-    setPublishing(false);
-  }
-};
+      try {
+        setPublishing(true);
 
-  const isFormComplete = useMemo(() => {
-    return Boolean(
-      scriptId.trim() &&
+        setFetchError(null);
+
+        setStatusMessage(
+          'Publishing staging data...'
+        );
+
+       
+        const cleanSectorHierarchy =
+          {};
+
+        Object.entries(
+          sectorHierarchy || {}
+        ).forEach(
+          ([key, value]) => {
+            if (
+              value !== null &&
+              value !== undefined &&
+              value !== ''
+            ) {
+              cleanSectorHierarchy[
+                key
+              ] = value;
+            }
+          }
+        );
+
+        const payload = {
+          scriptID:
+            scriptId.trim(),
+
+          source:
+            source.trim(),
+
+          companyName:
+            companyName.trim(),
+
+          sectorHierarchy:
+            cleanSectorHierarchy,
+
+          units,
+
+          granularity,
+
+          updatedValues:
+            formValues,
+
+          stagingData,
+        };
+
+        console.log(
+          'POST /Publishing/TSData'
+        );
+
+        console.log(
+          'Publish Payload:',
+          payload
+        );
+
+        const response =
+          await fetchDataFromPostApi(
+            payload,
+            'Publishing/TSData'
+          );
+
+        console.log(
+          'Publish Response:',
+          response
+        );
+
+        setStatusMessage(
+          'Data published successfully.'
+        );
+
+        alert(
+          'Data published successfully! ✓'
+        );
+      } catch (error) {
+        console.error(
+          'Publish error:',
+          error
+        );
+
+        setFetchError(
+          error?.message ||
+            'Failed to publish staging data.'
+        );
+
+        setStatusMessage(
+          'Publishing failed. Check the backend endpoint.'
+        );
+
+        alert(
+          error?.message ||
+            'Error publishing staging data ❌'
+        );
+      } finally {
+        setPublishing(false);
+      }
+    };
+
+  const isFormComplete =
+    useMemo(() => {
+      return Boolean(
+        scriptId.trim() &&
         source &&
         stagingData.length > 0
-    );
-  }, [
-    scriptId,
-    source,
-    stagingData,
-  ]);
+      );
+    }, [
+      scriptId,
+      source,
+      stagingData,
+    ]);
 
   return (
-    <AgGridProvider modules={modules}>
+    <AgGridProvider
+      modules={modules}
+    >
       <div className="min-h-screen bg-[#f8f9fa] text-slate-900 font-sans antialiased p-4 sm:p-6">
         <div className="max-w-[1700px] mx-auto space-y-4">
 
+          {/* HEADER */}
+
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-200/80 rounded-xl p-4 shadow-sm">
+
             <div className="flex items-center gap-3">
+
               <div className="w-9 h-9 rounded-lg bg-slate-900 text-white flex items-center justify-center font-mono text-xs font-bold">
                 PS
               </div>
 
               <div>
+
                 <div className="flex items-center gap-2">
+
                   <h1 className="text-sm font-semibold tracking-tight text-slate-900">
                     Publish Staging Data
                   </h1>
 
                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] font-mono text-slate-600">
+
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+
                     STAGING
+
                   </span>
+
                 </div>
 
                 <p className="text-xs text-slate-500 mt-0.5">
                   Review, edit, and push staging dataset to production index
                 </p>
+
               </div>
+
             </div>
 
             <button
-              onClick={handleFetchData}
+              onClick={
+                handleFetchData
+              }
               disabled={loading}
               className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 active:bg-black text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5 shrink-0 shadow-sm disabled:opacity-50"
             >
@@ -694,10 +955,15 @@ export default function PublishStagingData() {
                 ? 'Fetching...'
                 : 'Fetch Staging'}
             </button>
+
           </div>
 
+          {/* CONFIGURATION */}
+
           <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm overflow-hidden">
+
             <div className="px-4 py-2.5 bg-slate-900 text-white text-xs font-semibold flex items-center justify-between">
+
               <span>
                 1 · Script &amp; Pipeline Configuration
               </span>
@@ -705,16 +971,21 @@ export default function PublishStagingData() {
               <span className="font-mono text-[10px] text-slate-300 font-normal">
                 v1.1
               </span>
+
             </div>
 
             <div className="divide-y divide-slate-100 text-xs">
 
+              {/* SCRIPT ID */}
+
               <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+
                 <div className="px-4 py-2.5 bg-[#f8f9fa] font-medium text-slate-600">
                   Script ID
                 </div>
 
                 <div className="p-2 md:col-span-2">
+
                   <input
                     type="text"
                     value={scriptId}
@@ -726,15 +997,21 @@ export default function PublishStagingData() {
                     placeholder="e.g. MARUTI"
                     className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md font-mono text-[11px] text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-400"
                   />
+
                 </div>
+
               </div>
 
+              {/* SOURCE */}
+
               <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+
                 <div className="px-4 py-2.5 bg-[#f8f9fa] font-medium text-slate-600">
                   Source
                 </div>
 
                 <div className="p-2 md:col-span-2">
+
                   <select
                     value={source}
                     onChange={(e) =>
@@ -744,6 +1021,7 @@ export default function PublishStagingData() {
                     }
                     className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-[11px] text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-400"
                   >
+
                     <option value="AR">
                       AR (Annual Report)
                     </option>
@@ -755,16 +1033,23 @@ export default function PublishStagingData() {
                     <option value="PR">
                       PR (Press Release)
                     </option>
+
                   </select>
+
                 </div>
+
               </div>
 
+              {/* COMPANY */}
+
               <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+
                 <div className="px-4 py-2.5 bg-[#f8f9fa] font-medium text-slate-600">
                   Company Name
                 </div>
 
                 <div className="p-2 md:col-span-2">
+
                   <input
                     type="text"
                     value={companyName}
@@ -776,55 +1061,43 @@ export default function PublishStagingData() {
                     placeholder="e.g. Maruti Suzuki India Ltd"
                     className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-[11px] text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-400"
                   />
+
                 </div>
+
               </div>
 
+              {/* SECTOR HIERARCHY */}
+
               <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+
                 <div className="px-4 py-2.5 bg-[#f8f9fa] font-medium text-slate-600">
+
                   Sector Hierarchy
+
                 </div>
 
-                <div className="p-2 md:col-span-2">
-                  <select
-                    value={
-                      sectorHierarchy
+                <div className="p-3 md:col-span-2">
+
+                  <SectorHierarchyDropDown
+                    onSelect={
+                      handleSectorHierarchyChange
                     }
-                    onChange={(e) =>
-                      setSectorHierarchy(
-                        e.target.value
-                      )
-                    }
-                    className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-[11px] text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-400"
-                  >
-                    <option value="">
-                      Select sector &gt; sub-sector...
-                    </option>
+                  />
 
-                    <option value="Consumer > Auto & EV">
-                      Consumer &gt; Auto &amp; EV
-                    </option>
-
-                    <option value="Industrials > Cement & Construction">
-                      Industrials &gt; Cement &amp; Construction
-                    </option>
-
-                    <option value="Infrastructure > Power & Energy">
-                      Infrastructure &gt; Power &amp; Energy
-                    </option>
-
-                    <option value="Digital > Fintech & Payments">
-                      Digital &gt; Fintech &amp; Payments
-                    </option>
-                  </select>
                 </div>
+
               </div>
 
+              {/* UNITS + GRANULARITY */}
+
               <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+
                 <div className="px-4 py-2.5 bg-[#f8f9fa] font-medium text-slate-600">
                   Units &amp; Granularity
                 </div>
 
                 <div className="p-2 md:col-span-2 grid grid-cols-2 gap-2">
+
                   <select
                     value={units}
                     onChange={(e) =>
@@ -834,6 +1107,7 @@ export default function PublishStagingData() {
                     }
                     className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-[11px] text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-400"
                   >
+
                     <option value="">
                       Select unit...
                     </option>
@@ -849,6 +1123,7 @@ export default function PublishStagingData() {
                     <option value="Percentage (%)">
                       Percentage (%)
                     </option>
+
                   </select>
 
                   <select
@@ -860,6 +1135,7 @@ export default function PublishStagingData() {
                     }
                     className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-[11px] text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-400"
                   >
+
                     <option value="">
                       Select frequency...
                     </option>
@@ -875,13 +1151,19 @@ export default function PublishStagingData() {
                     <option value="Annual">
                       Annual
                     </option>
+
                   </select>
+
                 </div>
+
               </div>
 
             </div>
 
+            {/* STATUS */}
+
             <div className="px-4 py-2 bg-[#f8f9fa] border-t border-slate-100 text-[10px] font-mono flex items-center gap-2">
+
               <span
                 className={`w-1.5 h-1.5 rounded-full ${
                   fetchError
@@ -900,14 +1182,20 @@ export default function PublishStagingData() {
                 {fetchError ||
                   statusMessage}
               </span>
+
             </div>
+
           </div>
+
+          {/* REVIEW / EDIT */}
 
           {stagingData.length > 0 && (
             <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm overflow-hidden">
 
               <div className="px-4 py-2.5 bg-slate-900 text-white text-xs font-semibold flex items-center justify-between">
+
                 <div className="flex items-center gap-2">
+
                   <span>
                     2 · Review &amp; Edit Staging Metrics
                   </span>
@@ -915,17 +1203,23 @@ export default function PublishStagingData() {
                   <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-[9px] font-mono text-emerald-300">
                     EDITABLE
                   </span>
+
                 </div>
 
                 <span className="font-mono text-[10px] text-slate-300 font-normal">
                   {rawApiRows.length} Metrics
                 </span>
+
               </div>
 
               <div className="overflow-x-auto">
+
                 <table className="w-full text-left border-collapse table-fixed">
+
                   <thead>
+
                     <tr className="bg-[#f8f9fa] border-b border-slate-200/80 text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+
                       <th className="w-[35%] px-4 py-2.5">
                         Parameter
                       </th>
@@ -941,13 +1235,18 @@ export default function PublishStagingData() {
                       <th className="w-[30%] px-4 py-2.5 text-right">
                         Target Value
                       </th>
+
                     </tr>
+
                   </thead>
 
                   <tbody className="divide-y divide-slate-100 text-[11px]">
+
                     {rawApiRows.length > 0 ? (
+
                       rawApiRows.map(
                         (row, index) => {
+
                           const currentValue =
                             formValues[
                               `metric_${row.id}`
@@ -962,10 +1261,14 @@ export default function PublishStagingData() {
                               key={`${row.recordIndex}-${row.id}-${index}`}
                               className="hover:bg-slate-50/80 transition-colors"
                             >
+
                               <td className="px-4 py-2.5">
+
                                 <div
                                   className="font-medium text-slate-700 truncate max-w-[500px]"
-                                  title={row.name}
+                                  title={
+                                    row.name
+                                  }
                                 >
                                   {row.name}
                                 </div>
@@ -973,142 +1276,200 @@ export default function PublishStagingData() {
                                 {row.path && (
                                   <div
                                     className="mt-0.5 text-[9px] font-mono text-slate-400 truncate max-w-[500px]"
-                                    title={row.path}
+                                    title={
+                                      row.path
+                                    }
                                   >
                                     {row.path}
                                   </div>
                                 )}
+
                               </td>
 
                               <td
                                 className="px-4 py-2.5 font-mono text-[10px] text-slate-500 truncate"
-                                title={row.id}
+                                title={
+                                  row.id
+                                }
                               >
                                 {row.id}
                               </td>
 
                               <td className="px-4 py-2.5">
+
                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[9px] font-mono text-slate-600">
                                   {row.units}
                                 </span>
+
                               </td>
 
                               <td className="px-3 py-1.5">
-                                {row.hasChildren ? (
-                                  <div className="px-2 py-1.5 text-right font-mono text-[10px] text-slate-400">
-                                    Parent / calculated
-                                  </div>
-                                ) : (
-                                  <input
-                                    type="text"
-                                    value={
-                                      currentValue ===
-                                        null ||
-                                      currentValue ===
-                                        undefined
-                                        ? ''
-                                        : currentValue
-                                    }
-                                    onChange={(e) =>
-                                      handleInputChange(
-                                        row,
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full text-right px-2 py-1.5 font-mono text-[11px] font-semibold text-slate-700 bg-transparent border border-transparent hover:border-slate-200 focus:bg-slate-50 focus:outline-none focus:ring-1 focus:ring-slate-300 rounded"
-                                  />
-                                )}
+
+                                <input
+                                  type="text"
+                                  value={
+                                    currentValue ===
+                                      null ||
+                                    currentValue ===
+                                      undefined
+                                      ? ''
+                                      : currentValue
+                                  }
+                                  onChange={(
+                                    e
+                                  ) =>
+                                    handleInputChange(
+                                      row,
+                                      e
+                                        .target
+                                        .value
+                                    )
+                                  }
+                                  className="w-full text-right px-2 py-1.5 font-mono text-[11px] font-semibold text-slate-700 bg-transparent border border-transparent hover:border-slate-200 focus:bg-slate-50 focus:outline-none focus:ring-1 focus:ring-slate-300 rounded"
+                                />
+
                               </td>
+
                             </tr>
                           );
                         }
                       )
+
                     ) : (
+
                       <tr>
+
                         <td
                           colSpan={4}
                           className="px-4 py-10 text-center text-slate-400 font-mono text-[11px]"
                         >
                           NO ACTIVE STAGING FIELDS LOADED
                         </td>
+
                       </tr>
+
                     )}
+
                   </tbody>
+
                 </table>
+
               </div>
 
               <div className="px-4 py-2 bg-[#f8f9fa] border-t border-slate-100 text-[10px] font-mono text-slate-400 flex items-center justify-between">
+
                 <span>
-                  EDITABLE VALUES
+                  LEAF VALUES ONLY · NO CALCULATIONS
                 </span>
 
                 <span>
-                  {rawApiRows.filter(
-                    (row) =>
-                      !row.hasChildren
-                  ).length}{' '}
+                  {rawApiRows.length}{' '}
                   EDITABLE FIELDS
                 </span>
+
               </div>
+
             </div>
           )}
+
+          {/* TREE */}
 
           {stagingData.length > 0 && (
             <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm overflow-hidden">
 
               <div className="px-4 py-2.5 bg-slate-900 text-white text-xs font-semibold flex items-center justify-between">
+
                 <div className="flex items-center gap-2">
+
                   <span>
                     3 · Staging Data Tree
                   </span>
 
                   <span className="px-1.5 py-0.5 rounded bg-white/10 text-[9px] font-mono text-slate-300">
-                    TREE DATA
+                    ORIGINAL TREE
                   </span>
+
                 </div>
 
                 <span className="font-mono text-[10px] text-slate-300 font-normal">
                   {tableRows.length} Root Rows
                 </span>
+
               </div>
 
               <div className="px-3 py-3">
+
                 <div
                   style={{
                     width: '100%',
                     height: '620px',
                   }}
                 >
+
                   <AgGridReact
-                    theme={financialTheme}
-                    rowData={gridRows}
-                    columnDefs={columnDefs}
+                    theme={
+                      financialTheme
+                    }
+
+                    rowData={
+                      gridRows
+                    }
+
+                    columnDefs={
+                      columnDefs
+                    }
+
                     defaultColDef={
                       defaultColDef
                     }
-                    treeData={true}
+
+                    treeData={
+                      true
+                    }
+
                     treeDataChildrenField="children"
+
                     autoGroupColumnDef={
                       autoGroupColumnDef
                     }
-                    groupDefaultExpanded={0}
-                    animateRows={false}
-                    suppressCellFocus={false}
-                    singleClickEdit={true}
+
+                    groupDefaultExpanded={
+                      0
+                    }
+
+                    animateRows={
+                      false
+                    }
+
+                    suppressCellFocus={
+                      false
+                    }
+
+                    singleClickEdit={
+                      true
+                    }
+
                     stopEditingWhenCellsLoseFocus={
                       true
                     }
+
                     onCellValueChanged={
                       handleGridValueChange
                     }
-                    getRowId={(params) =>
+
+                    getRowId={(
+                      params
+                    ) =>
                       `${params.data.recordIndex}-${params.data.id}`
                     }
                   />
+
                 </div>
+
               </div>
 
               <div className="px-4 py-2 bg-[#f8f9fa] border-t border-slate-100 text-[10px] font-mono text-slate-400 flex items-center justify-between">
+
                 <span>
                   SOURCE: GET /getStagingData
                 </span>
@@ -1116,36 +1477,62 @@ export default function PublishStagingData() {
                 <span>
                   {tableRows.length} ROOT NODES
                 </span>
+
               </div>
+
             </div>
           )}
 
+          {/* PUBLISH */}
+
           {stagingData.length > 0 && (
             <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm overflow-hidden">
+
               <button
-                onClick={handlePublish}
+                onClick={
+                  handlePublish
+                }
                 disabled={
                   !isFormComplete ||
                   publishing
                 }
                 className="w-full px-6 py-3 bg-slate-900 hover:bg-slate-800 active:bg-black disabled:bg-slate-300 text-white font-semibold text-xs transition disabled:cursor-not-allowed"
               >
+
                 {publishing
                   ? 'PUBLISHING...'
                   : 'PUBLISH DATA'}
+
               </button>
 
               <div className="px-4 py-2 bg-[#f8f9fa] text-center text-[10px] font-mono text-slate-400">
+
                 TARGET SCRIPT:{' '}
-                {scriptId || 'NONE'}
+                {scriptId ||
+                  'NONE'}
 
                 <span className="mx-2">
                   |
                 </span>
 
                 SOURCE:{' '}
-                {source || 'NONE'}
+                {source ||
+                  'NONE'}
+
+                <span className="mx-2">
+                  |
+                </span>
+
+                SECTOR:{' '}
+
+                {Object.values(
+                  sectorHierarchy || {}
+                ).join(
+                  ' › '
+                ) || 'NONE'}
+
               </div>
+
             </div>
           )}
 
