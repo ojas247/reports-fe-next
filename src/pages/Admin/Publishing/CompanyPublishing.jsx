@@ -137,11 +137,15 @@ const normalizeLinkages = (response) => {
     );
 };
 
-function FetchDataItemsWidget({
+// Individual Data Items Widget for each category
+function DataItemsSelector({
   sectorOptions,
   selectedItems = [],
   onAddItems,
+  onRemoveItem,
   placeholder = 'Select data items...',
+  label = 'Data Items',
+  categoryLabel = ''
 }) {
   const [listOfDatasets, setListOfDatasets] = useState([]);
   const [selectedDSName, setSelectedDSName] = useState('');
@@ -149,7 +153,6 @@ function FetchDataItemsWidget({
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [loadingDatasets, setLoadingDatasets] = useState(false);
   const [loadingDataItems, setLoadingDataItems] = useState(false);
-  const [selectedDatasetForAdd, setSelectedDatasetForAdd] = useState('');
 
   const getSectorFilters = async (data) => {
     try {
@@ -159,9 +162,8 @@ function FetchDataItemsWidget({
 
       setListOfDatasets([]);
       setListOfDataItems([]);
-      setSelectedDSName([]);
+      setSelectedDSName('');
       setSelectedOptions([]);
-      setSelectedDatasetForAdd('');
       setLoadingDatasets(true);
 
       const response = await fetchDataFromPostApi(
@@ -197,7 +199,6 @@ function FetchDataItemsWidget({
       }
 
       setSelectedDSName(datasetName);
-      setSelectedDatasetForAdd(datasetName);
       setListOfDataItems([]);
       setSelectedOptions([]);
       setLoadingDataItems(true);
@@ -250,7 +251,6 @@ function FetchDataItemsWidget({
 
     if (mappings.length > 0) {
       onAddItems(mappings);
-      // Clear selections after adding
       setSelectedOptions([]);
     }
   };
@@ -286,7 +286,7 @@ function FetchDataItemsWidget({
 
         <div>
           <label className="block text-[9px] font-mono font-semibold text-slate-500 uppercase tracking-wide mb-1">
-            Data Items
+            {label}
           </label>
           <SingleDropDown
             isMulti={true}
@@ -307,6 +307,33 @@ function FetchDataItemsWidget({
           )}
         </div>
       </div>
+      
+      {/* Display selected items */}
+      {selectedItems.length > 0 && (
+        <div className="mt-3">
+          <div className="flex flex-wrap gap-1.5">
+            {selectedItems.map((item, index) => (
+              <span
+                key={`${item.DataSet}|${item.DataItem}|${index}`}
+                className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-100 border border-slate-200 text-[10px] font-mono text-slate-600"
+              >
+                <span className="font-semibold text-emerald-700">{item.DataSet}:</span>
+                <span>{item.DataItem}</span>
+                {onRemoveItem && (
+                  <button
+                    type="button"
+                    onClick={() => onRemoveItem(item)}
+                    className="text-slate-400 hover:text-red-500 transition"
+                    title={`Remove ${item.DataItem}`}
+                  >
+                    <i className="bi bi-x text-[11px]" />
+                  </button>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -317,7 +344,7 @@ export default function CompanyPublishing() {
   const [author, setAuthor] = useState('');
   const [tags, setTags] = useState([]);
   
-  // These store objects with DataSet and DataItem
+  // These store arrays of objects with DataSet and DataItem
   const [rawMaterials, setRawMaterials] = useState([]);
   const [outputProducts, setOutputProducts] = useState([]);
   const [leadingIndicators, setLeadingIndicators] = useState([]);
@@ -504,7 +531,7 @@ export default function CompanyPublishing() {
         symbol: symbol.trim().toUpperCase(),
         author: author.trim(),
         tags,
-        // Send the full objects with DataSet and DataItem
+        // Each key has an array of objects with DataSet and DataItem
         raw_materials: rawMaterials,
         output_products: outputProducts,
         leading_indicators: leadingIndicators,
@@ -585,62 +612,6 @@ export default function CompanyPublishing() {
       linkages.length
     );
   }, [rawMaterials, outputProducts, leadingIndicators, laggingIndicators, tags, linkages]);
-
-  // Render mapping section with proper display
-  const renderMappingSection = ({
-    label,
-    description,
-    items,
-    setItems,
-    placeholder,
-  }) => {
-    return (
-      <div className="border-b border-slate-100 last:border-b-0">
-        <div className="grid grid-cols-1 md:grid-cols-3">
-          <div className="px-4 py-3 bg-[#f8f9fa] border-r border-slate-100">
-            <div className="text-[11px] font-semibold text-slate-700">{label}</div>
-            <div className="text-[9px] text-slate-400 mt-1 leading-relaxed">{description}</div>
-            <div className="text-[9px] font-mono text-slate-400 mt-2">
-              {items.length} ITEMS SELECTED
-            </div>
-          </div>
-
-          <div className="p-3 md:col-span-2">
-            <FetchDataItemsWidget
-              sectorOptions={sectorOptions}
-              selectedItems={items}
-              onAddItems={(values) => addMappingItems(values, setItems)}
-              placeholder={placeholder}
-            />
-
-            {items.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5 mt-3">
-                {items.map((item, index) => (
-                  <span
-                    key={`${item.DataSet}|${item.DataItem}|${index}`}
-                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-100 border border-slate-200 text-[10px] font-mono text-slate-600"
-                  >
-                    <span className="font-semibold text-emerald-700">{item.DataSet}:</span>
-                    <span>{item.DataItem}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeMappingItem(item, setItems)}
-                      className="text-slate-400 hover:text-red-500 transition"
-                      title={`Remove ${item.DataItem}`}
-                    >
-                      <i className="bi bi-x text-[11px]" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <div className="text-[9px] text-slate-400 font-mono mt-2">NO ITEMS ADDED</div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="space-y-4">
@@ -894,37 +865,121 @@ export default function CompanyPublishing() {
           <span className="font-mono text-[10px] text-slate-300 font-normal">{totalItems} ITEMS</span>
         </div>
 
-        {renderMappingSection({
-          label: 'Raw Materials',
-          description: 'Key inputs / commodities required by the company.',
-          items: rawMaterials,
-          setItems: setRawMaterials,
-          placeholder: 'Select raw material data items...',
-        })}
+        {/* Raw Materials */}
+        <div className="border-b border-slate-100 last:border-b-0">
+          <div className="grid grid-cols-1 md:grid-cols-3">
+            <div className="px-4 py-3 bg-[#f8f9fa] border-r border-slate-100">
+              <div className="text-[11px] font-semibold text-slate-700">Raw Materials</div>
+              <div className="text-[9px] text-slate-400 mt-1 leading-relaxed">
+                Key inputs / commodities required by the company.
+              </div>
+              <div className="text-[9px] font-mono text-slate-400 mt-2">
+                {rawMaterials.length} ITEMS SELECTED
+              </div>
+            </div>
+            <div className="p-3 md:col-span-2">
+              <DataItemsSelector
+                sectorOptions={sectorOptions}
+                selectedItems={rawMaterials}
+                onAddItems={(values) => addMappingItems(values, setRawMaterials)}
+                onRemoveItem={(item) => removeMappingItem(item, setRawMaterials)}
+                placeholder="Select raw material data items..."
+                label="Data Items"
+                categoryLabel="Raw Materials"
+              />
+              {rawMaterials.length === 0 && (
+                <div className="text-[9px] text-slate-400 font-mono mt-2">NO ITEMS ADDED</div>
+              )}
+            </div>
+          </div>
+        </div>
 
-        {renderMappingSection({
-          label: 'Output Products',
-          description: 'Primary products or outputs generated by the company.',
-          items: outputProducts,
-          setItems: setOutputProducts,
-          placeholder: 'Select output product data items...',
-        })}
+        {/* Output Products */}
+        <div className="border-b border-slate-100 last:border-b-0">
+          <div className="grid grid-cols-1 md:grid-cols-3">
+            <div className="px-4 py-3 bg-[#f8f9fa] border-r border-slate-100">
+              <div className="text-[11px] font-semibold text-slate-700">Output Products</div>
+              <div className="text-[9px] text-slate-400 mt-1 leading-relaxed">
+                Primary products or outputs generated by the company.
+              </div>
+              <div className="text-[9px] font-mono text-slate-400 mt-2">
+                {outputProducts.length} ITEMS SELECTED
+              </div>
+            </div>
+            <div className="p-3 md:col-span-2">
+              <DataItemsSelector
+                sectorOptions={sectorOptions}
+                selectedItems={outputProducts}
+                onAddItems={(values) => addMappingItems(values, setOutputProducts)}
+                onRemoveItem={(item) => removeMappingItem(item, setOutputProducts)}
+                placeholder="Select output product data items..."
+                label="Data Items"
+                categoryLabel="Output Products"
+              />
+              {outputProducts.length === 0 && (
+                <div className="text-[9px] text-slate-400 font-mono mt-2">NO ITEMS ADDED</div>
+              )}
+            </div>
+          </div>
+        </div>
 
-        {renderMappingSection({
-          label: 'Leading Indicators',
-          description: 'External indicators that may provide forward-looking signals.',
-          items: leadingIndicators,
-          setItems: setLeadingIndicators,
-          placeholder: 'Select leading indicator data items...',
-        })}
+        {/* Leading Indicators */}
+        <div className="border-b border-slate-100 last:border-b-0">
+          <div className="grid grid-cols-1 md:grid-cols-3">
+            <div className="px-4 py-3 bg-[#f8f9fa] border-r border-slate-100">
+              <div className="text-[11px] font-semibold text-slate-700">Leading Indicators</div>
+              <div className="text-[9px] text-slate-400 mt-1 leading-relaxed">
+                External indicators that may provide forward-looking signals.
+              </div>
+              <div className="text-[9px] font-mono text-slate-400 mt-2">
+                {leadingIndicators.length} ITEMS SELECTED
+              </div>
+            </div>
+            <div className="p-3 md:col-span-2">
+              <DataItemsSelector
+                sectorOptions={sectorOptions}
+                selectedItems={leadingIndicators}
+                onAddItems={(values) => addMappingItems(values, setLeadingIndicators)}
+                onRemoveItem={(item) => removeMappingItem(item, setLeadingIndicators)}
+                placeholder="Select leading indicator data items..."
+                label="Data Items"
+                categoryLabel="Leading Indicators"
+              />
+              {leadingIndicators.length === 0 && (
+                <div className="text-[9px] text-slate-400 font-mono mt-2">NO ITEMS ADDED</div>
+              )}
+            </div>
+          </div>
+        </div>
 
-        {renderMappingSection({
-          label: 'Lagging Indicators',
-          description: 'Company or market indicators reflecting historical performance.',
-          items: laggingIndicators,
-          setItems: setLaggingIndicators,
-          placeholder: 'Select lagging indicator data items...',
-        })}
+        {/* Lagging Indicators */}
+        <div className="border-b border-slate-100 last:border-b-0">
+          <div className="grid grid-cols-1 md:grid-cols-3">
+            <div className="px-4 py-3 bg-[#f8f9fa] border-r border-slate-100">
+              <div className="text-[11px] font-semibold text-slate-700">Lagging Indicators</div>
+              <div className="text-[9px] text-slate-400 mt-1 leading-relaxed">
+                Company or market indicators reflecting historical performance.
+              </div>
+              <div className="text-[9px] font-mono text-slate-400 mt-2">
+                {laggingIndicators.length} ITEMS SELECTED
+              </div>
+            </div>
+            <div className="p-3 md:col-span-2">
+              <DataItemsSelector
+                sectorOptions={sectorOptions}
+                selectedItems={laggingIndicators}
+                onAddItems={(values) => addMappingItems(values, setLaggingIndicators)}
+                onRemoveItem={(item) => removeMappingItem(item, setLaggingIndicators)}
+                placeholder="Select lagging indicator data items..."
+                label="Data Items"
+                categoryLabel="Lagging Indicators"
+              />
+              {laggingIndicators.length === 0 && (
+                <div className="text-[9px] text-slate-400 font-mono mt-2">NO ITEMS ADDED</div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Linkage Mapping */}
