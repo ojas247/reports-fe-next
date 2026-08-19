@@ -6,10 +6,30 @@ import Select from 'react-select';
 const SingleDropDown_v1 = (props) => {
   const options = props.options?.options_list || [];
   const [mounted, setMounted] = useState(false);
+  
+  // Determine the current value for react-select
+  const getCurrentValue = () => {
+    if (props.value) {
+      // If value is provided, find matching option
+      const matchingOption = options.find(opt => opt === props.value);
+      if (matchingOption) {
+        return { value: matchingOption, label: matchingOption };
+      }
+      return null;
+    }
+    return null;
+  };
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleChange = (selectedOption) => {
+    if (props.onSelect) {
+      // Pass the value to parent, or null if cleared
+      props.onSelect(selectedOption ? selectedOption.value : null);
+    }
+  };
 
   if (!mounted) {
     return (
@@ -27,7 +47,8 @@ const SingleDropDown_v1 = (props) => {
         isMulti={props.isMulti ?? false}
         isClearable
         placeholder={props.placeholder || 'Select...'}
-        onChange={props.onSelect}
+        onChange={handleChange}
+        value={getCurrentValue()}
         menuPortalTarget={typeof window !== 'undefined' ? document.body : null}
         menuPosition="fixed"
         menuShouldBlockScroll={true}

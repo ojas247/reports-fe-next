@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SingleDropDown_v1 from "../../UtilityComponents/SingleDropdown_v1";
 import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/SectorHierarchyDropDown';
 import { fetchSetorSubOptions, fetchAuthors, fetchYears, fetchTags } from '../../../pages/api/Api';
@@ -12,6 +12,13 @@ const SearchFilters_v1 = (props) => {
   const [Authordata, setAuthordata] = useState([]);
   const [Yeardata, setYeardata] = useState([]);
   const [Tagdata, setTagdata] = useState([]);
+
+  // State for tracking selected values
+  const [selectedAuthor, setSelectedAuthor] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(null);
+  const [selectedTag, setSelectedTag] = useState(null);
+  const [selectedSector, setSelectedSector] = useState(null);
+  const [resetSector, setResetSector] = useState(false);
 
   const [filtersState, setFiltersState] = useState({
     author: null,
@@ -49,9 +56,16 @@ const SearchFilters_v1 = (props) => {
       ...prev,
       [field]: value,
     }));
+
+    // Update selected values for dropdowns
+    if (field === 'author') setSelectedAuthor(value);
+    if (field === 'year') setSelectedYear(value);
+    if (field === 'tags') setSelectedTag(value);
+    if (field === 'sector_filters') setSelectedSector(value);
   };
 
   const handleFilters = () => {
+    // Send filters to parent
     props.onDataSend(filtersState);
   };
 
@@ -62,7 +76,19 @@ const SearchFilters_v1 = (props) => {
       tags: null,
       sector_filters: null,
     };
+    
+    // Reset all states
     setFiltersState(emptyFilters);
+    setSelectedAuthor(null);
+    setSelectedYear(null);
+    setSelectedTag(null);
+    setSelectedSector(null);
+    
+    // Trigger reset for SectorHierarchyDropDown
+    setResetSector(true);
+    setTimeout(() => setResetSector(false), 100);
+    
+    // Send empty filters to parent
     props.onDataSend(emptyFilters);
   };
 
@@ -79,6 +105,7 @@ const SearchFilters_v1 = (props) => {
       {/* Sector Hierarchy Panel */}
       <div className="bg-white rounded-xl border border-slate-200/80 shadow-2xs p-4 sm:p-5">
         <SectorHierarchyDropDown
+          reset={resetSector}
           onSelect={(val) => updateFilterField('sector_filters', val)}
         />
       </div>
@@ -98,6 +125,7 @@ const SearchFilters_v1 = (props) => {
             <SingleDropDown_v1
               options={Authordata}
               placeholder="Select Author"
+              value={selectedAuthor}
               onSelect={(val) => updateFilterField('author', val)}
             />
           </div>
@@ -110,6 +138,7 @@ const SearchFilters_v1 = (props) => {
             <SingleDropDown_v1
               options={Yeardata}
               placeholder="Select Year"
+              value={selectedYear}
               onSelect={(val) => updateFilterField('year', val)}
             />
           </div>
@@ -122,6 +151,7 @@ const SearchFilters_v1 = (props) => {
             <SingleDropDown_v1
               options={Tagdata}
               placeholder="Select Tag"
+              value={selectedTag}
               onSelect={(val) => updateFilterField('tags', val)}
             />
           </div>

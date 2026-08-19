@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import ReportResultsComp from '../../components/Functionalities/ReportResultsComp';
 import SearchFilters_v1 from '../../components/Functionalities/Research/SearchFilters_v1';
@@ -13,6 +13,8 @@ export default function Data() {
   const [loading, setLoading] = useState(true);
   const [appliedFilters, setAppliedFilters] = useState({});
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [filterKey, setFilterKey] = useState(0);
+  const [isCleared, setIsCleared] = useState(false);
 
   useEffect(() => {
     const auth = isSessionTokenValid();
@@ -26,7 +28,29 @@ export default function Data() {
     setLoading(false);
   }, [router]);
 
-  const getAppliedFiltersFromChild = (filters) => {
+  const getAppliedFiltersFromChild = useCallback((filters) => {
+    console.log("Received filters from child:", filters);
+    
+    // Check if filters are empty (cleared)
+    const isEmpty = !filters || 
+      (Object.keys(filters).length === 0) ||
+      (!filters.author && 
+       !filters.year && 
+       !filters.tags && 
+       (!filters.sector_filters || Object.keys(filters.sector_filters).length === 0));
+
+    if (isEmpty) {
+      
+     
+      setAppliedFilters({});
+      setIsCleared(true);
+     
+      setFilterKey(prev => prev + 1);
+      return;
+    }
+
+    setIsCleared(false);
+
     const cleanFilters = {};
 
     if (
@@ -77,10 +101,11 @@ export default function Data() {
       }
     }
 
-    console.log("API FILTERS:", cleanFilters);
-
+    console.log("API FILTERS (clean):", cleanFilters);
     setAppliedFilters(cleanFilters);
-  };
+    // Increment key to force re-render when filters change
+    setFilterKey(prev => prev + 1);
+  }, []);
 
   if (loading || !isAuthenticated) {
     return (
@@ -122,7 +147,11 @@ export default function Data() {
 
             {/* Results Container */}
             <div className="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-5 shadow-2xs min-h-[420px]">
-              <ReportResultsComp researchType="Data" result={appliedFilters} />
+              <ReportResultsComp 
+                key={filterKey}
+                researchType="Data" 
+                result={appliedFilters} 
+              />
             </div>
 
           </div>
