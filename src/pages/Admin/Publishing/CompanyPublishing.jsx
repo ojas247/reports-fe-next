@@ -149,6 +149,7 @@ function FetchDataItemsWidget({
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [loadingDatasets, setLoadingDatasets] = useState(false);
   const [loadingDataItems, setLoadingDataItems] = useState(false);
+  const [selectedDatasetForAdd, setSelectedDatasetForAdd] = useState('');
 
   const getSectorFilters = async (data) => {
     try {
@@ -160,6 +161,7 @@ function FetchDataItemsWidget({
       setListOfDataItems([]);
       setSelectedDSName([]);
       setSelectedOptions([]);
+      setSelectedDatasetForAdd('');
       setLoadingDatasets(true);
 
       const response = await fetchDataFromPostApi(
@@ -195,6 +197,7 @@ function FetchDataItemsWidget({
       }
 
       setSelectedDSName(datasetName);
+      setSelectedDatasetForAdd(datasetName);
       setListOfDataItems([]);
       setSelectedOptions([]);
       setLoadingDataItems(true);
@@ -247,6 +250,8 @@ function FetchDataItemsWidget({
 
     if (mappings.length > 0) {
       onAddItems(mappings);
+      // Clear selections after adding
+      setSelectedOptions([]);
     }
   };
 
@@ -295,6 +300,11 @@ function FetchDataItemsWidget({
               LOADING DATA ITEMS...
             </div>
           )}
+          {selectedDSName && listOfDataItems.length > 0 && (
+            <div className="text-[8px] font-mono text-emerald-600 mt-1">
+              SELECTED DATASET: {selectedDSName}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -307,7 +317,7 @@ export default function CompanyPublishing() {
   const [author, setAuthor] = useState('');
   const [tags, setTags] = useState([]);
   
-  // These will now store objects with DataSet and DataItem
+  // These store objects with DataSet and DataItem
   const [rawMaterials, setRawMaterials] = useState([]);
   const [outputProducts, setOutputProducts] = useState([]);
   const [leadingIndicators, setLeadingIndicators] = useState([]);
@@ -370,7 +380,7 @@ export default function CompanyPublishing() {
     fetchMasterData();
   }, []);
 
-  // Updated to handle array of objects with DataSet and DataItem
+  // Handle adding multiple items with DataSet and DataItem
   const addMappingItems = (values, setItems) => {
     if (!Array.isArray(values)) {
       return;
@@ -401,7 +411,7 @@ export default function CompanyPublishing() {
     });
   };
 
-  // Updated to handle removal of objects
+  // Handle removal of items
   const removeMappingItem = (item, setItems) => {
     setItems((previous) =>
       previous.filter(
@@ -576,7 +586,7 @@ export default function CompanyPublishing() {
     );
   }, [rawMaterials, outputProducts, leadingIndicators, laggingIndicators, tags, linkages]);
 
-  // Updated render function to display DataSet and DataItem
+  // Render mapping section with proper display
   const renderMappingSection = ({
     label,
     description,
@@ -590,6 +600,9 @@ export default function CompanyPublishing() {
           <div className="px-4 py-3 bg-[#f8f9fa] border-r border-slate-100">
             <div className="text-[11px] font-semibold text-slate-700">{label}</div>
             <div className="text-[9px] text-slate-400 mt-1 leading-relaxed">{description}</div>
+            <div className="text-[9px] font-mono text-slate-400 mt-2">
+              {items.length} ITEMS SELECTED
+            </div>
           </div>
 
           <div className="p-3 md:col-span-2">
@@ -607,7 +620,7 @@ export default function CompanyPublishing() {
                     key={`${item.DataSet}|${item.DataItem}|${index}`}
                     className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-100 border border-slate-200 text-[10px] font-mono text-slate-600"
                   >
-                    <span className="font-semibold">{item.DataSet}:</span>
+                    <span className="font-semibold text-emerald-700">{item.DataSet}:</span>
                     <span>{item.DataItem}</span>
                     <button
                       type="button"
