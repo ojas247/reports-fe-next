@@ -183,6 +183,8 @@ function DataItemsSelector({
   const getItemFilter = async (data) => {
     try {
       if (!data) {
+        setSelectedDSName('');
+        setListOfDataItems([]);
         return;
       }
 
@@ -251,7 +253,6 @@ function DataItemsSelector({
 
     if (mappings.length > 0) {
       onAddItems(mappings);
-      setSelectedOptions([]);
     }
   };
 
@@ -274,6 +275,7 @@ function DataItemsSelector({
           </label>
           <SingleDropDown
             options={listOfDatasets}
+            value={selectedDSName}
             onSelect={getItemFilter}
             placeholder="Select dataset category..."
           />
@@ -307,7 +309,7 @@ function DataItemsSelector({
           )}
         </div>
       </div>
-      
+
       {/* Display selected items */}
       {selectedItems.length > 0 && (
         <div className="mt-3">
@@ -343,7 +345,7 @@ export default function CompanyPublishing() {
   const [symbol, setSymbol] = useState('');
   const [author, setAuthor] = useState('');
   const [tags, setTags] = useState([]);
-  
+
   // These store arrays of objects with DataSet and DataItem
   const [rawMaterials, setRawMaterials] = useState([]);
   const [outputProducts, setOutputProducts] = useState([]);
@@ -415,7 +417,7 @@ export default function CompanyPublishing() {
 
     setItems((previous) => {
       const existing = new Set(
-        previous.map((item) => 
+        previous.map((item) =>
           `${item.DataSet}|${item.DataItem}`.toLowerCase()
         )
       );
