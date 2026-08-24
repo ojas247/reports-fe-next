@@ -100,13 +100,13 @@ const TextWithGrid = (props) => {
       try {
         data = JSON.parse(data);
       } catch (error) {
-        console.error(
-          'Unable to parse dropdown API response:',
-          error
-        );
-
+        console.error('Unable to parse dropdown API response:', error);
         return [];
       }
+    }
+
+    if (Array.isArray(data)) {
+      return data;
     }
 
     if (Array.isArray(data?.options_list)) {
@@ -121,8 +121,16 @@ const TextWithGrid = (props) => {
       return data.data.options_list;
     }
 
-    if (Array.isArray(data)) {
-      return data;
+    if (Array.isArray(data?.authors)) {
+      return data.authors;
+    }
+
+    if (Array.isArray(data?.tags)) {
+      return data.tags;
+    }
+
+    if (Array.isArray(data?.items)) {
+      return data.items;
     }
 
     return [];
@@ -142,35 +150,11 @@ const TextWithGrid = (props) => {
           fetchUnits(),
         ]);
 
-        console.log(
-          'Granularity API response:',
-          granularityResponse
-        );
-
-        console.log(
-          'Units API response:',
-          unitsResponse
-        );
-
         const granularityOptions =
-          normalizeDropdownOptions(
-            granularityResponse
-          );
+          normalizeDropdownOptions(granularityResponse);
 
         const unitsOptions =
-          normalizeDropdownOptions(
-            unitsResponse
-          );
-
-        console.log(
-          'Normalized Granularity:',
-          granularityOptions
-        );
-
-        console.log(
-          'Normalized Units:',
-          unitsOptions
-        );
+          normalizeDropdownOptions(unitsResponse);
 
         setGranularityData({
           options_list: granularityOptions,
@@ -181,15 +165,11 @@ const TextWithGrid = (props) => {
         });
 
         if (granularityOptions.length === 0) {
-          console.warn(
-            'Granularity API returned no options.'
-          );
+          console.warn('Granularity API returned no options.');
         }
 
         if (unitsOptions.length === 0) {
-          console.warn(
-            'Units API returned no options.'
-          );
+          console.warn('Units API returned no options.');
         }
       } catch (err) {
         console.error(
@@ -217,6 +197,37 @@ const TextWithGrid = (props) => {
     getUnitsAndGranularity();
   }, []);
 
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const OptionsAuthorData = await fetchAuthors();
+        const OptionsTagsData = await fetchTags();
+
+        setAuthordata(
+          normalizeDropdownOptions(OptionsAuthorData)
+        );
+
+        setTagsdata(
+          normalizeDropdownOptions(OptionsTagsData)
+        );
+      } catch (err) {
+        console.error(
+          'Error fetching author or tags data:',
+          err
+        );
+
+        setAuthordata([]);
+        setTagsdata([]);
+      }
+    };
+
+    getData();
+  }, []);
+
+  useEffect(() => {
+    updateData(componentData);
+  }, [componentData, updateData]);
+
   const isTSData = {
     options_list: ['Yes', 'No'],
   };
@@ -237,24 +248,25 @@ const TextWithGrid = (props) => {
   const getSectorFilters = (data) => {
     if (
       data &&
+      typeof data === 'object' &&
       Object.keys(data).length > 0
     ) {
       updateField('sectorChain', data);
     }
   };
 
-  const assignFormData = (e) =>
+  const assignFormData = (e) => {
     updateField(
       e.target.name,
       e.target.value
     );
+  };
 
   const handleDataDescChange = (e) => {
     const value = e.target.value;
 
     const cursorPos =
-      e.target.selectionStart ||
-      value.length;
+      e.target.selectionStart ?? value.length;
 
     setComponentData((prev) => ({
       ...prev,
@@ -268,9 +280,7 @@ const TextWithGrid = (props) => {
 
     if (justTyped === '{{') {
       setShowTemplateDropdown(true);
-      setTemplateInsertIndex(
-        cursorPos - 2
-      );
+      setTemplateInsertIndex(cursorPos - 2);
     }
   };
 
@@ -280,23 +290,19 @@ const TextWithGrid = (props) => {
       showTemplateDropdown
     ) {
       e.stopPropagation();
-
       setShowTemplateDropdown(false);
       setTemplateInsertIndex(null);
     }
   };
 
   const handleTemplateSelect = (option) => {
-    if (
-      templateInsertIndex === null
-    ) {
+    if (templateInsertIndex === null) {
       setShowTemplateDropdown(false);
       return;
     }
 
     setComponentData((prev) => {
-      const current =
-        prev.dataDesc || '';
+      const current = prev.dataDesc || '';
 
       const before = current.slice(
         0,
@@ -307,12 +313,12 @@ const TextWithGrid = (props) => {
         templateInsertIndex + 2
       );
 
-      const newValue =
-        before + option + after;
-
       return {
         ...prev,
-        dataDesc: newValue,
+        dataDesc:
+          before +
+          option +
+          after,
       };
     });
 
@@ -320,88 +326,63 @@ const TextWithGrid = (props) => {
     setTemplateInsertIndex(null);
   };
 
-  const getDropDownData = (
-    field,
-    data
-  ) => {
+  const getDropDownData = (field, data) => {
+    if (!Array.isArray(data)) {
+      updateField(field, []);
+      return;
+    }
+
     updateField(
       field,
-      data.map(
-        (item) => item.value
-      )
+      data
+        .map((item) => {
+          if (
+            item &&
+            typeof item === 'object'
+          ) {
+            return item.value;
+          }
+
+          return item;
+        })
+        .filter(
+          (item) =>
+            item !== undefined &&
+            item !== null &&
+            item !== ''
+        )
     );
   };
 
-  const getSingleDropDownData = (
-    field,
-    data
-  ) => {
+  const getSingleDropDownData = (field, data) => {
     updateField(
       field,
-      data?.value || ''
+      data?.value ?? ''
     );
   };
 
-  const saveTable = (tableData) =>
+  const saveTable = (tableData) => {
     updateField(
       'tableData',
       tableData
     );
+  };
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        const OptionsAuthorData =
-          await fetchAuthors();
+  const isUnitsSelected = Boolean(
+    componentData.units
+  );
 
-        setAuthordata(
-          OptionsAuthorData
-        );
-
-        const OptionsTagsData =
-          await fetchTags();
-
-        setTagsdata(
-          OptionsTagsData
-        );
-      } catch (err) {
-        console.error(
-          'Error fetching author or tags data:',
-          err
-        );
-      }
-    }
-
-    getData();
-  }, []);
-
-  useEffect(() => {
-    props.updateData(
-      componentData
-    );
-  }, [componentData]);
-
-  const isUnitsSelected =
-    Boolean(
-      componentData.units
-    );
-
-  const isGranularitySelected =
-    Boolean(
-      componentData.granularity
-    );
+  const isGranularitySelected = Boolean(
+    componentData.granularity
+  );
 
   const isTSDataSelected =
-    Boolean(
-      componentData.isTSData &&
-        componentData.isTSData.length > 0
-    );
+    Array.isArray(componentData.isTSData) &&
+    componentData.isTSData.length > 0;
 
   const isGeoSelected =
-    Boolean(
-      componentData.geo &&
-        componentData.geo.length > 0
-    );
+    Array.isArray(componentData.geo) &&
+    componentData.geo.length > 0;
 
   return (
     <div className="space-y-6 text-slate-900 font-sans pb-28 overflow-visible">
@@ -430,13 +411,9 @@ const TextWithGrid = (props) => {
         </label>
 
         <SectorHierarchyDropDown
-          preSelectedData={
-            initialData.sectorChain
-          }
+          preSelectedData={initialData.sectorChain}
           options={SecSubdata}
-          onSelect={
-            getSectorFilters
-          }
+          onSelect={getSectorFilters}
         />
       </div>
 
@@ -448,9 +425,7 @@ const TextWithGrid = (props) => {
             className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 font-mono"
           >
             Data Name{' '}
-            <span className="text-rose-500">
-              *
-            </span>
+            <span className="text-rose-500">*</span>
           </label>
 
           <input
@@ -458,14 +433,9 @@ const TextWithGrid = (props) => {
             name="dataName"
             id="dataName"
             placeholder="e.g. India Energy Consumption Q3"
-            value={
-              componentData.dataName ||
-              ''
-            }
+            value={componentData.dataName || ''}
             className="w-full bg-white border border-slate-200 focus:border-slate-800 focus:ring-1 focus:ring-slate-800 rounded-lg p-2.5 text-xs text-slate-900 transition outline-none font-medium"
-            onChange={
-              assignFormData
-            }
+            onChange={assignFormData}
           />
         </div>
 
@@ -482,14 +452,9 @@ const TextWithGrid = (props) => {
             name="sourceURL"
             id="sourceURL"
             placeholder="https://..."
-            value={
-              componentData.sourceURL ||
-              ''
-            }
+            value={componentData.sourceURL || ''}
             className="w-full bg-white border border-slate-200 focus:border-slate-800 focus:ring-1 focus:ring-slate-800 rounded-lg p-2.5 text-xs text-slate-900 transition outline-none font-mono"
-            onChange={
-              assignFormData
-            }
+            onChange={assignFormData}
           />
         </div>
 
@@ -521,24 +486,14 @@ const TextWithGrid = (props) => {
             id="dataDesc"
             rows={3}
             placeholder="Describe the dataset..."
-            value={
-              componentData.dataDesc ||
-              ''
-            }
-            onChange={
-              handleDataDescChange
-            }
-            onKeyDown={
-              handleDataDescKeyDown
-            }
+            value={componentData.dataDesc || ''}
+            onChange={handleDataDescChange}
+            onKeyDown={handleDataDescKeyDown}
             className="w-full bg-white border border-slate-200 focus:border-slate-800 focus:ring-1 focus:ring-slate-800 rounded-lg p-2.5 text-xs text-slate-900 transition outline-none leading-relaxed font-normal"
             onInput={(e) => {
+              e.target.style.height = 'auto';
               e.target.style.height =
-                'auto';
-
-              e.target.style.height =
-                e.target.scrollHeight +
-                'px';
+                e.target.scrollHeight + 'px';
             }}
           />
 
@@ -549,30 +504,24 @@ const TextWithGrid = (props) => {
                 Insert Token Option
               </div>
 
-              {templateOptions.map(
-                (opt) => (
-                  <button
-                    key={
-                      opt.value
-                    }
-                    type="button"
-                    className="w-full text-left px-3 py-2 text-xs font-mono text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition flex items-center justify-between cursor-pointer"
-                    onClick={() =>
-                      handleTemplateSelect(
-                        opt.value
-                      )
-                    }
-                  >
-                    <span className="font-semibold text-slate-900">
-                      {opt.value}
-                    </span>
+              {templateOptions.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  className="w-full text-left px-3 py-2 text-xs font-mono text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition flex items-center justify-between cursor-pointer"
+                  onClick={() =>
+                    handleTemplateSelect(opt.value)
+                  }
+                >
+                  <span className="font-semibold text-slate-900">
+                    {opt.value}
+                  </span>
 
-                    <span className="text-[10px] text-slate-400">
-                      {opt.label}
-                    </span>
-                  </button>
-                )
-              )}
+                  <span className="text-[10px] text-slate-400">
+                    {opt.label}
+                  </span>
+                </button>
+              ))}
 
             </div>
           )}
@@ -594,21 +543,13 @@ const TextWithGrid = (props) => {
           id="seoDesc"
           rows={2}
           placeholder="Brief SEO summary for engine crawlers..."
-          value={
-            componentData.seoDesc ||
-            ''
-          }
-          onChange={
-            assignFormData
-          }
+          value={componentData.seoDesc || ''}
+          onChange={assignFormData}
           className="w-full bg-white border border-slate-200 focus:border-slate-800 focus:ring-1 focus:ring-slate-800 rounded-lg p-2.5 text-xs text-slate-900 transition outline-none leading-relaxed font-normal"
           onInput={(e) => {
+            e.target.style.height = 'auto';
             e.target.style.height =
-              'auto';
-
-            e.target.style.height =
-              e.target.scrollHeight +
-              'px';
+              e.target.scrollHeight + 'px';
           }}
         />
 
@@ -629,13 +570,8 @@ const TextWithGrid = (props) => {
             type="month"
             name="year"
             id="year"
-            value={
-              componentData.year ||
-              ''
-            }
-            onChange={
-              assignFormData
-            }
+            value={componentData.year || ''}
+            onChange={assignFormData}
             className="w-full bg-white border border-slate-200 focus:border-slate-800 focus:ring-1 focus:ring-slate-800 rounded-lg p-2 text-xs text-slate-900 transition outline-none font-mono"
           />
 
@@ -654,16 +590,9 @@ const TextWithGrid = (props) => {
 
             <SingleDropDown
               isMulti={true}
-              options={
-                Authordata
-              }
-              placeholder={
-                author_placeholder
-              }
-              selectedValue={
-                componentData.authors ||
-                null
-              }
+              options={Authordata}
+              placeholder={author_placeholder}
+              value={componentData.authors || []}
               onSelect={(data) =>
                 getDropDownData(
                   'authors',
@@ -688,14 +617,9 @@ const TextWithGrid = (props) => {
           <div className="text-slate-900 font-medium">
 
             <SingleDropDown
-              options={
-                Tagsdata
-              }
+              options={Tagsdata}
               isMulti={true}
-              selectedValue={
-                componentData.tags ||
-                null
-              }
+              value={componentData.tags || []}
               onSelect={(data) =>
                 getDropDownData(
                   'tags',
@@ -725,9 +649,7 @@ const TextWithGrid = (props) => {
           <div className="min-w-full text-slate-900 font-medium">
 
             <RenderEditableGrid
-              oldTableData={
-                componentData.tableData
-              }
+              oldTableData={componentData.tableData}
               onSave={saveTable}
             />
 
@@ -745,26 +667,16 @@ const TextWithGrid = (props) => {
             htmlFor="units"
             className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 font-mono flex items-center gap-1"
           >
-            <span>
-              Units
-            </span>
-
-            <span className="text-rose-500 font-bold">
-              *
-            </span>
+            <span>Units</span>
+            <span className="text-rose-500 font-bold">*</span>
           </label>
 
           <div className="text-slate-900 font-medium rounded-lg">
 
             <SingleDropDown
-              options={
-                UnitsData
-              }
+              options={UnitsData}
               isMulti={false}
-              selectedValue={
-                componentData.units ||
-                null
-              }
+              value={componentData.units || null}
               onSelect={(data) =>
                 getSingleDropDownData(
                   'units',
@@ -782,8 +694,7 @@ const TextWithGrid = (props) => {
           )}
 
           {!loadingMetadata &&
-            UnitsData.options_list
-              .length === 0 && (
+            UnitsData.options_list.length === 0 && (
               <p className="text-[9px] text-rose-500 font-mono">
                 No units available
               </p>
@@ -797,26 +708,16 @@ const TextWithGrid = (props) => {
             htmlFor="granularity"
             className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 font-mono flex items-center gap-1"
           >
-            <span>
-              Granularity
-            </span>
-
-            <span className="text-rose-500 font-bold">
-              *
-            </span>
+            <span>Granularity</span>
+            <span className="text-rose-500 font-bold">*</span>
           </label>
 
           <div className="text-slate-900 font-medium rounded-lg">
 
             <SingleDropDown
-              options={
-                GranularityData
-              }
+              options={GranularityData}
               isMulti={false}
-              selectedValue={
-                componentData.granularity ||
-                null
-              }
+              value={componentData.granularity || null}
               onSelect={(data) =>
                 getSingleDropDownData(
                   'granularity',
@@ -834,9 +735,7 @@ const TextWithGrid = (props) => {
           )}
 
           {!loadingMetadata &&
-            GranularityData
-              .options_list
-              .length === 0 && (
+            GranularityData.options_list.length === 0 && (
               <p className="text-[9px] text-rose-500 font-mono">
                 No granularity options available
               </p>
@@ -850,26 +749,16 @@ const TextWithGrid = (props) => {
             htmlFor="isTSData"
             className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 font-mono flex items-center gap-1"
           >
-            <span>
-              Is Time Series
-            </span>
-
-            <span className="text-rose-500 font-bold">
-              *
-            </span>
+            <span>Is Time Series</span>
+            <span className="text-rose-500 font-bold">*</span>
           </label>
 
           <div className="text-slate-900 font-medium rounded-lg">
 
             <SingleDropDown
-              options={
-                isTSData
-              }
+              options={isTSData}
               isMulti={true}
-              selectedValue={
-                componentData.isTSData ||
-                null
-              }
+              value={componentData.isTSData || []}
               onSelect={(data) =>
                 getDropDownData(
                   'isTSData',
@@ -888,26 +777,16 @@ const TextWithGrid = (props) => {
             htmlFor="geo"
             className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 font-mono flex items-center gap-1"
           >
-            <span>
-              Geography
-            </span>
-
-            <span className="text-rose-500 font-bold">
-              *
-            </span>
+            <span>Geography</span>
+            <span className="text-rose-500 font-bold">*</span>
           </label>
 
           <div className="text-slate-900 font-medium rounded-lg">
 
             <SingleDropDown
-              options={
-                GeoData
-              }
+              options={GeoData}
               isMulti={true}
-              selectedValue={
-                componentData.geo ||
-                null
-              }
+              value={componentData.geo || []}
               onSelect={(data) =>
                 getDropDownData(
                   'geo',

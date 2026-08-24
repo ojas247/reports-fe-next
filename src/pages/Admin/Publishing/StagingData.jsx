@@ -44,23 +44,33 @@ const financialTheme = themeQuartz.withParams({
 });
 
 export default function PublishStagingData() {
-  const [scriptId, setScriptId] = useState('MARUTI');
-  const [source, setSource] = useState('AR');
+  const [scriptId, setScriptId] = useState('');
+  const [source, setSource] = useState('');
+
   const [stagingData, setStagingData] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [publishing, setPublishing] = useState(false);
+
   const [fetchError, setFetchError] = useState(null);
+
   const [statusMessage, setStatusMessage] = useState(
     'Enter Script ID and Source, then click Fetch Staging.'
   );
-  const [companyName, setCompanyName] = useState('');
+
+  const [dataName, setDataName] = useState('');
+
   const [sectorHierarchy, setSectorHierarchy] = useState({});
+
   const [units, setUnits] = useState('');
   const [granularity, setGranularity] = useState('');
+
   const [unitOptions, setUnitOptions] = useState([]);
   const [granularityOptions, setGranularityOptions] = useState([]);
+
   const [loadingUnits, setLoadingUnits] = useState(false);
   const [loadingGranularity, setLoadingGranularity] = useState(false);
+
   const [formValues, setFormValues] = useState({});
 
   const normalizeOptionItem = (item) => {
@@ -162,9 +172,7 @@ export default function PublishStagingData() {
         );
     }
 
-    if (
-      typeof data !== 'object'
-    ) {
+    if (typeof data !== 'object') {
       return [];
     }
 
@@ -250,16 +258,6 @@ export default function PublishStagingData() {
           ),
         ]);
 
-        console.log(
-          'Granularity API Response:',
-          granularityResponse
-        );
-
-        console.log(
-          'Units API Response:',
-          unitsResponse
-        );
-
         const normalizedGranularity =
           normalizeOptionsResponse(
             granularityResponse,
@@ -291,16 +289,6 @@ export default function PublishStagingData() {
             normalizedUnits
           ),
         ];
-
-        console.log(
-          'Normalized Granularity:',
-          uniqueGranularity
-        );
-
-        console.log(
-          'Normalized Units:',
-          uniqueUnits
-        );
 
         if (!mounted) {
           return;
@@ -368,9 +356,7 @@ export default function PublishStagingData() {
 
     let data = record.data;
 
-    if (
-      typeof data === 'string'
-    ) {
+    if (typeof data === 'string') {
       try {
         data = JSON.parse(data);
       } catch (error) {
@@ -387,20 +373,113 @@ export default function PublishStagingData() {
       return [];
     }
 
-    if (
-      Array.isArray(data)
-    ) {
+    if (Array.isArray(data)) {
       return data;
     }
 
-    if (
-      Array.isArray(data.children)
-    ) {
+    if (Array.isArray(data.children)) {
       return [data];
     }
 
     return [data];
   };
+
+  const extractDate = (object) => {
+    if (
+      !object ||
+      typeof object !== 'object'
+    ) {
+      return '';
+    }
+
+    const possibleKeys = [
+      'date',
+      'Date',
+      'dataDate',
+      'data_date',
+      'reportDate',
+      'report_date',
+      'period',
+      'periodDate',
+      'period_date',
+      'financialDate',
+      'financial_date',
+      'year',
+      'yearEnded',
+      'year_ended',
+      'financialYear',
+      'financial_year',
+      'asOfDate',
+      'as_of_date',
+    ];
+
+    for (const key of possibleKeys) {
+      if (
+        object[key] !== undefined &&
+        object[key] !== null &&
+        object[key] !== ''
+      ) {
+        return String(object[key]);
+      }
+    }
+
+    return '';
+  };
+
+  const getRecordDate = (record, node = null) => {
+    const recordDate =
+      extractDate(record);
+
+    if (recordDate) {
+      return recordDate;
+    }
+
+    const nodeDate =
+      extractDate(node);
+
+    if (nodeDate) {
+      return nodeDate;
+    }
+
+    return '';
+  };
+
+  const dateColumns = useMemo(() => {
+    const dates = [];
+
+    stagingData.forEach(
+      (record) => {
+        const recordDate =
+          getRecordDate(record);
+
+        if (
+          recordDate &&
+          !dates.includes(recordDate)
+        ) {
+          dates.push(recordDate);
+        }
+
+        normalizeData(record).forEach(
+          (node) => {
+            const nodeDate =
+              getRecordDate(
+                record,
+                node
+              );
+
+            if (
+              nodeDate &&
+              !dates.includes(nodeDate)
+            ) {
+              dates.push(nodeDate);
+            }
+          }
+        );
+      }
+    );
+
+    return dates;
+  }, [stagingData]);
 
   const rawApiRows = useMemo(() => {
     const rows = [];
@@ -408,7 +487,8 @@ export default function PublishStagingData() {
     const extractMetrics = (
       node,
       parentPath = '',
-      recordIndex = 0
+      recordIndex = 0,
+      recordDate = ''
     ) => {
       if (
         !node ||
@@ -426,6 +506,14 @@ export default function PublishStagingData() {
       const metricId =
         node.id ||
         `${metricName}-${recordIndex}-${rows.length}`;
+
+      const nodeDate =
+        getRecordDate(
+          {
+            date: recordDate,
+          },
+          node
+        ) || recordDate;
 
       const children =
         Array.isArray(node.children)
@@ -458,8 +546,8 @@ export default function PublishStagingData() {
               hasValue
                 ? node.value
                 : '',
-            path:
-              parentPath,
+            date: nodeDate,
+            path: parentPath,
             recordIndex,
             hasChildren: false,
           });
@@ -475,7 +563,8 @@ export default function PublishStagingData() {
             metricName
               ? `${parentPath}${parentPath ? ' → ' : ''}${metricName}`
               : parentPath,
-            recordIndex
+            recordIndex,
+            nodeDate
           );
         }
       );
@@ -483,14 +572,16 @@ export default function PublishStagingData() {
 
     stagingData.forEach(
       (record, recordIndex) => {
-        normalizeData(
-          record
-        ).forEach(
+        const recordDate =
+          getRecordDate(record);
+
+        normalizeData(record).forEach(
           (node) => {
             extractMetrics(
               node,
               '',
-              recordIndex
+              recordIndex,
+              recordDate
             );
           }
         );
@@ -500,13 +591,58 @@ export default function PublishStagingData() {
     return rows;
   }, [stagingData]);
 
+  const mergedRawApiRows = useMemo(() => {
+    const grouped = new Map();
+
+    rawApiRows.forEach(
+      (row) => {
+        const key =
+          `${row.id}__${row.name}`;
+
+        if (!grouped.has(key)) {
+          grouped.set(key, {
+            ...row,
+            valuesByDate: {},
+            recordIndexesByDate: {},
+          });
+        }
+
+        const existing =
+          grouped.get(key);
+
+        if (row.date) {
+          existing.valuesByDate[
+            row.date
+          ] = row.value;
+
+          existing.recordIndexesByDate[
+            row.date
+          ] = row.recordIndex;
+        }
+
+        if (
+          !existing.units ||
+          existing.units === '—'
+        ) {
+          existing.units =
+            row.units;
+        }
+      }
+    );
+
+    return Array.from(
+      grouped.values()
+    );
+  }, [rawApiRows]);
+
   const tableRows = useMemo(() => {
     const rows = [];
 
     const cloneNode = (
       node,
       parentPath = [],
-      recordIndex = 0
+      recordIndex = 0,
+      recordDate = ''
     ) => {
       if (
         !node ||
@@ -525,6 +661,14 @@ export default function PublishStagingData() {
         node.id ||
         `${name}-${recordIndex}-${rows.length}`;
 
+      const nodeDate =
+        getRecordDate(
+          {
+            date: recordDate,
+          },
+          node
+        ) || recordDate;
+
       const children =
         Array.isArray(
           node.children
@@ -535,7 +679,8 @@ export default function PublishStagingData() {
                   cloneNode(
                     child,
                     [...parentPath, name],
-                    recordIndex
+                    recordIndex,
+                    nodeDate
                   )
               )
               .filter(Boolean)
@@ -563,6 +708,14 @@ export default function PublishStagingData() {
         hasChildren:
           children.length > 0,
         recordIndex,
+        recordDate: nodeDate,
+        dateValues:
+          nodeDate
+            ? {
+                [nodeDate]:
+                  originalValue,
+              }
+            : {},
       };
 
       rows.push(row);
@@ -574,6 +727,9 @@ export default function PublishStagingData() {
 
     stagingData.forEach(
       (record, recordIndex) => {
+        const recordDate =
+          getRecordDate(record);
+
         const data =
           normalizeData(record);
 
@@ -583,7 +739,8 @@ export default function PublishStagingData() {
               cloneNode(
                 node,
                 [],
-                recordIndex
+                recordIndex,
+                recordDate
               );
 
             if (row) {
@@ -597,25 +754,9 @@ export default function PublishStagingData() {
     return roots;
   }, [stagingData]);
 
-  const gridRows = useMemo(
-    () => tableRows,
-    [tableRows]
-  );
-
-  const getYearHeader = () => {
-    const possibleYear =
-      stagingData?.[0]?.year ||
-      stagingData?.[0]?.yearEnded ||
-      stagingData?.[0]?.year_ended ||
-      stagingData?.[0]?.financialYear ||
-      stagingData?.[0]?.financial_year;
-
-    if (possibleYear) {
-      return String(possibleYear);
-    }
-
-    return 'Value';
-  };
+  const gridRows = useMemo(() => {
+    return tableRows;
+  }, [tableRows]);
 
   const updateNestedValue = (
     nodes,
@@ -655,13 +796,24 @@ export default function PublishStagingData() {
   };
 
   const setTableRowsForPublish = (
+    recordIndex,
     targetId,
     newValue
   ) => {
     setStagingData(
       (previous) => {
         return previous.map(
-          (record) => {
+          (
+            record,
+            currentRecordIndex
+          ) => {
+            if (
+              currentRecordIndex !==
+              recordIndex
+            ) {
+              return record;
+            }
+
             let data =
               record.data;
 
@@ -705,6 +857,42 @@ export default function PublishStagingData() {
     );
   };
 
+  const handleInputChange = (
+    row,
+    date,
+    value
+  ) => {
+    if (row.hasChildren) {
+      return;
+    }
+
+    const recordIndex =
+      row.recordIndexesByDate?.[
+        date
+      ] ??
+      row.recordIndex;
+
+    const fieldKey =
+      `metric_${row.id}_${date}`;
+
+    setFormValues(
+      (previous) => ({
+        ...previous,
+        [fieldKey]: value,
+      })
+    );
+
+    setTableRowsForPublish(
+      recordIndex,
+      row.id,
+      value
+    );
+
+    setStatusMessage(
+      `Staging value edited for ${date}. Changes will be included when published.`
+    );
+  };
+
   const handleGridValueChange = (
     params
   ) => {
@@ -719,6 +907,13 @@ export default function PublishStagingData() {
       return;
     }
 
+    const date =
+      params.colDef?.dateKey;
+
+    if (!date) {
+      return;
+    }
+
     if (
       node.value ===
       params.newValue
@@ -727,6 +922,7 @@ export default function PublishStagingData() {
     }
 
     setTableRowsForPublish(
+      node.recordIndex,
       node.id,
       params.newValue
     );
@@ -734,41 +930,13 @@ export default function PublishStagingData() {
     setFormValues(
       (previous) => ({
         ...previous,
-        [`metric_${node.id}`]:
+        [`metric_${node.id}_${date}`]:
           params.newValue,
       })
     );
 
     setStatusMessage(
-      'Staging value edited. Changes will be included when published.'
-    );
-  };
-
-  const handleInputChange = (
-    row,
-    value
-  ) => {
-    if (row.hasChildren) {
-      return;
-    }
-
-    const fieldKey =
-      `metric_${row.id}`;
-
-    setFormValues(
-      (previous) => ({
-        ...previous,
-        [fieldKey]: value,
-      })
-    );
-
-    setTableRowsForPublish(
-      row.id,
-      value
-    );
-
-    setStatusMessage(
-      'Staging value edited. Changes will be included when published.'
+      `Staging value edited for ${date}. Changes will be included when published.`
     );
   };
 
@@ -802,8 +970,30 @@ export default function PublishStagingData() {
     );
   };
 
+  const formatCellValue = (
+    value
+  ) => {
+    if (
+      value === null ||
+      value === undefined ||
+      value === ''
+    ) {
+      return '';
+    }
+
+    if (
+      typeof value === 'number'
+    ) {
+      return value.toLocaleString(
+        'en-IN'
+      );
+    }
+
+    return String(value);
+  };
+
   const columnDefs = useMemo(() => {
-    return [
+    const baseColumns = [
       {
         headerName: 'Units',
         field: 'units',
@@ -816,47 +1006,110 @@ export default function PublishStagingData() {
           (params) =>
             params.value || '',
       },
-      {
-        headerName:
-          getYearHeader(),
+    ];
+
+    const dynamicDateColumns =
+      dateColumns.map(
+        (date) => ({
+          headerName: date,
+          colId: `date_${date}`,
+          dateKey: date,
+          width: 180,
+          minWidth: 150,
+          flex: 1,
+          editable: (
+            params
+          ) =>
+            !params.data
+              ?.hasChildren,
+          valueGetter: (
+            params
+          ) => {
+            const values =
+              params.data
+                ?.dateValues;
+
+            if (!values) {
+              return '';
+            }
+
+            return values[
+              date
+            ] ?? '';
+          },
+          valueSetter: (
+            params
+          ) => {
+            if (
+              params.data
+                ?.hasChildren
+            ) {
+              return false;
+            }
+
+            if (
+              !params.data
+                .dateValues
+            ) {
+              params.data.dateValues =
+                {};
+            }
+
+            params.data.dateValues[
+              date
+            ] =
+              params.newValue;
+
+            return true;
+          },
+          cellClass:
+            (params) =>
+              params.data
+                ?.hasChildren
+                ? 'financial-value-parent'
+                : 'financial-value',
+          valueFormatter:
+            (params) =>
+              formatCellValue(
+                params.value
+              ),
+        })
+      );
+
+    if (
+      dynamicDateColumns.length ===
+      0
+    ) {
+      dynamicDateColumns.push({
+        headerName: 'Value',
         field: 'value',
         width: 220,
         minWidth: 180,
         flex: 0.35,
-        editable:
-          (params) =>
-            !params.data?.hasChildren,
+        editable: (
+          params
+        ) =>
+          !params.data
+            ?.hasChildren,
         cellClass:
           (params) =>
-            params.data?.hasChildren
+            params.data
+              ?.hasChildren
               ? 'financial-value-parent'
               : 'financial-value',
         valueFormatter:
-          (params) => {
-            if (
-              params.value === null ||
-              params.value === undefined ||
-              params.value === ''
-            ) {
-              return '';
-            }
-
-            if (
-              typeof params.value ===
-              'number'
-            ) {
-              return params.value.toLocaleString(
-                'en-IN'
-              );
-            }
-
-            return String(
+          (params) =>
+            formatCellValue(
               params.value
-            );
-          },
-      },
+            ),
+      });
+    }
+
+    return [
+      ...baseColumns,
+      ...dynamicDateColumns,
     ];
-  }, [stagingData]);
+  }, [dateColumns]);
 
   const autoGroupColumnDef =
     useMemo(() => {
@@ -923,6 +1176,7 @@ export default function PublishStagingData() {
         setFetchError(null);
         setStagingData([]);
         setFormValues({});
+        setDataName('');
 
         setStatusMessage(
           `Fetching staging data for ${trimmedScriptId} (${source})...`
@@ -963,6 +1217,7 @@ export default function PublishStagingData() {
         ) {
           setStagingData([]);
           setFormValues({});
+          setDataName('');
 
           setStatusMessage(
             `No staging records found for ${trimmedScriptId} (${source}).`
@@ -970,6 +1225,37 @@ export default function PublishStagingData() {
 
           return;
         }
+
+        /*
+         * Capture dataName.
+         *
+         * Normally the API will return:
+         *
+         * {
+         *   dataName: "...",
+         *   date: "...",
+         *   data: [...]
+         * }
+         *
+         * This also supports dataName being present
+         * on any record in the response.
+         */
+        const apiDataName =
+          records.find(
+            (record) =>
+              record &&
+              typeof record ===
+                'object' &&
+              record.dataName !==
+                undefined &&
+              record.dataName !==
+                null &&
+              record.dataName !== ''
+          )?.dataName || '';
+
+        setDataName(
+          String(apiDataName)
+        );
 
         setStagingData(
           records
@@ -979,13 +1265,27 @@ export default function PublishStagingData() {
           {};
 
         const extractNodes =
-          (node) => {
+          (
+            node,
+            recordIndex,
+            recordDate
+          ) => {
             if (
               !node ||
               typeof node !== 'object'
             ) {
               return;
             }
+
+            const nodeDate =
+              getRecordDate(
+                {
+                  date:
+                    recordDate,
+                },
+                node
+              ) ||
+              recordDate;
 
             const children =
               Array.isArray(
@@ -995,7 +1295,8 @@ export default function PublishStagingData() {
                 : [];
 
             if (
-              children.length === 0 &&
+              children.length ===
+                0 &&
               node.value !==
                 undefined &&
               node.value !== null
@@ -1005,22 +1306,45 @@ export default function PublishStagingData() {
                 node.name ||
                 'unnamed_metric';
 
+              const dateKey =
+                nodeDate ||
+                'value';
+
               initialInputs[
-                `metric_${fieldKey}`
-              ] = node.value;
+                `metric_${fieldKey}_${dateKey}`
+              ] =
+                node.value;
             }
 
             children.forEach(
-              extractNodes
+              (child) =>
+                extractNodes(
+                  child,
+                  recordIndex,
+                  nodeDate
+                )
             );
           };
 
         records.forEach(
-          (record) => {
+          (
+            record,
+            recordIndex
+          ) => {
+            const recordDate =
+              getRecordDate(
+                record
+              );
+
             normalizeData(
               record
             ).forEach(
-              extractNodes
+              (node) =>
+                extractNodes(
+                  node,
+                  recordIndex,
+                  recordDate
+                )
             );
           }
         );
@@ -1029,8 +1353,71 @@ export default function PublishStagingData() {
           initialInputs
         );
 
+        const detectedDates = [];
+
+        records.forEach(
+          (record) => {
+            const recordDate =
+              getRecordDate(
+                record
+              );
+
+            if (
+              recordDate &&
+              !detectedDates.includes(
+                recordDate
+              )
+            ) {
+              detectedDates.push(
+                recordDate
+              );
+            }
+
+            normalizeData(
+              record
+            ).forEach(
+              (node) => {
+                const nodeDate =
+                  getRecordDate(
+                    record,
+                    node
+                  );
+
+                if (
+                  nodeDate &&
+                  !detectedDates.includes(
+                    nodeDate
+                  )
+                ) {
+                  detectedDates.push(
+                    nodeDate
+                  );
+                }
+              }
+            );
+          }
+        );
+
+        console.log(
+          'Captured dataName:',
+          apiDataName
+        );
+
+        console.log(
+          'Captured dates:',
+          detectedDates
+        );
+
         setStatusMessage(
-          `Loaded ${records.length} staging record(s) for ${trimmedScriptId} (${source}).`
+          `Loaded ${records.length} staging record(s) for ${trimmedScriptId} (${source}). ${
+            apiDataName
+              ? `dataName: ${apiDataName}.`
+              : ''
+          } ${
+            detectedDates.length > 0
+              ? `${detectedDates.length} date(s) detected.`
+              : 'No date field detected.'
+          }`
         );
       } catch (err) {
         console.error(
@@ -1049,6 +1436,7 @@ export default function PublishStagingData() {
 
         setStagingData([]);
         setFormValues({});
+        setDataName('');
       } finally {
         setLoading(false);
       }
@@ -1116,8 +1504,8 @@ export default function PublishStagingData() {
           source:
             source.trim(),
 
-          companyName:
-            companyName.trim(),
+          dataName:
+            dataName.trim(),
 
           sectorHierarchy:
             cleanSectorHierarchy,
@@ -1295,19 +1683,19 @@ export default function PublishStagingData() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
                 <div className="px-4 py-2.5 bg-[#f8f9fa] font-medium text-slate-600">
-                  Company Name
+                  dataName
                 </div>
 
                 <div className="p-2 md:col-span-2">
                   <input
                     type="text"
-                    value={companyName}
+                    value={dataName}
                     onChange={(e) =>
-                      setCompanyName(
+                      setDataName(
                         e.target.value
                       )
                     }
-                    placeholder="e.g. Maruti Suzuki India Ltd"
+                    placeholder="Populated from API response"
                     className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-[11px] text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-400"
                   />
                 </div>
@@ -1442,107 +1830,169 @@ export default function PublishStagingData() {
                 </div>
 
                 <span className="font-mono text-[10px] text-slate-300 font-normal">
-                  {rawApiRows.length}{' '}
+                  {mergedRawApiRows.length}{' '}
                   Metrics
                 </span>
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse table-fixed">
+                <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-[#f8f9fa] border-b border-slate-200/80 text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
-                      <th className="w-[35%] px-4 py-2.5">
+
+                      <th className="min-w-[280px] px-4 py-2.5">
                         Parameter
                       </th>
 
-                      <th className="w-[20%] px-4 py-2.5">
+                      <th className="min-w-[180px] px-4 py-2.5">
                         Metric ID
                       </th>
 
-                      <th className="w-[15%] px-4 py-2.5">
+                      <th className="min-w-[120px] px-4 py-2.5">
                         Units
                       </th>
 
-                      <th className="w-[30%] px-4 py-2.5 text-right">
-                        Target Value
-                      </th>
+                      {dateColumns.length > 0 ? (
+                        dateColumns.map(
+                          (date) => (
+                            <th
+                              key={date}
+                              className="min-w-[180px] px-4 py-2.5 text-right whitespace-nowrap"
+                            >
+                              {date}
+                            </th>
+                          )
+                        )
+                      ) : (
+                        <th className="min-w-[180px] px-4 py-2.5 text-right">
+                          Target Value
+                        </th>
+                      )}
+
                     </tr>
                   </thead>
 
                   <tbody className="divide-y divide-slate-100 text-[11px]">
-                    {rawApiRows.length > 0 ? (
-                      rawApiRows.map(
+
+                    {mergedRawApiRows.length > 0 ? (
+                      mergedRawApiRows.map(
                         (
                           row,
                           index
-                        ) => {
-                          const currentValue =
-                            formValues[
-                              `metric_${row.id}`
-                            ] !== undefined
-                              ? formValues[
-                                  `metric_${row.id}`
-                                ]
-                              : row.value;
+                        ) => (
+                          <tr
+                            key={`${row.id}-${index}`}
+                            className="hover:bg-slate-50/80 transition-colors"
+                          >
 
-                          return (
-                            <tr
-                              key={`${row.recordIndex}-${row.id}-${index}`}
-                              className="hover:bg-slate-50/80 transition-colors"
-                            >
-                              <td className="px-4 py-2.5">
-                                <div
-                                  className="font-medium text-slate-700 truncate max-w-[500px]"
-                                  title={
-                                    row.name
-                                  }
-                                >
-                                  {row.name}
-                                </div>
-
-                                {row.path && (
-                                  <div
-                                    className="mt-0.5 text-[9px] font-mono text-slate-400 truncate max-w-[500px]"
-                                    title={
-                                      row.path
-                                    }
-                                  >
-                                    {row.path}
-                                  </div>
-                                )}
-                              </td>
-
-                              <td
-                                className="px-4 py-2.5 font-mono text-[10px] text-slate-500 truncate"
+                            <td className="px-4 py-2.5">
+                              <div
+                                className="font-medium text-slate-700 truncate max-w-[500px]"
                                 title={
-                                  row.id
+                                  row.name
                                 }
                               >
-                                {row.id}
-                              </td>
+                                {row.name}
+                              </div>
 
-                              <td className="px-4 py-2.5">
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[9px] font-mono text-slate-600">
-                                  {row.units}
-                                </span>
-                              </td>
+                              {row.path && (
+                                <div
+                                  className="mt-0.5 text-[9px] font-mono text-slate-400 truncate max-w-[500px]"
+                                  title={
+                                    row.path
+                                  }
+                                >
+                                  {row.path}
+                                </div>
+                              )}
+                            </td>
 
+                            <td
+                              className="px-4 py-2.5 font-mono text-[10px] text-slate-500 truncate"
+                              title={
+                                row.id
+                              }
+                            >
+                              {row.id}
+                            </td>
+
+                            <td className="px-4 py-2.5">
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[9px] font-mono text-slate-600">
+                                {row.units}
+                              </span>
+                            </td>
+
+                            {dateColumns.length > 0 ? (
+                              dateColumns.map(
+                                (
+                                  date
+                                ) => {
+                                  const currentValue =
+                                    formValues[
+                                      `metric_${row.id}_${date}`
+                                    ] !==
+                                    undefined
+                                      ? formValues[
+                                          `metric_${row.id}_${date}`
+                                        ]
+                                      : row
+                                          .valuesByDate[
+                                          date
+                                        ] ??
+                                        '';
+
+                                  return (
+                                    <td
+                                      key={`${row.id}-${date}`}
+                                      className="px-3 py-1.5"
+                                    >
+                                      <input
+                                        type="text"
+                                        value={
+                                          currentValue ===
+                                            null ||
+                                          currentValue ===
+                                            undefined
+                                            ? ''
+                                            : currentValue
+                                        }
+                                        onChange={(
+                                          e
+                                        ) =>
+                                          handleInputChange(
+                                            row,
+                                            date,
+                                            e
+                                              .target
+                                              .value
+                                          )
+                                        }
+                                        className="w-full text-right px-2 py-1.5 font-mono text-[11px] font-semibold text-slate-700 bg-transparent border border-transparent hover:border-slate-200 focus:bg-slate-50 focus:outline-none focus:ring-1 focus:ring-slate-300 rounded"
+                                      />
+                                    </td>
+                                  );
+                                }
+                              )
+                            ) : (
                               <td className="px-3 py-1.5">
                                 <input
                                   type="text"
                                   value={
-                                    currentValue ===
-                                      null ||
-                                    currentValue ===
-                                      undefined
-                                      ? ''
-                                      : currentValue
+                                    formValues[
+                                      `metric_${row.id}_value`
+                                    ] !==
+                                    undefined
+                                      ? formValues[
+                                          `metric_${row.id}_value`
+                                        ]
+                                      : row.value
                                   }
                                   onChange={(
                                     e
                                   ) =>
                                     handleInputChange(
                                       row,
+                                      '',
                                       e
                                         .target
                                         .value
@@ -1551,20 +2001,28 @@ export default function PublishStagingData() {
                                   className="w-full text-right px-2 py-1.5 font-mono text-[11px] font-semibold text-slate-700 bg-transparent border border-transparent hover:border-slate-200 focus:bg-slate-50 focus:outline-none focus:ring-1 focus:ring-slate-300 rounded"
                                 />
                               </td>
-                            </tr>
-                          );
-                        }
+                            )}
+
+                          </tr>
+                        )
                       )
                     ) : (
                       <tr>
                         <td
-                          colSpan={4}
+                          colSpan={
+                            3 +
+                            Math.max(
+                              dateColumns.length,
+                              1
+                            )
+                          }
                           className="px-4 py-10 text-center text-slate-400 font-mono text-[11px]"
                         >
                           NO ACTIVE STAGING FIELDS LOADED
                         </td>
                       </tr>
                     )}
+
                   </tbody>
                 </table>
               </div>
@@ -1575,7 +2033,7 @@ export default function PublishStagingData() {
                 </span>
 
                 <span>
-                  {rawApiRows.length}{' '}
+                  {mergedRawApiRows.length}{' '}
                   EDITABLE FIELDS
                 </span>
               </div>
@@ -1661,7 +2119,9 @@ export default function PublishStagingData() {
                 </span>
 
                 <span>
-                  {tableRows.length} ROOT NODES
+                  {dateColumns.length > 0
+                    ? `${dateColumns.length} DATE COLUMNS`
+                    : 'NO DATE DETECTED'}
                 </span>
               </div>
             </div>
@@ -1685,46 +2145,57 @@ export default function PublishStagingData() {
                   : 'PUBLISH DATA'}
               </button>
 
-              <div className="px-4 py-2 bg-[#f8f9fa] text-center text-[10px] font-mono text-slate-400">
-                TARGET SCRIPT:{' '}
-                {scriptId ||
-                  'NONE'}
+              <div className="px-4 py-2 bg-[#f8f9fa] text-center text-[10px] font-mono text-slate-400 flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
 
-                <span className="mx-2">
-                  |
+                <span>
+                  TARGET SCRIPT:{' '}
+                  {scriptId ||
+                    'NONE'}
                 </span>
 
-                SOURCE:{' '}
-                {source ||
-                  'NONE'}
+                <span>|</span>
 
-                <span className="mx-2">
-                  |
+                <span>
+                  SOURCE:{' '}
+                  {source ||
+                    'NONE'}
                 </span>
 
-                SECTOR:{' '}
+                <span>|</span>
 
-                {Object.values(
-                  sectorHierarchy || {}
-                ).join(
-                  ' › '
-                ) || 'NONE'}
-
-                <span className="mx-2">
-                  |
+                <span>
+                  DATA NAME:{' '}
+                  {dataName ||
+                    'NONE'}
                 </span>
 
-                UNIT:{' '}
-                {units ||
-                  'NONE'}
+                <span>|</span>
 
-                <span className="mx-2">
-                  |
+                <span>
+                  SECTOR:{' '}
+                  {Object.values(
+                    sectorHierarchy || {}
+                  ).join(
+                    ' › '
+                  ) || 'NONE'}
                 </span>
 
-                GRANULARITY:{' '}
-                {granularity ||
-                  'NONE'}
+                <span>|</span>
+
+                <span>
+                  UNIT:{' '}
+                  {units ||
+                    'NONE'}
+                </span>
+
+                <span>|</span>
+
+                <span>
+                  GRANULARITY:{' '}
+                  {granularity ||
+                    'NONE'}
+                </span>
+
               </div>
             </div>
           )}
