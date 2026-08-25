@@ -4,43 +4,54 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 
 const SingleDropDown_v1 = (props) => {
-  const options = props.options?.options_list || [];
+ 
+  const options = Array.isArray(props.options) 
+    ? props.options 
+    : (props.options?.options_list || []);
+
   const [mounted, setMounted] = useState(false);
-  
-  // Determine the current value for react-select
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+
   const getCurrentValue = () => {
     if (props.value) {
-      // If value is provided, find matching option
+    
       const matchingOption = options.find(opt => opt === props.value);
       if (matchingOption) {
         return { value: matchingOption, label: matchingOption };
+      }
+   
+      if (Array.isArray(props.value)) {
+        return props.value.map(v => ({ value: v, label: v }));
       }
       return null;
     }
     return null;
   };
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const handleChange = (selectedOption) => {
     if (props.onSelect) {
-      // Pass the value to parent, or null if cleared
-      props.onSelect(selectedOption ? selectedOption.value : null);
+     
+      if (props.isMulti) {
+        const values = selectedOption ? selectedOption.map(opt => opt.value) : [];
+        props.onSelect(values);
+      } else {
+        props.onSelect(selectedOption ? selectedOption.value : null);
+      }
     }
   };
 
   if (!mounted) {
-    return (
-      <div className="w-full h-[42px] bg-slate-100 rounded-xl animate-pulse" />
-    );
+    return <div className="w-full h-[42px] bg-slate-100 rounded-xl animate-pulse" />;
   }
 
   return (
     <div className="w-full text-sm">
       <Select
-        options={options.map((option) => ({
+        options={options.map(option => ({
           value: option,
           label: option,
         }))}
@@ -51,7 +62,7 @@ const SingleDropDown_v1 = (props) => {
         value={getCurrentValue()}
         menuPortalTarget={typeof window !== 'undefined' ? document.body : null}
         menuPosition="fixed"
-        menuShouldBlockScroll={true}
+        menuShouldBlockScroll
         classNamePrefix="react-select"
         styles={{
           menuPortal: (base) => ({

@@ -13,6 +13,8 @@ import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/S
 
 const TextWithGrid = (props) => {
   const {
+     id,                        
+    onUpdate, 
     sectorSub1Data = [],
     initialData = {},
     updateData = () => {},

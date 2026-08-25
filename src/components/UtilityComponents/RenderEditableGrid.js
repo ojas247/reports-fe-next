@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useMemo,useCallback  } from "react"; // import useMemo
 import 'handsontable/styles/handsontable.min.css';
 import 'handsontable/styles/ht-theme-main.min.css';
 import Handsontable from 'handsontable/base';
@@ -12,18 +12,21 @@ registerAllModules();
 export default function RenderEditableGrid({ oldTableData, onSave, onUpdate }) {
   const hotRef = useRef(null);
 
-  const safeData = oldTableData && oldTableData.length > 0
-    ? oldTableData.map((row) => [...row])
-    : Array.from({ length: 5 }, () => Array(5).fill(""));
+  
+  const safeData = useMemo(() => {
+    return oldTableData && oldTableData.length > 0
+      ? oldTableData.map((row) => [...row])
+      : Array.from({ length: 5 }, () => Array(5).fill(""));
+  }, [oldTableData]); // only recompute when oldTableData changes
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (hotRef.current && hotRef.current.hotInstance) {
       const instance = hotRef.current.hotInstance;
       const newData = instance.getData();
       console.log("Table Data Saved:", newData);
       if (onSave) onSave(newData);
     }
-  };
+  }, [onSave]);
 
   return (
     <div className="w-full space-y-3 font-sans">

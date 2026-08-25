@@ -20,7 +20,7 @@ function RepubData_v1() {
   const [loading, setLoading] = useState(false);
   const [aggDataFromTxtgrdComponent, setAggDataFromTxtgrdComponent] = useState({});
   const [aggPageData, setAggPageData] = useState({});
-  
+  const [selectedReport, setSelectedReport] = useState(null);
   // Validation tracking state
   const [isFormValid, setIsFormValid] = useState(true);
   const [validationError, setValidationError] = useState('');
@@ -81,7 +81,21 @@ function RepubData_v1() {
       setLoading(false);
     }
   };
-
+const handleReportSelect = async (selectedValue) => {
+  setSelectedReport(selectedValue);
+  if (!selectedValue) return;
+  try {
+    setLoading(true);
+    const payload = { ...sectorChain, data: selectedValue };
+    const Report_Data = await fetchDataFromPostApi(payload, 'GetReportEntity_v1');
+    setOldReportData(Report_Data || {});
+    setValidationError('');
+  } catch (err) {
+    console.error("Error fetching report entity details:", err);
+  } finally {
+    setLoading(false);
+  }
+};
   // Handler to clear staging table data in backend & local state
   const handleClearStaging = async () => {
     try {
@@ -229,7 +243,8 @@ function RepubData_v1() {
             </label>
             <SingleDropDown_v1
               options={reportList}
-              onSelect={getSelectedReportDetails}
+              value={selectedReport}
+              onSelect={handleReportSelect}
             />
           </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import SingleDropDown_v1 from "../../../components/UtilityComponents/SingleDropdown_v1";
 import CascadingDropDown from "../../../components/UtilityComponents/CascadingDropdown";
 import { fetchSetorSubOptions, fetchAuthors, fetchYears, fetchTags } from "../../api/Api";
@@ -38,29 +38,27 @@ function DataPublishingForm() {
   const [aggDataFromTxtgrdComponent, setAggDataFromTxtgrdComponent] = useState({});
   const [selectedCity, setSelectedCity] = useState("");
 
-  /// Add new TxtGrid Component
-  const addTxtGrdComponent = () => {
-    setTxtGrdComponents((prev) => [...prev, { id: Date.now() }]);
-  };
+ 
+  const getTextWithGridData = useCallback((id, data) => {
+    setAggDataFromTxtgrdComponent((prevData) => ({
+      ...prevData,
+      [`txtGrid_${id}`]: data,
+    }));
+  }, []); 
 
-  /// Remove TxtGrid Component
-  const removeTxtGrdComponent = (id) => {
+  
+  const addTxtGrdComponent = useCallback(() => {
+    setTxtGrdComponents((prev) => [...prev, { id: Date.now() }]);
+  }, []);
+
+  const removeTxtGrdComponent = useCallback((id) => {
     setTxtGrdComponents((prev) => prev.filter((comp) => comp.id !== id));
     setAggDataFromTxtgrdComponent((prev) => {
       const updated = { ...prev };
       delete updated[`txtGrid_${id}`];
       return updated;
     });
-  };
-
-  /// Callback from TxtGrid Component
-  const getTextWithGridData = (id, data) => {
-    setAggDataFromTxtgrdComponent((prevData) => ({
-      ...prevData,
-      [`txtGrid_${id}`]: data,
-    }));
-  };
-
+  }, []);
   useEffect(() => {
     async function getData() {
       try {
@@ -320,18 +318,19 @@ function DataPublishingForm() {
                     </button>
                   </div>
 
-                  {/* Component Inner Body */}
+                
                   <div className="p-4">
-                    <TextWithGrid
-                      updateData={(data) => getTextWithGridData(comp.id, data)}
-                      sectorSub1Data={SecSubdata}
-                    />
+                     <TextWithGrid
+      id={comp.id}                          
+      onUpdate={getTextWithGridData}         // stable, no arrow wrapper
+      sectorSub1Data={SecSubdata}
+    />
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            /* Empty State Canvas */
+           
             <div className="border-2 border-dashed border-slate-200 rounded-xl p-12 text-center bg-white/50 space-y-3">
               <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-sm">
                 <i className="bi bi-layout-three-columns"></i>
