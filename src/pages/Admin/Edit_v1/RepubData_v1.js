@@ -193,7 +193,7 @@ const handleReportSelect = async (selectedValue) => {
   };
 
   return (
-    <div className="flex w-full h-screen bg-slate-50 overflow-hidden font-sans text-slate-900">
+    <div className="flex w-full h-screen bg-slate-50 overflow-x-hidden overflow-y-auto font-sans text-slate-900">
       
       {/* Sidebar Controls */}
       <aside className="w-80 shrink-0 bg-white border-r border-slate-200/80 flex flex-col h-full z-10 shadow-xs">
@@ -320,7 +320,8 @@ const handleReportSelect = async (selectedValue) => {
                 </div>
                 <TextWithGrid
                   key={oldReportData?.dataName || comp.id}
-                  updateData={(data, isValid) => getTextWithGridData(comp.id, data, isValid)}
+                   id={comp.id}                          // pass id separately
+  onUpdate={getTextWithGridData} 
                   sectorSub1Data={SecSubdata}
                   initialData={oldReportData}
                 />

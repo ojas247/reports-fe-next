@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo,useCallback  } from "react"; // import useMemo
+import { useRef, useMemo, useCallback } from "react";
 import 'handsontable/styles/handsontable.min.css';
 import 'handsontable/styles/ht-theme-main.min.css';
 import Handsontable from 'handsontable/base';
@@ -12,12 +12,11 @@ registerAllModules();
 export default function RenderEditableGrid({ oldTableData, onSave, onUpdate }) {
   const hotRef = useRef(null);
 
-  
   const safeData = useMemo(() => {
     return oldTableData && oldTableData.length > 0
       ? oldTableData.map((row) => [...row])
       : Array.from({ length: 5 }, () => Array(5).fill(""));
-  }, [oldTableData]); // only recompute when oldTableData changes
+  }, [oldTableData]);
 
   const handleSave = useCallback(() => {
     if (hotRef.current && hotRef.current.hotInstance) {
@@ -30,10 +29,8 @@ export default function RenderEditableGrid({ oldTableData, onSave, onUpdate }) {
 
   return (
     <div className="w-full space-y-3 font-sans">
-      
-      {/* Custom Clean Grid Styling Override */}
       <style jsx global>{`
-        /* Fix visibility of text inside table inputs & cells */
+        /* Text visibility */
         .handsontable td, 
         .handsontable th,
         .handsontable input {
@@ -42,7 +39,6 @@ export default function RenderEditableGrid({ oldTableData, onSave, onUpdate }) {
           font-family: inherit !important;
         }
 
-        /* Crisp modern headers */
         .handsontable th {
           background-color: #f8fafc !important;
           color: #475569 !important;
@@ -50,49 +46,42 @@ export default function RenderEditableGrid({ oldTableData, onSave, onUpdate }) {
           border-color: #e2e8f0 !important;
         }
 
-        /* Clean table cell borders */
         .handsontable td {
           border-color: #cbd5e1 !important;
         }
 
-        /* Active focus cell indicator */
         .handsontable .htBorder.current {
           background-color: #2563eb !important;
         }
 
-        /* Container responsiveness */
         .ht_master .wtHolder {
           width: 100% !important;
           max-width: 100% !important;
         }
 
-        /* ============== Z-INDEX FIXES ============== */
-        .handsontable {
-          z-index: 10 !important;
-        }
-
-        /* Make sure Handsontable menus don't block react-select */
-        .handsontable .htContextMenu,
-        .handsontable .htDropdownMenu,
-        .handsontable .htAutocompleteEditor,
-        .handsontable .htCellEditor {
-          z-index: 500 !important;
-        }
+        /* Handsontable menus/editors */
+.handsontable .htContextMenu,
+.handsontable .htDropdownMenu,
+.handsontable .htAutocompleteEditor,
+.handsontable .htCellEditor,
+.htContextMenu {
+  z-index: 999999 !important;
+}
       `}</style>
 
-      {/* Grid Container */}
-      <div className="w-full bg-white rounded-lg border border-slate-200 overflow-x-auto p-1 shadow-2xs">
+      <div className="w-full bg-white rounded-lg border border-slate-200  p-1 shadow-2xs">
         <HotTable
           ref={hotRef}
           data={safeData}
           rowHeaders={true}
-          colHeaders={true}
-          height="320px"
+          colHeaders={true}  
+          height="auto"              
           width="100%"
           stretchH="all"
           autoWrapRow={true}
           autoWrapCol={true}
           manualRowMove={true}
+          preventOverflow="horizontal"
           dropdownMenu={true}
           persistentState={true}
           multiColumnSorting={true}
@@ -114,7 +103,6 @@ export default function RenderEditableGrid({ oldTableData, onSave, onUpdate }) {
         />
       </div>
 
-      {/* Save Action Toolbar */}
       <div className="flex items-center justify-between pt-1">
         <span className="text-[11px] text-slate-400 font-mono">
           Right-click table cells to open edit menu
@@ -130,7 +118,6 @@ export default function RenderEditableGrid({ oldTableData, onSave, onUpdate }) {
           <span>Save Table</span>
         </button>
       </div>
-
     </div>
   );
 }

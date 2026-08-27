@@ -227,8 +227,10 @@ const TextWithGrid = (props) => {
   }, []);
 
   useEffect(() => {
-    updateData(componentData);
-  }, [componentData, updateData]);
+  if (onUpdate && id) {
+    onUpdate(id, componentData);
+  }
+}, [componentData, id, onUpdate]);
 
   const isTSData = {
     options_list: ['Yes', 'No'],
@@ -636,33 +638,27 @@ const TextWithGrid = (props) => {
 
       </div>
 
-      <div className="pt-4">
+    <div className="pt-4 relative z-[100]">
+  <div className="border-t border-slate-100 pt-4 mb-3 flex items-center justify-between">
+    <h4 className="text-xs font-bold text-slate-800 tracking-wider uppercase font-mono">
+      Structured Data Table
+    </h4>
+  </div>
 
-        <div className="border-t border-slate-100 pt-4 mb-3 flex items-center justify-between">
+<div
+  className="bg-slate-50/70 p-4 border border-slate-200 rounded-xl text-slate-900 space-y-4 shadow-2xs [&_input]:text-slate-900 [&_input]:font-medium [&_td]:text-slate-900 [&_th]:text-slate-900"
+  style={{ overflow: 'visible' }}
+>
+  <div className=" text-slate-900 font-medium">
+      <RenderEditableGrid
+        oldTableData={componentData.tableData}
+        onSave={saveTable}
+      />
+    </div>
+  </div>
+</div>
 
-          <h4 className="text-xs font-bold text-slate-800 tracking-wider uppercase font-mono">
-            Structured Data Table
-          </h4>
-
-        </div>
-
-        <div className="bg-slate-50/70 p-4 border border-slate-200 rounded-xl overflow-x-auto text-slate-900 space-y-4 shadow-2xs [&_input]:text-slate-900 [&_input]:font-medium [&_td]:text-slate-900 [&_th]:text-slate-900">
-
-          <div className="min-w-full text-slate-900 font-medium">
-
-            <RenderEditableGrid
-              oldTableData={componentData.tableData}
-              onSave={saveTable}
-            />
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-slate-100 relative z-50">
-
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-slate-100 relative z-10">
         <div className="space-y-1.5 relative z-50">
 
           <label
@@ -757,18 +753,17 @@ const TextWithGrid = (props) => {
 
           <div className="text-slate-900 font-medium rounded-lg">
 
-            <SingleDropDown
-              options={isTSData}
-              isMulti={true}
-              value={componentData.isTSData || []}
-              onSelect={(data) =>
-                getDropDownData(
-                  'isTSData',
-                  data
-                )
-              }
-            />
-
+           <SingleDropDown
+  options={isTSData}
+  isMulti={false}
+  value={componentData.isTSData || null}
+  onSelect={(data) =>
+    getSingleDropDownData( 
+      'isTSData',
+      data
+    )
+  }
+/>
           </div>
 
         </div>
