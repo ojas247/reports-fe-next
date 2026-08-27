@@ -94,44 +94,89 @@ function DataPublishingForm() {
     setPageHeaderData({ ...pageHeaderData, data });
   };
 
-  function handleSubmit(e) {
+ function handleSubmit(e) {
   e.preventDefault();
 
-  // Extract the first grid's data (we only have one)
-  const gridKeys = Object.keys(aggPageData).filter(key => key.startsWith('txtGrid_'));
-  if (gridKeys.length === 0) {
-    alert('No grid data to publish.');
-    return;
-  }
-
-  // Take the first grid, but also merge any top-level fields from aggPageData
-  const firstGrid = aggPageData[gridKeys[0]];
-
-  // Build the flat payload as Postman shows
-  const payload = {
-    units: firstGrid.units || "In Numbers",
-    granularity: firstGrid.granularity || "Monthly",
-    isTSData: firstGrid.isTSData || "Yes",
-    geo: firstGrid.geo || ["India"],
-    tableData: firstGrid.tableData || [],
-    sectorChain: firstGrid.sectorChain || {}
-  };
-
-  // Include dataName, sourceURL, dataDesc, monthYear if they exist
-  if (firstGrid.dataName) payload.dataName = firstGrid.dataName;
-  if (firstGrid.sourceURL) payload.sourceURL = firstGrid.sourceURL;
-  if (firstGrid.dataDesc) payload.dataDesc = firstGrid.dataDesc;
-  if (firstGrid.monthYear) payload.monthYear = firstGrid.monthYear;
-
-  console.log("FINAL PAYLOAD:", JSON.stringify(payload, null, 2));
-
   setLoading(true);
-  axios.post(`${backendAPI}/Publishing/Data_v1`, payload, {
-    headers: { 'Content-Type': 'application/json' }
-  })
-    .then(res => setResponse(res.data))
-    .catch(err => console.error("Submission error:", err))
-    .finally(() => setLoading(false));
+  setResponse(null);
+
+  const payload = Object.fromEntries(
+    Object.entries(aggPageData)
+      .filter(([key]) => key.startsWith("txtGrid_"))
+      .map(([key, value]) => [
+        key,
+        {
+          sectorChain: value.sectorChain || {},
+
+          dataName: value.dataName || "",
+
+          sourceURL: value.sourceURL || "",
+
+          dataDesc: value.dataDesc || "",
+
+          seoDesc: value.seoDesc || "",
+
+          year: value.year || "",
+
+          authors: Array.isArray(value.authors)
+            ? value.authors
+            : value.authors
+              ? [value.authors]
+              : [],
+
+          tags: Array.isArray(value.tags)
+            ? value.tags
+            : value.tags
+              ? [value.tags]
+              : [],
+
+          units: value.units || "",
+
+          granularity: value.granularity || "",
+
+          isTSData: Array.isArray(value.isTSData)
+            ? value.isTSData
+            : value.isTSData
+              ? [value.isTSData]
+              : [],
+
+          geo: Array.isArray(value.geo)
+            ? value.geo
+            : value.geo
+              ? [value.geo]
+              : [],
+
+          tableData: Array.isArray(value.tableData)
+            ? value.tableData
+            : [],
+        },
+      ])
+  );
+
+ 
+
+  axios
+    .post(
+      `${backendAPI}/Publishing/Data_v1`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+    .then((res) => {
+      console.log("SUCCESS:", res.data);
+      setResponse(res.data);
+    })
+    .catch((err) => {
+      console.error("STATUS:", err.response?.status);
+      console.error("DATA:", err.response?.data);
+      console.error("FULL ERROR:", err);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
 }
 
   const handleReset = () => {

@@ -22,8 +22,22 @@ const TextWithGrid = (props) => {
   } = props;
 
   const [SecSubdata, setSecSubdata] = useState(sectorSub1Data);
-  const [componentData, setComponentData] = useState({});
-  const [showTemplateDropdown, setShowTemplateDropdown] = useState(false);
+const [componentData, setComponentData] = useState({
+  sectorChain: {},
+  dataName: "",
+  sourceURL: "",
+  dataDesc: "",
+  seoDesc: "",
+  year: "",
+  authors: [],
+  tags: [],
+  units: "",
+  granularity: "",
+  isTSData: [],
+  geo: [],
+  tableData: [],
+});
+ const [showTemplateDropdown, setShowTemplateDropdown] = useState(false);
   const [templateInsertIndex, setTemplateInsertIndex] = useState(null);
 
   const [Authordata, setAuthordata] = useState([]);
@@ -331,39 +345,40 @@ const TextWithGrid = (props) => {
   };
 
   const getDropDownData = (field, data) => {
-    if (!Array.isArray(data)) {
-      updateField(field, []);
-      return;
-    }
+  if (!Array.isArray(data)) {
+    updateField(field, data ? [data] : []);
+    return;
+  }
 
-    updateField(
-      field,
-      data
-        .map((item) => {
-          if (
-            item &&
-            typeof item === 'object'
-          ) {
-            return item.value;
-          }
+  updateField(
+    field,
+    data
+      .map((item) => {
+        if (item && typeof item === 'object') {
+          return item.value;
+        }
 
-          return item;
-        })
-        .filter(
-          (item) =>
-            item !== undefined &&
-            item !== null &&
-            item !== ''
-        )
-    );
-  };
+        return item;
+      })
+      .filter(
+        (item) =>
+          item !== undefined &&
+          item !== null &&
+          item !== ''
+      )
+  );
+};
 
   const getSingleDropDownData = (field, data) => {
-    updateField(
-      field,
-      data?.value ?? ''
-    );
-  };
+  const value = data?.value ?? '';
+
+  if (field === 'isTSData') {
+    updateField(field, value ? [value] : []);
+    return;
+  }
+
+  updateField(field, value);
+};
 
   const saveTable = (tableData) => {
     updateField(
@@ -570,12 +585,12 @@ const TextWithGrid = (props) => {
             Data Published On
           </label>
 
-          <input
-            type="month"
-            name="year"
-            id="year"
-            value={componentData.year || ''}
-            onChange={assignFormData}
+        <input
+          type="month"
+          name="monthYear"
+          id="monthYear"
+          value={componentData.year || ''}
+          onChange={assignFormData}
             className="w-full bg-white border border-slate-200 focus:border-slate-800 focus:ring-1 focus:ring-slate-800 rounded-lg p-2 text-xs text-slate-900 transition outline-none font-mono"
           />
 
@@ -753,15 +768,19 @@ const TextWithGrid = (props) => {
 
           <div className="text-slate-900 font-medium rounded-lg">
 
-           <SingleDropDown
+        <SingleDropDown
   options={isTSData}
   isMulti={false}
-  value={componentData.isTSData || null}
+  value={
+    componentData.isTSData?.[0]
+      ? {
+          value: componentData.isTSData[0],
+          label: componentData.isTSData[0],
+        }
+      : null
+  }
   onSelect={(data) =>
-    getSingleDropDownData( 
-      'isTSData',
-      data
-    )
+    getSingleDropDownData('isTSData', data)
   }
 />
           </div>
