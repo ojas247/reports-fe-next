@@ -12,14 +12,13 @@ import {
 import SectorHierarchyDropDown from '../../../components/Functionalities/Admin/SectorHierarchyDropDown';
 
 const TextWithGrid = (props) => {
-  const {
-     id,                        
-    onUpdate, 
-    sectorSub1Data = [],
-    initialData = {},
-    updateData = () => {},
-    isTimeSeriesMandatory = false,
-  } = props;
+const {
+  id,
+  onUpdate,
+  sectorSub1Data = [],
+  initialData = {},
+  isTimeSeriesMandatory = false,
+} = props;
 
   const [SecSubdata, setSecSubdata] = useState(sectorSub1Data);
 const [componentData, setComponentData] = useState({
@@ -653,15 +652,15 @@ const [componentData, setComponentData] = useState({
 
       </div>
 
-    <div className="pt-4 relative z-[100]">
-  <div className="border-t border-slate-100 pt-4 mb-3 flex items-center justify-between">
+<div className="pt-4">
+    <div className="border-t border-slate-100 pt-4 mb-3 flex items-center justify-between">
     <h4 className="text-xs font-bold text-slate-800 tracking-wider uppercase font-mono">
       Structured Data Table
     </h4>
   </div>
 
 <div
-  className="bg-slate-50/70 p-4 border border-slate-200 rounded-xl text-slate-900 space-y-4 shadow-2xs [&_input]:text-slate-900 [&_input]:font-medium [&_td]:text-slate-900 [&_th]:text-slate-900"
+  className="bg-slate-50/70 p-4 border border-slate-200 rounded-xl text-slate-900 space-y-4 shadow-2xs"
   style={{ overflow: 'visible' }}
 >
   <div className=" text-slate-900 font-medium">

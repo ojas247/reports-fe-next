@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import SingleDropDown_v1 from "@/components/UtilityComponents/SingleDropdown_v1";
 import { fetchSetorSubOptions, fetchDataFromPostApi } from "../../api/Api";
 import axios from 'axios';
@@ -19,7 +19,6 @@ function RepubData_v1() {
   const [SecSubdata, setSecSubdata] = useState([]);
   const [loading, setLoading] = useState(false);
   const [aggDataFromTxtgrdComponent, setAggDataFromTxtgrdComponent] = useState({});
-  const [aggPageData, setAggPageData] = useState({});
   const [selectedReport, setSelectedReport] = useState(null);
   // Validation tracking state
   const [isFormValid, setIsFormValid] = useState(true);
@@ -121,27 +120,23 @@ const handleReportSelect = async (selectedValue) => {
   };
 
   // Callback to sync child TextWithGrid data and track validation state
-  const getTextWithGridData = (id, data, isValid = true) => {
-    setAggDataFromTxtgrdComponent((prevData) => ({
-      ...prevData,
-      [`txtGrid_${id}`]: data,
-    }));
-    
-    // Update parent validation status from child evaluation
-    setIsFormValid(isValid);
-    if (isValid) setValidationError('');
-  };
+  const getTextWithGridData = useCallback((id, data, isValid = true) => {
+  setAggDataFromTxtgrdComponent((prevData) => ({
+    ...prevData,
+    [`txtGrid_${id}`]: data,
+  }));
 
-  // Keep state sync updated for submission payload
-  useEffect(() => {
-    setAggPageData({
-      ...aggDataFromTxtgrdComponent
-    });
-  }, [aggDataFromTxtgrdComponent]);
+  setIsFormValid(isValid);
 
-  const getSectorFilters = (data) => {
-    setSectorChain({ sectorChain: data });
-  };
+  if (isValid) {
+    setValidationError('');
+  }
+}, []);
+
+
+const getSectorFilters = useCallback((data) => {
+  setSectorChain({ sectorChain: data });
+}, []);
 
   // Form submission handler with hard validation enforcement
   const handleSubmit = (e) => {
@@ -167,11 +162,15 @@ const handleReportSelect = async (selectedValue) => {
     setResponse(null);
     setValidationError('');
 
-    axios.post(`${backendAPI}/RePublishing/Data_v1`, aggPageData, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
+   axios.post(
+  `${backendAPI}/RePublishing/Data_v1`,
+  aggDataFromTxtgrdComponent,
+  {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }
+)
       .then(res => {
         setResponse(res.data);
       })
@@ -193,8 +192,7 @@ const handleReportSelect = async (selectedValue) => {
   };
 
   return (
-    <div className="flex w-full h-screen bg-slate-50 overflow-x-hidden overflow-y-auto font-sans text-slate-900">
-      
+<div className="flex w-full h-screen bg-slate-50 overflow-hidden font-sans text-slate-900">      
       {/* Sidebar Controls */}
       <aside className="w-80 shrink-0 bg-white border-r border-slate-200/80 flex flex-col h-full z-10 shadow-xs">
         
@@ -263,7 +261,7 @@ const handleReportSelect = async (selectedValue) => {
       </aside>
 
       {/* Main Content Workspace */}
-      <main className="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50/50">
+<main className="flex-1 min-w-0 min-h-0 overflow-y-auto overflow-x-hidden p-6 md:p-8 bg-slate-50/50">
         <div className="max-w-5xl mx-auto space-y-6">
           
           {/* Main Workspace Header */}

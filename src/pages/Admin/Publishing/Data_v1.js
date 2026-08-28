@@ -31,7 +31,6 @@ function DataPublishingForm() {
   const [Tagsdata, setTagsdata] = useState([]);
   const [gridCSVFile, setGridCSVFile] = useState(null);
   const [pageHeaderData, setPageHeaderData] = useState({});
-  const [aggPageData, setAggPageData] = useState({});
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
   const [txtGrdComponents, setTxtGrdComponents] = useState([]);
@@ -79,84 +78,90 @@ function DataPublishingForm() {
     getData();
   }, [backendAPI]);
 
-  useEffect(() => {
-    setAggPageData({
-      ...pageHeaderData,
-      ...aggDataFromTxtgrdComponent
-    });
-  }, [pageHeaderData, aggDataFromTxtgrdComponent]);
+  
 
-  const getDropDownData = (field, data) => {
-    setPageHeaderData({ ...pageHeaderData, [field]: data.map(item => item.value) });
-  };
+ const getDropDownData = useCallback((field, data) => {
+  setPageHeaderData((prev) => ({
+    ...prev,
+    [field]: Array.isArray(data)
+      ? data.map((item) => item.value)
+      : [],
+  }));
+}, []);
 
-  const getSectorFilters = (data) => {
-    setPageHeaderData({ ...pageHeaderData, data });
-  };
+const getSectorFilters = useCallback((data) => {
+  setPageHeaderData((prev) => ({
+    ...prev,
+    data,
+  }));
+}, []);
 
- function handleSubmit(e) {
+ const handleSubmit = async (e) => {
   e.preventDefault();
 
   setLoading(true);
   setResponse(null);
 
-  const payload = Object.fromEntries(
-    Object.entries(aggPageData)
-      .filter(([key]) => key.startsWith("txtGrid_"))
-      .map(([key, value]) => [
-        key,
-        {
-          sectorChain: value.sectorChain || {},
+  try {
+    const payload = Object.fromEntries(
+      Object.entries(aggDataFromTxtgrdComponent)
+        .filter(([key]) => key.startsWith("txtGrid_"))
+        .map(([key, value]) => [
+          key,
+          {
+            sectorChain: value.sectorChain || {},
 
-          dataName: value.dataName || "",
+            dataName: value.dataName || "",
 
-          sourceURL: value.sourceURL || "",
+            sourceURL: value.sourceURL || "",
 
-          dataDesc: value.dataDesc || "",
+            dataDesc: value.dataDesc || "",
 
-          seoDesc: value.seoDesc || "",
+            seoDesc: value.seoDesc || "",
 
-          year: value.year || "",
+            year: value.year || "",
 
-          authors: Array.isArray(value.authors)
-            ? value.authors
-            : value.authors
-              ? [value.authors]
+            authors: Array.isArray(value.authors)
+              ? value.authors
+              : value.authors
+                ? [value.authors]
+                : [],
+
+            tags: Array.isArray(value.tags)
+              ? value.tags
+              : value.tags
+                ? [value.tags]
+                : [],
+
+            units: value.units || "",
+
+            granularity: value.granularity || "",
+
+            isTSData: Array.isArray(value.isTSData)
+              ? value.isTSData
+              : value.isTSData
+                ? [value.isTSData]
+                : [],
+
+            geo: Array.isArray(value.geo)
+              ? value.geo
+              : value.geo
+                ? [value.geo]
+                : [],
+
+            tableData: Array.isArray(value.tableData)
+              ? value.tableData
               : [],
+          },
+        ])
+    );
 
-          tags: Array.isArray(value.tags)
-            ? value.tags
-            : value.tags
-              ? [value.tags]
-              : [],
+    console.log(
+      "FINAL PUBLISH PAYLOAD:",
+      JSON.stringify(payload, null, 2)
+    );
 
-          units: value.units || "",
-
-          granularity: value.granularity || "",
-
-          isTSData: Array.isArray(value.isTSData)
-            ? value.isTSData
-            : value.isTSData
-              ? [value.isTSData]
-              : [],
-
-          geo: Array.isArray(value.geo)
-            ? value.geo
-            : value.geo
-              ? [value.geo]
-              : [],
-
-          tableData: Array.isArray(value.tableData)
-            ? value.tableData
-            : [],
-        },
-      ])
-  );
-
- 
-
-  axios
-    .post(
+    const res = await axios.post(
       `${backendAPI}/Publishing/Data_v1`,
       payload,
       {
@@ -164,20 +169,28 @@ function DataPublishingForm() {
           "Content-Type": "application/json",
         },
       }
-    )
-    .then((res) => {
-      console.log("SUCCESS:", res.data);
-      setResponse(res.data);
-    })
-    .catch((err) => {
-      console.error("STATUS:", err.response?.status);
-      console.error("DATA:", err.response?.data);
-      console.error("FULL ERROR:", err);
-    })
-    .finally(() => {
-      setLoading(false);
+    );
+
+    console.log("SUCCESS:", res.data);
+    setResponse(res.data);
+
+  } catch (err) {
+    console.error("PUBLISH STATUS:", err.response?.status);
+    console.error("PUBLISH DATA:", err.response?.data);
+    console.error("PUBLISH ERROR:", err);
+
+    setResponse({
+      Status: "Error",
+      Message:
+        err.response?.data ||
+        err.message ||
+        "Publishing failed",
     });
-}
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleReset = () => {
     setTxtGrdComponents([]);

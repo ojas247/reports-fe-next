@@ -194,26 +194,36 @@ export default function Navbar() {
                 <i className={`bi bi-chevron-down text-[10px] text-slate-400 transition-transform duration-200 ${activeDropdown === 'services2' ? 'rotate-180 text-slate-900' : ''}`}></i>
               </button>
 
-              {activeDropdown === 'services2' && (
-                <div className="absolute left-0 mt-2 w-48 bg-white border border-slate-200/80 rounded-xl shadow-lg p-1.5 space-y-0.5 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <Link 
-                    onClick={() => handleClick("Resources-DataSets")} 
-                    href="/DataSets" 
-                    className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-700 hover:bg-slate-100/80 rounded-lg transition"
-                  >
-                    <i className="bi bi-clipboard-data text-slate-800"></i>
-                    <span>DataSets</span>
-                  </Link>
-                  <Link 
-                    onClick={() => handleClick("Resources-Insights")} 
-                    href="/Insights" 
-                    className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-700 hover:bg-slate-100/80 rounded-lg transition"
-                  >
-                    <i className="bi bi-layout-text-sidebar text-slate-800"></i>
-                    <span>Insights</span>
-                  </Link>
-                </div>
-              )}
+            {activeDropdown === 'services2' && (
+  <div className="absolute left-0 mt-2 w-48 bg-white border border-slate-200/80 rounded-xl shadow-lg p-1.5 space-y-0.5 animate-in fade-in slide-in-from-top-1 duration-150">
+    <Link 
+      onClick={() => handleClick("Resources-DataSets")} 
+      href="/DataSets" 
+      className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-700 hover:bg-slate-100/80 rounded-lg transition"
+    >
+      <i className="bi bi-clipboard-data text-slate-800"></i>
+      <span>DataSets</span>
+    </Link>
+
+    <Link 
+      onClick={() => handleClick("Resources-Insights")} 
+      href="/Insights" 
+      className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-700 hover:bg-slate-100/80 rounded-lg transition"
+    >
+      <i className="bi bi-layout-text-sidebar text-slate-800"></i>
+      <span>Insights</span>
+    </Link>
+
+    <Link 
+      onClick={() => handleClick("Resources-Company")} 
+      href="/Company" 
+      className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-700 hover:bg-slate-100/80 rounded-lg transition"
+    >
+      <i className="bi bi-building text-slate-800"></i>
+      <span>Company</span>
+    </Link>
+  </div>
+)}
             </li>
 
             {/* Pricing */}
@@ -365,26 +375,36 @@ export default function Navbar() {
                 <i className={`bi bi-chevron-down text-xs text-slate-400 transition-transform ${activeDropdown === 'services2' ? 'rotate-180' : ''}`}></i>
               </button>
 
-              {activeDropdown === 'services2' && (
-                <div className="pl-4 pr-2 py-1 space-y-1 bg-slate-50/80 rounded-lg my-1">
-                  <Link 
-                    onClick={() => handleClick("Resources-DataSets")} 
-                    href="/DataSets" 
-                    className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-600 hover:text-slate-900"
-                  >
-                    <i className="bi bi-clipboard-data"></i>
-                    <span>DataSets</span>
-                  </Link>
-                  <Link 
-                    onClick={() => handleClick("Resources-Insights")} 
-                    href="/Insights" 
-                    className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-600 hover:text-slate-900"
-                  >
-                    <i className="bi bi-layout-text-sidebar"></i>
-                    <span>Insights</span>
-                  </Link>
-                </div>
-              )}
+             {activeDropdown === 'services2' && (
+  <div className="pl-4 pr-2 py-1 space-y-1 bg-slate-50/80 rounded-lg my-1">
+    <Link 
+      onClick={() => handleClick("Resources-DataSets")} 
+      href="/DataSets" 
+      className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-600 hover:text-slate-900"
+    >
+      <i className="bi bi-clipboard-data"></i>
+      <span>DataSets</span>
+    </Link>
+
+    <Link 
+      onClick={() => handleClick("Resources-Insights")} 
+      href="/Insights" 
+      className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-600 hover:text-slate-900"
+    >
+      <i className="bi bi-layout-text-sidebar"></i>
+      <span>Insights</span>
+    </Link>
+
+    <Link 
+      onClick={() => handleClick("Resources-Company")} 
+      href="/Company" 
+      className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-600 hover:text-slate-900"
+    >
+      <i className="bi bi-building"></i>
+      <span>Company</span>
+    </Link>
+  </div>
+)}
             </li>
 
             <li>
