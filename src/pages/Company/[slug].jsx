@@ -107,7 +107,6 @@ export default function CompanyDashboard() {
         if (defaultIndicator) {
           await fetchAndSetTimeSeries(defaultIndicator, defaultGroup);
           setActiveIndicator(defaultIndicator);
-          console.log('Default indicator set:', indicatorsResponse);
         } else {
           setError('No indicators available for this company.');
         }
@@ -195,7 +194,6 @@ export default function CompanyDashboard() {
               <div className="flex flex-wrap gap-1.5">
                 {group.indicators.map(ind => {
                   const isActive = activeIndicator?.dataItem === ind.dataItem;
-                  // Use composite key to ensure uniqueness
                   const uniqueKey = `${group.sector}-${group.subSector}-${ind.dataItem}`;
                   return (
                     <button
@@ -232,7 +230,7 @@ export default function CompanyDashboard() {
     );
   };
 
-  const hasIndicatorData = activeIndicatorData && activeIndicatorData.length > 0;
+  const hasIndicatorData = activeIndicatorData && activeIndicatorData.length > 0 && activeIndicatorData.some(v => v !== null && v !== undefined);
 
   const chartData = {
     labels: chartLabels,
@@ -398,7 +396,6 @@ export default function CompanyDashboard() {
                       laggingIndicator: { label: 'Lagging', color: 'purple' }
                     };
                     const stage = stageMap[group.indicatorType] || { label: 'Unknown', color: 'slate' };
-                    // Use composite key for table row as well
                     const rowKey = `${group.sector}-${group.subSector}-${ind.dataItem}`;
                     return (
                       <tr key={rowKey} className="hover:bg-slate-50/80 transition-colors">
