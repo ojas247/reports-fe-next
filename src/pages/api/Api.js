@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
 
 if (!backendAPI) {
@@ -18,6 +20,44 @@ const buildBackendUrl = (urlSlug) => {
 
   return `${base}/${path}`;
 };
+
+export const fetchCompanyIndicators = async (companySymbol) => {
+  try {
+    const response = await axios.post(`${backendAPI}/SearchCompanyIndicators`, {
+      companySymbol
+    }, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return response.data;
+  } catch (error) {
+    // Log full error details
+    console.error('❌ Axios error config:', error.config);
+    console.error('❌ Axios error response:', error.response);
+    console.error('❌ Axios error message:', error.message);
+    if (error.response) {
+      console.error('❌ Status:', error.response.status);
+      console.error('❌ Data:', error.response.data);
+    }
+    throw error;
+  }
+};
+
+export const fetchIndicatorTimeSeries = async (dataName, dataItem, sector, subSector) => {
+  try {
+    const response = await axios.post(`${backendAPI}/SearchIndicatorTS`, {
+      dataName,
+      dataItem,
+      sector,
+      subSector
+    }, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching time series:', error);
+    throw error;
+  }
+}
 
 export async function fetchDataFromGetApi(urlSlug) {
   try {
