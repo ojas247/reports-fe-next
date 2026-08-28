@@ -1,7 +1,6 @@
 // pages/csv-grid.js
 
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';  // Allows raw HTML in Markdown
@@ -18,6 +17,20 @@ const formatIndianNumber = (value) => {
   return new Intl.NumberFormat("en-IN").format(num);
 };
 
+const getGranularityText = (granularity) => {
+  if (granularity === "Yearly") return "Financial YoY";
+  if (granularity === "Quarterly") return "Financial QoQ";
+  if (
+    granularity === "Monthly" ||
+    granularity === "Monthly Cumulative" ||
+    granularity === "Monthly Snapshot"
+  ) {
+    return granularity;
+  }
+  if (granularity === "Calendar Year") return "Calendar Year";
+  return "";
+};
+
 // Dynamically import DataGrid so it only runs in the browser:
 const DataGrid = dynamic(
   () => import('react-data-grid').then((mod) => mod.default),
@@ -25,7 +38,6 @@ const DataGrid = dynamic(
 );
 
 export default function CsvGridPage(props) {
-  const [granularityText, setGranularityText] = useState('');
   const headers_raw = props.headers;
   const rows = props.rows;
   const bucketUrl = props.bucketUrl;
@@ -45,21 +57,8 @@ export default function CsvGridPage(props) {
     desc1 = parts[0].trim();
     desc2 = parts.slice(1).join("\\p").trim(); // in case multiple \p exist
   }
-  useEffect(() => {
-    if (granularity === "Yearly") {
-      setGranularityText("Financial YoY");
-    } else if (granularity === "Quarterly") {
-      setGranularityText("Financial QoQ");
-    } else if (granularity === "Monthly") {
-      setGranularityText("Monthly");
-    } else if (granularity === "Calendar Year") {
-      setGranularityText("Calendar Year");
-    }
-  }, [granularity]);
-
-  // console.log("Header: ", headers_raw, " Granularity: ", granularity, " granularityText: ", granularityText)
+  const granularityText = getGranularityText(granularity);
   const headers_v1 = formatGridHeader(headers_raw, granularityText);
-  // console.log("Output from formatGridHeader: ", headers_v1);
 
   const processedDesc1 = desc1
     .replace(/\\n/g, '<br />') // New line
