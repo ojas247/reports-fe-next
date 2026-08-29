@@ -369,6 +369,25 @@ const SearchBar = () => {
         setLoading(false);
     };
 
+    const getSuggestionIcon = (item) => {
+        const indicator = String(
+            item?.value?.indicator ??
+            item?.indicator ??
+            item?.type ??
+            ''
+        ).toLowerCase();
+
+        if (indicator === 'report') {
+            return 'bi-file-earmark-text';
+        }
+
+        if (indicator === 'data') {
+            return 'bi-bar-chart-line';
+        }
+
+        return 'bi-search';
+    };
+
     useEffect(() => {
         return () => {
             if (debounceRef.current) {
@@ -432,8 +451,8 @@ const SearchBar = () => {
                             aria-label="Clear search"
                             className="
                                 absolute
-                             right-[95px]
-                             sm:right-[88px]  
+                                right-[95px]
+                                sm:right-[88px]
                                 top-1/2
                                 -translate-y-1/2
                                 w-8
@@ -453,47 +472,47 @@ const SearchBar = () => {
                         </button>
                     )}
 
-                  <button
-    type="button"
-    onClick={handleSearch}
-    disabled={!query.trim() || loading}
-    className="
-        absolute
-        right-1
-        top-1/2
-        -translate-y-1/2
-        h-[30px]
-        min-w-[72px]
-        px-3
-        bg-[#1e3a5f]
-        hover:bg-[#1e3a5f]
-        active:bg-[#1e3a5f]
-        disabled:bg-[#1e3a5f]
-        disabled:opacity-50
-        disabled:cursor-not-allowed
-        text-white
-        rounded-full
-        text-[11px]
-        font-semibold
-        cursor-pointer
-        shadow-sm
-        transition
-        flex
-        items-center
-        justify-center
-        gap-1.5
-        z-20
-    "
->
-    {loading ? (
-        <i className="bi bi-arrow-repeat animate-spin text-[12px]" />
-    ) : (
-        <>
-            <i className="bi bi-search text-[12px]" />
-            <span>Search</span>
-        </>
-    )}
-</button>
+                    <button
+                        type="button"
+                        onClick={handleSearch}
+                        disabled={!query.trim() || loading}
+                        className="
+                            absolute
+                            right-1
+                            top-1/2
+                            -translate-y-1/2
+                            h-[30px]
+                            min-w-[72px]
+                            px-3
+                            bg-[#1e3a5f]
+                            hover:bg-[#1e3a5f]
+                            active:bg-[#1e3a5f]
+                            disabled:bg-[#1e3a5f]
+                            disabled:opacity-50
+                            disabled:cursor-not-allowed
+                            text-white
+                            rounded-full
+                            text-[11px]
+                            font-semibold
+                            cursor-pointer
+                            shadow-sm
+                            transition
+                            flex
+                            items-center
+                            justify-center
+                            gap-1.5
+                            z-20
+                        "
+                    >
+                        {loading ? (
+                            <i className="bi bi-arrow-repeat animate-spin text-[12px]" />
+                        ) : (
+                            <>
+                                <i className="bi bi-search text-[12px]" />
+                                <span>Search</span>
+                            </>
+                        )}
+                    </button>
                 </div>
 
                 {showSuggestions && (
@@ -555,8 +574,8 @@ const SearchBar = () => {
                                                 className="
                                                     w-full
                                                     text-left
-                                                    px-4
-                                                    py-3
+                                                    px-3
+                                                    py-2
                                                     border-b
                                                     border-slate-100
                                                     last:border-b-0
@@ -565,13 +584,13 @@ const SearchBar = () => {
                                                     transition
                                                     flex
                                                     items-center
-                                                    gap-3
+                                                    gap-2.5
                                                 "
                                             >
                                                 <div
                                                     className="
-                                                        w-8
-                                                        h-8
+                                                        w-7
+                                                        h-7
                                                         shrink-0
                                                         rounded-full
                                                         bg-slate-100
@@ -580,7 +599,9 @@ const SearchBar = () => {
                                                         justify-center
                                                     "
                                                 >
-                                                    <i className="bi bi-search text-slate-500 text-xs" />
+                                                    <i
+                                                        className={`bi ${getSuggestionIcon(item)} text-slate-500 text-xs`}
+                                                    />
                                                 </div>
 
                                                 <div className="min-w-0 flex-1">
