@@ -584,14 +584,17 @@ const [componentData, setComponentData] = useState({
             Data Published On
           </label>
 
+      
+
         <input
-          type="month"
-          name="monthYear"
-          id="monthYear"
+          type="date"
+          name="year"
+          id="year"
           value={componentData.year || ''}
           onChange={assignFormData}
-            className="w-full bg-white border border-slate-200 focus:border-slate-800 focus:ring-1 focus:ring-slate-800 rounded-lg p-2 text-xs text-slate-900 transition outline-none font-mono"
-          />
+          className="w-full bg-white border border-slate-200 focus:border-slate-800 focus:ring-1 focus:ring-slate-800 rounded-lg p-2.5 text-xs text-slate-900 transition outline-none font-mono cursor-pointer"
+        />
+   
 
         </div>
 
