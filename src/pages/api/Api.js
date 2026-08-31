@@ -1,457 +1,347 @@
+
 import axios from 'axios';
 
 const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
 
 if (!backendAPI) {
-  console.error(
-    "NEXT_PUBLIC_backendAPI is not defined in environment variables"
-  );
+  console.error('NEXT_PUBLIC_backendAPI is not defined in environment variables');
 }
 
 const buildBackendUrl = (urlSlug) => {
   if (!backendAPI) {
-    throw new Error(
-      "Backend API URL is not configured"
-    );
+    throw new Error('Backend API URL is not configured');
   }
 
-  const base = backendAPI.replace(/\/+$/, "");
-  const path = String(urlSlug || "").replace(/^\/+/, "");
+  const base = backendAPI.replace(/\/+$/, '');
+  const path = String(urlSlug || '').replace(/^\/+/, '');
 
   return `${base}/${path}`;
 };
 
 export const fetchCompanyIndicators = async (companySymbol) => {
   try {
-    const response = await axios.post(`${backendAPI}/SearchCompanyIndicators`, {
-      companySymbol
-    }, {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    const response = await axios.post(
+      `${backendAPI}/SearchCompanyIndicators`,
+      {
+        companySymbol
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
     return response.data;
   } catch (error) {
-    // Log full error details
-    console.error('❌ Axios error config:', error.config);
-    console.error('❌ Axios error response:', error.response);
-    console.error('❌ Axios error message:', error.message);
-    if (error.response) {
-      console.error('❌ Status:', error.response.status);
-      console.error('❌ Data:', error.response.data);
-    }
+    console.error('Error fetching company indicators:', error);
     throw error;
   }
 };
 
-export const fetchIndicatorTimeSeries = async (dataName, dataItem, sector, subSector) => {
+export const fetchIndicatorTimeSeries = async (params) => {
   try {
-    const response = await axios.post(`${backendAPI}/SearchIndicatorTS`, {
+    const {
       dataName,
       dataItem,
       sector,
       subSector
-    }, {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    } = params;
+
+    const response = await axios.post(
+      `${backendAPI}/SearchIndicatorTS`,
+      {
+        dataName,
+        dataItem,
+        sector,
+        subSector
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
     return response.data;
   } catch (error) {
-    console.error('Error fetching time series:', error);
+    console.error('Error fetching indicator time series:', error);
     throw error;
   }
-}
+};
+
+export const fetchIndicatorStockChart = async (params) => {
+  try {
+    const {
+      dataName,
+      dataItem,
+      sector,
+      subSector,
+      company
+    } = params;
+
+    const response = await axios.post(
+      `${backendAPI}/indicatorStockChart`,
+      {
+        dataName,
+        dataItem,
+        sector,
+        subSector,
+        company
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching indicator stock chart:', error);
+    throw error;
+  }
+};
+
+export const fetchLTP = async (symbol) => {
+  try {
+    const response = await axios.post(
+      `${backendAPI}/getLTP`,
+      {
+        symbol
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching LTP:', error);
+    throw error;
+  }
+};
+
+export const fetchStockHistory = async (symbol, years = 5) => {
+  try {
+    const url = `${backendAPI}/historicStocksData?symbol=${encodeURIComponent(
+      symbol
+    )}&years=${years}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching stock history:', error);
+    throw error;
+  }
+};
 
 export async function fetchDataFromGetApi(urlSlug) {
   try {
     if (!backendAPI) {
-      throw new Error(
-        "Backend API URL is not configured"
-      );
+      throw new Error('Backend API URL is not configured');
     }
 
-    if (urlSlug === "_ah/warmup") {
-      console.log(
-        "Skipping warmup endpoint call"
-      );
-
+    if (urlSlug === '_ah/warmup') {
       return {
-        status: "skipped",
+        status: 'skipped'
       };
     }
 
     const url = buildBackendUrl(urlSlug);
 
-    console.log(
-      "[GET API] Request:",
-      url
-    );
-
     const response = await fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        Accept: "application/json",
-      },
+        Accept: 'application/json'
+      }
     });
 
     if (!response.ok) {
       const text = await response.text();
-
-      console.error(
-        "[GET API] Status:",
-        response.status
-      );
-
-      console.error(
-        "[GET API] StatusText:",
-        response.statusText
-      );
-
-      console.error(
-        "[GET API] Response:",
-        text
-      );
-
-      throw new Error(
-        `${response.status} ${response.statusText}\n${text}`
-      );
+      throw new Error(`${response.status} ${response.statusText}\n${text}`);
     }
 
-    const data = await response.json();
-
-    console.log(
-      "[GET API] Response:",
-      data
-    );
-
-    return data;
+    return await response.json();
   } catch (error) {
-    console.error(
-      `[GET API] Error from ${urlSlug}:`,
-      error
-    );
-
+    console.error(`Error from ${urlSlug}:`, error);
     throw error;
   }
 }
 
-export async function fetchDataFromPostApi(
-  requestBody,
-  urlSlug
-) {
+export async function fetchDataFromPostApi(requestBody, urlSlug) {
   try {
     if (!backendAPI) {
-      throw new Error(
-        "Backend API URL is not configured"
-      );
-    }
-
-    if (
-      !requestBody ||
-      Object.keys(requestBody).length === 0
-    ) {
-      console.warn(
-        "Request body is empty for:",
-        urlSlug
-      );
-    }
-
-    let bodyToSend = requestBody;
-
-    if (
-      urlSlug === "getTSdata" &&
-      !Array.isArray(requestBody)
-    ) {
-      bodyToSend = requestBody;
+      throw new Error('Backend API URL is not configured');
     }
 
     const url = buildBackendUrl(urlSlug);
 
-    console.log(
-      "[POST API] Request:",
-      url
-    );
-
     const response = await fetch(url, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
       },
-      body: JSON.stringify(bodyToSend),
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
       const text = await response.text();
-
-      console.error(
-        "[POST API] Status:",
-        response.status
-      );
-
-      console.error(
-        "[POST API] StatusText:",
-        response.statusText
-      );
-
-      console.error(
-        "[POST API] Response:",
-        text
-      );
-
       throw new Error(
-        `Network response from ${url} was not ok: ${response.status}`
+        `Network response from ${url} was not ok: ${response.status}\n${text}`
       );
     }
 
-    const data = await response.json();
-
-    return data;
+    return await response.json();
   } catch (error) {
-    console.error(
-      "Error posting data:",
-      error
-    );
-
+    console.error('Error posting data:', error);
     throw error;
   }
 }
 
 export async function fetchSetorSubOptions() {
   try {
-    const url = buildBackendUrl(
-      "CRUD/get/Sectors"
-    );
+    const url = buildBackendUrl('CRUD/get/Sectors');
 
     const response = await fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        Accept: "application/json",
-      },
+        Accept: 'application/json'
+      }
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Network response was not ok: ${response.status}`
-      );
+      throw new Error(`Network response was not ok: ${response.status}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error(
-      "Error fetching sector options:",
-      error
-    );
-
+    console.error('Error fetching sector options:', error);
     throw error;
   }
 }
 
 export async function fetchAuthors() {
   try {
-    const url = buildBackendUrl(
-      "CRUD/get/Authors"
-    );
+    const url = buildBackendUrl('CRUD/get/Authors');
 
     const response = await fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        Accept: "application/json",
-      },
+        Accept: 'application/json'
+      }
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Network response was not ok: ${response.status}`
-      );
+      throw new Error(`Network response was not ok: ${response.status}`);
     }
 
-    const data = await response.json();
-
-    console.log(
-      "Authors fetched:",
-      data
-    );
-
-    return data;
+    return await response.json();
   } catch (error) {
-    console.error(
-      "Error fetching authors:",
-      error
-    );
-
+    console.error('Error fetching authors:', error);
     throw error;
   }
 }
 
 export async function fetchYears() {
   try {
-    const url = buildBackendUrl(
-      "CRUD/get/years"
-    );
+    const url = buildBackendUrl('CRUD/get/years');
 
     const response = await fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        Accept: "application/json",
-      },
+        Accept: 'application/json'
+      }
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Network response was not ok: ${response.status}`
-      );
+      throw new Error(`Network response was not ok: ${response.status}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error(
-      "Error fetching years:",
-      error
-    );
-
+    console.error('Error fetching years:', error);
     throw error;
   }
 }
 
 export async function fetchTags() {
   try {
-    const url = buildBackendUrl(
-      "CRUD/get/Tags"
-    );
+    const url = buildBackendUrl('CRUD/get/Tags');
 
     const response = await fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        Accept: "application/json",
-      },
+        Accept: 'application/json'
+      }
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Network response was not ok: ${response.status}`
-      );
+      throw new Error(`Network response was not ok: ${response.status}`);
     }
 
-    const data = await response.json();
-
-    console.log(
-      "Tags fetched:",
-      data
-    );
-
-    return data;
+    return await response.json();
   } catch (error) {
-    console.error(
-      "Error fetching tags:",
-      error
-    );
-
+    console.error('Error fetching tags:', error);
     throw error;
   }
 }
 
 export async function fetchGranularity() {
   try {
-    const url = buildBackendUrl(
-      "CRUD/get/Granularity"
-    );
-
-    console.log(
-      "[Granularity] Fetching:",
-      url
-    );
+    const url = buildBackendUrl('CRUD/get/Granularity');
 
     const response = await fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        Accept: "application/json",
-      },
+        Accept: 'application/json'
+      }
     });
 
     if (!response.ok) {
       const text = await response.text();
-
-      console.error(
-        "[Granularity] Status:",
-        response.status
-      );
-
-      console.error(
-        "[Granularity] Response:",
-        text
-      );
-
-      throw new Error(
-        `Failed to fetch Granularity: ${response.status}`
-      );
+      throw new Error(`Failed to fetch Granularity: ${response.status}\n${text}`);
     }
 
-    const data = await response.json();
-
-    console.log(
-      "[Granularity] Data:",
-      data
-    );
-
-    return data;
+    return await response.json();
   } catch (error) {
-    console.error(
-      "Error fetching Granularity:",
-      error
-    );
-
+    console.error('Error fetching Granularity:', error);
     throw error;
   }
 }
 
 export async function fetchUnits() {
   try {
-    const url = buildBackendUrl(
-      "CRUD/get/Units"
-    );
-
-    console.log(
-      "[Units] Fetching:",
-      url
-    );
+    const url = buildBackendUrl('CRUD/get/Units');
 
     const response = await fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        Accept: "application/json",
-      },
+        Accept: 'application/json'
+      }
     });
 
     if (!response.ok) {
       const text = await response.text();
-
-      console.error(
-        "[Units] Status:",
-        response.status
-      );
-
-      console.error(
-        "[Units] Response:",
-        text
-      );
-
-      throw new Error(
-        `Failed to fetch Units: ${response.status}`
-      );
+      throw new Error(`Failed to fetch Units: ${response.status}\n${text}`);
     }
 
-    const data = await response.json();
-
-    console.log(
-      "[Units] Data:",
-      data
-    );
-
-    return data;
+    return await response.json();
   } catch (error) {
-    console.error(
-      "Error fetching Units:",
-      error
-    );
-
+    console.error('Error fetching Units:', error);
     throw error;
   }
 }
