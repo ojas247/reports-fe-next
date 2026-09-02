@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import SingleDropDown_v1 from "@/components/UtilityComponents/SingleDropdown_v1";
 
 export default function SectorHierarchyDropDown(props) {
@@ -8,8 +8,9 @@ export default function SectorHierarchyDropDown(props) {
       { level: "Sector", options_list: [] },
     ]);
     const [selectedPath, setSelectedPath] = useState([]);
+    const [selectedValues, setSelectedValues] = useState({});
+    const isResetting = useRef(false);
   
-    // Fetch items from backend
     const fetchItems = async (parentKind, parentName, parentPath, childKind) => {
       let payload = {};
   
@@ -27,104 +28,168 @@ export default function SectorHierarchyDropDown(props) {
       return data.items?.map((item) => item.name) || [];
     };
   
-    // Load top-level Sectors on mount
+    // Reset function to clear all selections
+    const resetHierarchy = () => {
+      isResetting.current = true;
+      setDropdowns([{ level: "Sector", options_list: dropdowns[0]?.options_list || [] }]);
+      setSelectedPath([]);
+      setSelectedValues({});
+      // Send empty sector filters to parent
+      props.onSelect({});
+      setTimeout(() => {
+        isResetting.current = false;
+      }, 100);
+    };
+
+    // Expose reset method to parent via ref or callback
+    useEffect(() => {
+      if (props.resetRef) {
+        props.resetRef.current = resetHierarchy;
+      }
+    }, []);
+
+    // Load sectors on mount
     useEffect(() => {
       const loadSectors = async () => {
-        const sectors = await fetchItems(); // empty payload fetches sectors
+        const sectors = await fetchItems();
         setDropdowns([{ level: "Sector", options_list: sectors }]);
         setSelectedPath([]);
+        setSelectedValues({});
       };
       loadSectors();
     }, []);
 
+    // Send selected path to parent when it changes
     useEffect(() => {
+      if (isResetting.current) return;
+      
+      const pathObject = {};
+      selectedPath.forEach((selectedValue, idx) => {
+        if (dropdowns[idx]) {
+          const levelName = dropdowns[idx].level;
+          pathObject[levelName] = selectedValue;
+        }
+      });
+      
+      // Only send if there are selections
+      if (Object.keys(pathObject).length > 0) {
+        props.onSelect(pathObject);
+      }
+    }, [dropdowns, selectedPath]);
+      
+    const handleSelect = async (levelIndex, selected) => {
+      if (isResetting.current) return;
+      
+      const chosenValue = selected ? selected.value : null;
+      
+      // Update selected values
+      setSelectedValues(prev => ({
+        ...prev,
+        [levelIndex]: chosenValue
+      }));
+      
+      if (!chosenValue) {
+        // If clearing a selection, remove all dropdowns after this level
+        const newDropdowns = dropdowns.slice(0, Math.max(levelIndex + 1, 1)); 
+        const newPath = selectedPath.slice(0, Math.max(levelIndex, 0));
+        
+        // Keep the first dropdown if it's the only one
+        if (newDropdowns.length === 0) {
+          newDropdowns.push({ level: "Sector", options_list: dropdowns[0]?.options_list || [] });
+        }
+        
+        setDropdowns(newDropdowns);
+        setSelectedPath(newPath);
+        
+        // Send updated path to parent
         const pathObject = {};
-        selectedPath.forEach((selectedValue, idx) => {
-          if (dropdowns[idx]) {
-            const levelName = dropdowns[idx].level;
-            pathObject[levelName] = selectedValue;
+        newPath.forEach((val, idx) => {
+          if (newDropdowns[idx]) {
+            const levelName = newDropdowns[idx].level;
+            pathObject[levelName] = val;
           }
         });
-        props.onSelect(pathObject);
-      }, [dropdowns, selectedPath]);
-      
-  
-    // Handle selection in any dropdown
-    const handleSelect = async (levelIndex, selected) => {
-        const chosenValue = selected ? selected.value : null;
-      
-        if (!chosenValue) {
-          // Handle clear
-          const newDropdowns = dropdowns.slice(0, Math.max(levelIndex, 1)); 
-          const newPath = selectedPath.slice(0, Math.max(levelIndex, 1));
-          setDropdowns(newDropdowns);
-          setSelectedPath(newPath);
-          return;
+        
+        if (Object.keys(pathObject).length > 0) {
+          props.onSelect(pathObject);
+        } else {
+          props.onSelect({});
         }
+        return;
+      }
       
-        // Update path
-        const newPath = [...selectedPath];
-        newPath[levelIndex] = chosenValue;
-        setSelectedPath(newPath);
+      const newPath = [...selectedPath];
+      newPath[levelIndex] = chosenValue;
+      setSelectedPath(newPath);
       
-        // Reset deeper dropdowns if higher one changes
-        const newDropdowns = dropdowns.slice(0, levelIndex + 1);
+      const newDropdowns = dropdowns.slice(0, levelIndex + 1);
       
-        // Parent info
-        const parent = newDropdowns[levelIndex];
-        const parentKind = parent.level;
-        const parentName = chosenValue;
-        const parentPath = newPath
-          .slice(0, -1)
-          .map((name, idx) => `${dropdowns[idx].level}/${name}`)
-          .join("/");
+      const parent = newDropdowns[levelIndex];
+      const parentKind = parent.level;
+      const parentName = chosenValue;
+      const parentPath = newPath
+        .slice(0, -1)
+        .map((name, idx) => `${dropdowns[idx].level}/${name}`)
+        .join("/");
       
-        // Ask backend what children exist
-        const childKind =
-          levelIndex === 0 ? "Sub1" : `Sub${levelIndex + 1}`;
+      const childKind =
+        levelIndex === 0 ? "Sub1" : `Sub${levelIndex + 1}`;
       
-        const children = await fetchItems(
-          parentKind,
-          parentName,
-          parentPath,
-          childKind
-        );
+      const children = await fetchItems(
+        parentKind,
+        parentName,
+        parentPath,
+        childKind
+      );
       
-        if (children.length > 0) {
-          newDropdowns.push({
-            level: childKind,
-            options_list: children,
-          });
-        }
+      if (children.length > 0) {
+        newDropdowns.push({
+          level: childKind,
+          options_list: children,
+        });
+      }
       
-        setDropdowns(newDropdowns);
-      };
+      setDropdowns(newDropdowns);
+    };
+    
+    // Reset when props.reset is triggered from parent
+    useEffect(() => {
+      if (props.reset) {
+        resetHierarchy();
+      }
+    }, [props.reset]);
       
-  
     return (
-      <div className="p-4">
-        <h2 className="block text-sm font-medium text-gray-600 mb-1 sm:px-6">Sector Hierarchy Dropdowns</h2>
+      <div className="w-full">
+        <h2 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-600 mb-3">
+          Taxonomy Hierarchy
+        </h2>
   
-        <div className="flex flex-row flex-wrap px-0 py-2" >
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3">
           {dropdowns.map((dropdown, idx) => (
-            <SingleDropDown_v1
-              key={idx}
-              options={{ options_list: dropdown.options_list }}
-              placeholder={`Select ${dropdown.level}`}
-              onSelect={(selected) => handleSelect(idx, selected)}
-            />
+            <div key={idx} className="w-full sm:flex-1 min-w-[140px]">
+              <SingleDropDown_v1
+                options={{ options_list: dropdown.options_list }}
+                placeholder={`Select ${dropdown.level}`}
+                value={selectedValues[idx] || null}
+                onSelect={(selected) => handleSelect(idx, { value: selected, label: selected })}
+              />
+            </div>
           ))}
         </div>
   
-        <div className="mt-4 text-sm text-gray-700">
-          <strong>Selected Sector:</strong>{" "}
-          {selectedPath
-            .map((p, i) =>
-              dropdowns[i] ? `${p}` : p
-            )
-            .join(" > ")}
+        <div className="mt-4 text-xs text-slate-500 font-mono">
+          <span className="font-semibold text-slate-700">Selected Path:</span>{" "}
+          {selectedPath.length > 0 ? (
+            selectedPath
+              .map((p, i) =>
+                dropdowns[i] ? `${p}` : p
+              )
+              .join(" › ")
+          ) : (
+            <span className="text-slate-400">No selection</span>
+          )}
         </div>
       </div>
     );
-  
 }

@@ -1,85 +1,138 @@
 'use client';
 
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useSidebar } from "@/contexts/SidebarContext";
 
 const sampleServices = [
-  { id: 1, name: "Research Data", icon: <i className="bi bi-pie-chart text-blue-900" />, href: "/Research/Data" },
-  { id: 2, name: "Research Reports", icon: <i className="bi bi-newspaper text-blue-900" />, href: "/Research/Reports" },
-  { id: 3, name: "Data Correlation", icon: <i className="bi bi-reception-3 text-blue-900" />, href: "/Research/Correlations" },
-  { id: 4, name: "AI Insights", icon: <i className="bi bi-robot text-blue-900" />, href: "/Research/AI-Insights" },
-  { id: 5, name: "Support", icon: "🛠️", href: "/services/support" },
+  { id: 1, name: "Research Data", icon: "bi-pie-chart", href: "/Research/Data" },
+  { id: 2, name: "Research Reports", icon: "bi-newspaper", href: "/Research/Reports" },
+  { id: 3, name: "Data Correlation", icon: "bi-reception-3", href: "/Research/Correlations" },
+  { id: 4, name: "AI Insights", icon: "bi-robot", href: "/Research/AI-Insights" },
+  { id: 5, name: "Support", icon: "bi-headset", href: "/services/support" },
 ];
 
 export default function CollapsibleSidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { isCollapsed, setIsCollapsed } = useSidebar();
+  const pathname = usePathname();
 
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
-  const toggleMobile = () => setIsMobileOpen(!isMobileOpen);
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* SIDEBAR (Desktop ONLY) */}
-      <aside
-        className={`hidden md:block bg-white shadow-lg transition-all duration-300 ease-in-out 
-        fixed inset-y-0 left-0 z-40 transform w-64 md:relative 
-        ${isCollapsed ? "md:w-16" : "md:w-64"}
-        `}
-      >
-        {/* LOGO */}
-        <div
-          className={`flex items-center justify-center p-4 border-b transition-all
-            ${isCollapsed ? "px-2" : "px-4"}`}
-        >
-          <Link href="/">
-            <Image
-              src="/favicon.ico"
-              alt="MarketInsight"
-              width={isCollapsed ? 32 : 40}
-              height={isCollapsed ? 32 : 40}
-              className="cursor-pointer"
-            />
-          </Link>
-        </div>
+    <aside
+      className={`hidden md:flex flex-col bg-white border-r border-slate-200/80 fixed top-0 left-0 h-screen z-40 transition-all duration-300 ease-in-out ${
+        isCollapsed ? "w-[72px]" : "w-60"
+      }`}
+    >
+      {/* ========== HEADER ========== */}
+      <div className="h-14 border-b border-slate-200/80 flex items-center shrink-0 px-3">
+        {isCollapsed ? (
+          <div className="w-full flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-[#1e3a5f] flex items-center justify-center">
+              <Image
+                src="/favicon.ico"
+                alt="MarketInsight"
+                width={18}
+                height={18}
+                className="object-contain"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between w-full">
+            <Link href="/" className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-[#1e3a5f] flex items-center justify-center shrink-0">
+                <Image
+                  src="/favicon.ico"
+                  alt="MarketInsight"
+                  width={18}
+                  height={18}
+                  className="object-contain"
+                />
+              </div>
+              <span className="font-bold text-[15px] tracking-tight text-slate-900 whitespace-nowrap">
+                MarketReports
+              </span>
+            </Link>
 
-        {/* Desktop Collapse Button */}
-        <div className="hidden md:flex items-center justify-between p-4 border-b">
-          {!isCollapsed && <h2 className="text-xl font-bold text-gray-800">Services</h2>}
-          <button
+            <button
+              onClick={toggleCollapse}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+              title="Collapse sidebar"
+            >
+              <i className="bi bi-list text-base" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ========== NAVIGATION ========== */}
+      <nav className="flex-1 overflow-y-auto py-3 px-2 relative">
+        {/* Invisible click overlay when collapsed - clicking anywhere expands */}
+        {isCollapsed && (
+          <div
             onClick={toggleCollapse}
-            className="p-2 rounded-lg hover:bg-gray-100"
-          >
-            {isCollapsed ? <i className="bi bi-list" /> : <i className="bi bi-x" />}
-          </button>
-        </div>
+            className="absolute inset-0 z-10 cursor-pointer"
+            title="Click to expand sidebar"
+          />
+        )}
 
-        {/* Menu List */}
-        <nav className="p-2 overflow-y-auto h-[calc(100vh-120px)]">
-          <ul className="space-y-2">
-            {sampleServices.map((service) => (
+        {!isCollapsed && (
+          <p className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+            Services
+          </p>
+        )}
+
+        <ul className="space-y-1">
+          {sampleServices.map((service) => {
+            const isActive =
+              pathname === service.href || pathname?.startsWith(service.href + "/");
+
+            return (
               <li key={service.id}>
-                <a
+                <Link
                   href={service.href}
-                  className={`flex items-center p-3 rounded-lg hover:bg-blue-50 transition group
-                    ${isCollapsed ? "justify-center" : "justify-start"}`}
+                  onClick={(e) => {
+                    // Prevent navigation when collapsed (just expand instead)
+                    if (isCollapsed) {
+                      e.preventDefault();
+                      toggleCollapse();
+                    }
+                  }}
+                  className={`
+                    flex items-center rounded-xl text-[13px] font-medium transition-all duration-150
+                    ${isCollapsed 
+                      ? "justify-center w-11 h-11 mx-auto" 
+                      : "gap-3 px-3 py-2.5"
+                    }
+                    ${
+                      isActive
+                        ? "bg-[#1e3a5f] text-white shadow-sm"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                    }
+                  `}
+                  title={isCollapsed ? service.name : undefined}
                 >
-                  <span className="text-2xl mr-3">{service.icon}</span>
-
-                  {!isCollapsed && (
-                    <span className="text-gray-700 font-medium whitespace-nowrap">
-                      {service.name}
-                    </span>
-                  )}
-                </a>
+                  <i
+                    className={`bi ${service.icon} text-[16px] shrink-0 ${
+                      isActive ? "text-white" : "text-slate-500"
+                    }`}
+                  />
+                  {!isCollapsed && <span className="truncate">{service.name}</span>}
+                </Link>
               </li>
-            ))}
-          </ul>
-        </nav>
-      </aside>
+            );
+          })}
+        </ul>
+      </nav>
 
-
-    </div>
+      {/* ========== FOOTER ========== */}
+      {!isCollapsed && (
+        <div className="p-3 border-t border-slate-200/80 text-center">
+          <span className="text-[11px] text-slate-400">© 2026 MarketInsight</span>
+        </div>
+      )}
+    </aside>
   );
 }

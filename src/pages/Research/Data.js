@@ -1,65 +1,161 @@
-import React, { useState, useEffect, useRef } from 'react';
-import NavBar from "../../components/Functionalities/NavBar";
-import Footer from "../../components/Website/Footer";
-import ReportResultsComp from "../../components/Functionalities/ReportResultsComp";
-import SearchFilters from '../../components/Functionalities/SearchFilters';
-import SearchFilters_v1 from '../../components/Functionalities/Research/SearchFilters_v1';
-import FilterTags from '../../components/UtilityComponents/FilterTags';
-import ToggleLeftPanel from '../../components/UtilityComponents/ToggleLeftPanel';
-import { checkAuthentication } from '../api/UtilFunctions';
-import SearchBar from '../../components/Functionalities/SearchBar';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import styles from '../../styles/Pages/reports.module.css';
-import DashboardLayout from "@/components/Layout/DashboardLayout";
-import { isSessionTokenValid } from "../../pages/api/UtilFunctions"
-import { useRouter } from "next/navigation";
+'use client';
 
+import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import ReportResultsComp from '../../components/Functionalities/ReportResultsComp';
+import SearchFilters_v1 from '../../components/Functionalities/Research/SearchFilters_v1';
+import DashboardLayout from '@/components/Layout/DashboardLayout';
+import { isSessionTokenValid } from '../../pages/api/UtilFunctions';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export default function Data() {
   const router = useRouter();
-  const hasMounted = useRef(false);
   const [loading, setLoading] = useState(true);
   const [appliedFilters, setAppliedFilters] = useState({});
-  const [isToggled, setIsToggled] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // false in production
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [filterKey, setFilterKey] = useState(0);
+  const [isCleared, setIsCleared] = useState(false);
 
   useEffect(() => {
     const auth = isSessionTokenValid();
     setIsAuthenticated(auth);
 
     if (!auth) {
-      alert("Please login to access product-based services.");
-      router.push("/Login");
+      alert('Please login to access product-based services.');
+      router.push('/Login');
       return;
     }
+    setLoading(false);
+  }, [router]);
+
+  const getAppliedFiltersFromChild = useCallback((filters) => {
+    console.log("Received filters from child:", filters);
+    
+    // Check if filters are empty (cleared)
+    const isEmpty = !filters || 
+      (Object.keys(filters).length === 0) ||
+      (!filters.author && 
+       !filters.year && 
+       !filters.tags && 
+       (!filters.sector_filters || Object.keys(filters.sector_filters).length === 0));
+
+    if (isEmpty) {
+      
+     
+      setAppliedFilters({});
+      setIsCleared(true);
+     
+      setFilterKey(prev => prev + 1);
+      return;
+    }
+
+    setIsCleared(false);
+
+    const cleanFilters = {};
+
+    if (
+      filters?.sector_filters &&
+      Object.keys(filters.sector_filters).length > 0
+    ) {
+      cleanFilters.sector_filters = filters.sector_filters;
+    }
+
+    if (filters?.author) {
+      if (typeof filters.author === "object" && filters.author.value) {
+        cleanFilters.author = {
+          value: filters.author.value,
+          label: filters.author.label || filters.author.value,
+        };
+      } else if (typeof filters.author === "string" && filters.author.trim()) {
+        cleanFilters.author = {
+          value: filters.author,
+          label: filters.author,
+        };
+      }
+    }
+
+    if (
+      filters?.year !== null &&
+      filters?.year !== undefined &&
+      filters?.year !== ""
+    ) {
+      cleanFilters.year =
+        typeof filters.year === "object"
+          ? filters.year.value
+          : filters.year;
+    }
+
+    if (filters?.tags) {
+      if (Array.isArray(filters.tags) && filters.tags.length > 0) {
+        cleanFilters.tags = filters.tags;
+      } else if (
+        typeof filters.tags === "object" &&
+        filters.tags.value
+      ) {
+        cleanFilters.tags = filters.tags;
+      } else if (
+        typeof filters.tags === "string" &&
+        filters.tags.trim()
+      ) {
+        cleanFilters.tags = filters.tags;
+      }
+    }
+
+    console.log("API FILTERS (clean):", cleanFilters);
+    setAppliedFilters(cleanFilters);
+    // Increment key to force re-render when filters change
+    setFilterKey(prev => prev + 1);
   }, []);
 
-  const getAppliedFiltersFromChild = (filters) => {
-    console.log("Received filters from SearchFilters:", filters);
-    setAppliedFilters({ ...filters }); // creates a new object
+  if (loading || !isAuthenticated) {
+    return (
+      <DashboardLayout>
+        <div className="flex w-full h-screen bg-slate-50 overflow-hidden font-sans text-slate-900">
+          <div className="flex-1 flex flex-col items-center justify-center p-6">
+            <div className="w-5 h-5 border-2 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+            <p className="text-xs font-mono mt-3 text-slate-500 tracking-wider">
+              AUTHENTICATING...
+            </p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
   }
-
-  // Function to handle button click
-  const handleToggle = () => {
-    setIsToggled(prevState => !prevState); // Toggle the state
-  };
-
 
   return (
     <DashboardLayout>
-      <div className={styles.resultBodyContainer}>
-        <div className={styles.searchRow}>
-          <div className={styles.searchToggle}></div>
-          <SearchFilters_v1 onDataSend={getAppliedFiltersFromChild} />
+      <div className="flex w-full bg-slate-50 overflow-hidden font-sans text-slate-900">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/50">
+          <div className="max-w-7xl mx-auto space-y-5 sm:space-y-6">
+            
+            {/* Page Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-200/80 pb-4">
+              <div>
+                <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+                  Research Data
+                </h1>
+                <p className="text-xs text-slate-500 mt-1">
+                  Search and filter high-frequency datasets across sectors.
+                </p>
+              </div>
+            </div>
 
-        </div>
-        {/* <div className={styles.filterTags}>
-        <FilterTags applied_filters={appliedFilters} />
-      </div> */}
-        <div className="">
-          <ReportResultsComp researchType="Data" result={appliedFilters} />
-        </div>
+            {/* Search & Filters Section */}
+            <div className="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-5 shadow-2xs">
+              <SearchFilters_v1 onDataSend={getAppliedFiltersFromChild} />
+            </div>
 
+            {/* Results Container */}
+            <div className="bg-white border border-slate-200/80 rounded-xl p-4 sm:p-5 shadow-2xs min-h-[420px]">
+              <ReportResultsComp 
+                key={filterKey}
+                researchType="Data" 
+                result={appliedFilters} 
+              />
+            </div>
+
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );

@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 
 export default function FactsLoader({ isLoading = true }) {
@@ -20,27 +21,25 @@ export default function FactsLoader({ isLoading = true }) {
   useEffect(() => {
     if (!isLoading) return;
 
-    // Pick a random fact on load
     const randomIndex = Math.floor(Math.random() * facts.length);
     setCurrentFact(facts[randomIndex]);
-
-    // Optional: Cleanup (no interval needed)
-    return () => {};
-  }, [isLoading, facts.length]);
+  }, [isLoading]);
 
   if (!isLoading) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
-      <div className="text-center p-8 max-w-md mx-auto">
-        <div className="animate-pulse mb-6 flex justify-center">
-          <div className="w-12 h-12 bg-blue-500 rounded-full"></div>
-        </div>
-        <h2 className="text-lg font-semibold text-gray-700 mb-4">Loading...</h2>
-        <p className="text-gray-600 italic transition-opacity duration-500 ease-in-out opacity-100 text-sm leading-relaxed max-w-prose mx-auto">
-          {currentFact}
-        </p>
-      </div>
+    <div className="min-h-screen bg-[#f8f9fa] flex flex-col items-center justify-center p-6">
+      {/* Same spinner style as CrawlerBoard */}
+      <div className="w-5 h-5 border-2 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+      
+      <p className="text-xs font-mono mt-3 text-slate-500 tracking-wider">
+        LOADING...
+      </p>
+
+      {/* Random fact */}
+      <p className="text-xs text-slate-500 mt-4 max-w-md text-center leading-relaxed italic px-4">
+        {currentFact}
+      </p>
     </div>
   );
 }

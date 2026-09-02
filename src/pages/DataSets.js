@@ -68,7 +68,7 @@ export default function DataSets({ data }) {
 export async function getServerSideProps() {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
 
-    const res = await fetch(`${backendAPI}/get-dataset-objs?count=10&slug=""`, {
+    const res = await fetch(`${backendAPI}/get-dataset-objs?count=10`, {
         cache: 'no-store',
         headers: {
             'content-type': 'application/json'

@@ -175,7 +175,7 @@ export function formatGridHeader(headers, granularity) {
       const year = date.getFullYear().toString().slice(-2);
       const month = date.getMonth(); // 0 = Jan, 11 = Dec
 
-      if (granularity === "Monthly") {
+      if (granularity === "Monthly" || granularity === "Monthly Cumulative" || granularity === "Monthly Snapshot") {
         return `${monthNames[month]} '${year}`;
       }
 
@@ -203,6 +203,8 @@ export function formatGridHeader(headers, granularity) {
         const cyYear =  date.getFullYear();
         return `CY${cyYear.toString().slice(-2)}`;
       }
+
+      return h;
     }
     catch (error) {
       console.warn("Error formatting header:", h, error);

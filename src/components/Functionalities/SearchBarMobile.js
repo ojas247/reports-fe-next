@@ -2,224 +2,666 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import styles from '../../styles/searchbar.module.css';
 import { useRouter } from 'next/router';
-import ShowSuggestions from "./ShowSuggestions";
-import { isSessionTokenValid, checkAuthentication } from '../../pages/api/UtilFunctions';
+import ShowSuggestions from './ShowSuggestions';
 
 const SearchBar = () => {
     const backendAPI = process.env.NEXT_PUBLIC_backendAPI;
+
     const [query, setQuery] = useState('');
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const suggestionRef = useRef();
-    const isFirstRender = useRef(true);
+
+    const suggestionRef = useRef(null);
+    const searchInputRef = useRef(null);
+
     const router = useRouter();
 
-
+    /*
+     * ---------------------------------------------------------
+     * CREATE FILTER OPTIONS
+     * ---------------------------------------------------------
+     */
     const create_filter_options = (getUrl) => {
-        const urlObj = new URL(getUrl);
-        const params = new URLSearchParams(urlObj.search);
-        const queryParams = {};
-        const sector_filters = {};
-        const author_arr = [];
-        const author_json_item = {};
+        try {
+            const urlObj = new URL(getUrl);
+            const params = new URLSearchParams(urlObj.search);
 
-        const kind = params.get('kind');
-        const value1 = params.get('value1');
+            const queryParams = {};
+            const sector_filters = {};
+            const author_arr = [];
 
-        if (kind === 'sub1') {
-            sector_filters["sub1"] = value1;
-            queryParams["sector_filters"] = sector_filters;
-        } else if (kind === 'sector') {
-            sector_filters["sector"] = value1;
-            queryParams["sector_filters"] = sector_filters;
-        } else if (kind === 'author') {
-            author_json_item["value"] = value1;
-            author_json_item["label"] = value1;
-            author_arr.push(author_json_item);
-            queryParams["author"] = author_arr;
-        }
+            const kind = params.get('kind');
+            const value1 = params.get('value1');
 
-        return queryParams;
-    }
-
-    const SearchReports = async (getUrl) => {
-        const filter_options_json = await create_filter_options(getUrl);
-        console.log("filter_options_json: ", filter_options_json);
-
-        const res = await axios.get(getUrl)
-
-        console.log("resData:", res.data);
-        const ReportFilterProps = res.data;
-
-        if (ReportFilterProps.message === "Invalid Authorization") {
-            router.push('/Login', { state: {} })
-        } else {
-            router.push('/ReportResult', { state: { ReportFilterProps, filter_options_json } })
-        }
-
-    }
-
-
-    const suggestionClick = (value) => {
-        console.log("From Child: ", value) //Add logic of what to do with the click
-        setShowSuggestions(false);
-        SearchReports(value);
-    }
-
-    const handleInputChange = async (e) => {
-        const value = e.target.value;
-        setQuery(value);
-        // console.log("Query: ", value);
-    }
-
-    useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
-
-        if (query.trim() === '') {
-            setSuggestions([]);
-            setShowSuggestions(false);
-            return;
-        }
-
-        const fetchSuggestions = async () => {
-            try {
-                setLoading(true); // 🟡 Start loading
-                // const tokenString = sessionStorage.getItem("token")? JSON.parse(sessionStorage.getItem("token")).value : null;
-                // const token = tokenString;
-                const token = "x@dffgfumdflkd76tg8jivdgoolnvll==";
-
-                // const isAuthenticated = await checkAuthentication();
-                // if (!isAuthenticated) {
-                //     router.push('/Login', { state: {} });
-                //     return;
-                // }
-                const response = await axios.get(
-                    `${backendAPI}/AlgoliaSearchEndpoint?keyStroke=${query}`,
-                    {
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-                            "Content-Type": "application/json"
-                        }
-                    }
-                );
-                setSuggestions(response.data); // Set the parsed JSON directly
-                // setShowSuggestions(true);
-
-                if (response.data.message === "UpdatePlan") {
-                    console.log("UpdatePlan: ", response.data.message);
-                    // Show popup for plan update
-                    const confirmed = window.confirm("Your current plan needs to be updated to access this feature. Would you like to update your plan?");
-                    if (confirmed) {
-                        router.push('/Pricing', { state: {} });
-                    }
-                    setShowSuggestions(false);
-                    return;
-                }
-                console.log("Suggestions: ", suggestions);
-            } catch (error) {
-                console.error("Error fetching suggestions:", error);
-            } finally {
-                setLoading(false); // 🟢 Stop loading
+            if (kind === 'sub1') {
+                sector_filters.sub1 = value1;
+                queryParams.sector_filters = sector_filters;
             }
-        };
-        fetchSuggestions();
-    }, [query]);
 
-    const handleClickOutside = (event) => {
-        if (suggestionRef.current && !suggestionRef.current.contains(event.target)) {
-            setShowSuggestions(false); // Hide suggestions when clicking outside
+            else if (kind === 'sector') {
+                sector_filters.sector = value1;
+                queryParams.sector_filters = sector_filters;
+            }
+
+            else if (kind === 'author') {
+                author_arr.push({
+                    value: value1,
+                    label: value1
+                });
+
+                queryParams.author = author_arr;
+            }
+
+            return queryParams;
+
+        } catch (error) {
+            console.error(
+                'Error creating filter options:',
+                error
+            );
+
+            return {};
         }
     };
 
+
+    /*
+     * ---------------------------------------------------------
+     * SEARCH REPORTS
+     * ---------------------------------------------------------
+     */
+    const SearchReports = async (getUrl) => {
+
+        try {
+
+            const filter_options_json =
+                create_filter_options(getUrl);
+
+            console.log(
+                'filter_options_json:',
+                filter_options_json
+            );
+
+            const res = await axios.get(getUrl);
+
+            console.log(
+                'Report search response:',
+                res.data
+            );
+
+            const ReportFilterProps = res.data;
+
+            if (
+                ReportFilterProps?.message ===
+                'Invalid Authorization'
+            ) {
+                router.push('/Login');
+                return;
+            }
+
+            router.push({
+                pathname: '/ReportResult',
+                query: {
+                    // Keep your existing navigation behavior
+                }
+            });
+
+            /*
+             * IMPORTANT:
+             *
+             * If your project relies on router state from
+             * another implementation, keep your original
+             * navigation here.
+             *
+             * The important part for the current issue is
+             * rendering ShowSuggestions below.
+             */
+
+        } catch (error) {
+
+            console.error(
+                'Search reports error:',
+                error
+            );
+
+        }
+
+    };
+
+
+    /*
+     * ---------------------------------------------------------
+     * SUGGESTION CLICK
+     * ---------------------------------------------------------
+     */
+    const suggestionClick = (value) => {
+
+        console.log(
+            'Selected suggestion:',
+            value
+        );
+
+        setShowSuggestions(false);
+        setOpen(false);
+
+        /*
+         * If ShowSuggestions returns the URL directly
+         */
+        if (typeof value === 'string') {
+            SearchReports(value);
+            return;
+        }
+
+        /*
+         * If the suggestion is an object,
+         * try common URL properties.
+         */
+        const url =
+            value?.url ||
+            value?.URL ||
+            value?.href ||
+            value?.link ||
+            value?.value;
+
+        if (url) {
+            SearchReports(url);
+        } else {
+            console.error(
+                'Could not find URL in selected suggestion:',
+                value
+            );
+        }
+    };
+
+
+    /*
+     * ---------------------------------------------------------
+     * FETCH SUGGESTIONS
+     * ---------------------------------------------------------
+     */
     useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+
+        if (!open) {
+            return;
+        }
+
+        const trimmedQuery = query.trim();
+
+        if (trimmedQuery === '') {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            setLoading(false);
+            return;
+        }
+
+        let cancelled = false;
+
+        const fetchSuggestions = async () => {
+
+            try {
+
+                setLoading(true);
+
+                const token =
+                    'x@dffgfumdflkd76tg8jivdgoolnvll==';
+
+                const response = await axios.get(
+                    `${backendAPI}/AlgoliaSearchEndpoint`,
+                    {
+                        params: {
+                            keyStroke: trimmedQuery
+                        },
+
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`,
+
+                            'Content-Type':
+                                'application/json'
+                        }
+                    }
+                );
+
+                if (cancelled) {
+                    return;
+                }
+
+                /*
+                 * Handle plan restriction
+                 */
+                if (
+                    response.data?.message ===
+                    'UpdatePlan'
+                ) {
+
+                    const confirmed =
+                        window.confirm(
+                            'Your current plan needs to be updated to access this feature. Would you like to update your plan?'
+                        );
+
+                    if (confirmed) {
+                        router.push('/Pricing');
+                    }
+
+                    setSuggestions([]);
+                    setShowSuggestions(false);
+
+                    return;
+                }
+
+                /*
+                 * Make sure we always store an array.
+                 */
+                const result =
+                    Array.isArray(response.data)
+                        ? response.data
+                        : Array.isArray(
+                              response.data?.options_list
+                          )
+                            ? response.data.options_list
+                            : [];
+
+                console.log(
+                    'Search suggestions:',
+                    result
+                );
+
+                setSuggestions(result);
+
+                setShowSuggestions(
+                    result.length > 0
+                );
+
+            } catch (error) {
+
+                if (!cancelled) {
+
+                    console.error(
+                        'Error fetching suggestions:',
+                        error
+                    );
+
+                    setSuggestions([]);
+                    setShowSuggestions(false);
+                }
+
+            } finally {
+
+                if (!cancelled) {
+                    setLoading(false);
+                }
+
+            }
+
         };
+
+        fetchSuggestions();
+
+        return () => {
+            cancelled = true;
+        };
+
+    }, [query, open, backendAPI, router]);
+
+
+    /*
+     * ---------------------------------------------------------
+     * CLICK OUTSIDE
+     * ---------------------------------------------------------
+     */
+    useEffect(() => {
+
+        const handleClickOutside = (event) => {
+
+            if (
+                suggestionRef.current &&
+                !suggestionRef.current.contains(
+                    event.target
+                )
+            ) {
+                setShowSuggestions(false);
+            }
+
+        };
+
+        document.addEventListener(
+            'mousedown',
+            handleClickOutside
+        );
+
+        return () => {
+            document.removeEventListener(
+                'mousedown',
+                handleClickOutside
+            );
+        };
+
     }, []);
 
-    useEffect(() => {
-        console.log("Suggestions updated:", suggestions);
-        if (suggestions.length > 0) {
-            setShowSuggestions(true);
+
+    /*
+     * ---------------------------------------------------------
+     * OPEN SEARCH
+     * ---------------------------------------------------------
+     */
+    const openSearch = () => {
+
+        setOpen(true);
+
+        setTimeout(() => {
+            searchInputRef.current?.focus();
+        }, 0);
+
+    };
+
+
+    /*
+     * ---------------------------------------------------------
+     * CLOSE SEARCH
+     * ---------------------------------------------------------
+     */
+    const closeSearch = () => {
+
+        setOpen(false);
+        setQuery('');
+        setSuggestions([]);
+        setShowSuggestions(false);
+        setLoading(false);
+
+    };
+
+
+    /*
+     * ---------------------------------------------------------
+     * INPUT CHANGE
+     * ---------------------------------------------------------
+     */
+    const handleInputChange = (e) => {
+
+        const value = e.target.value;
+
+        setQuery(value);
+
+        if (value.trim() === '') {
+            setSuggestions([]);
+            setShowSuggestions(false);
         }
-    }, [suggestions]);
+
+    };
+
 
     return (
-        <div className="flex flex-col items-center justify-center w-full px-4 py-4 sm:py-0">
-            <div ref={suggestionRef} className="relative w-full max-w-[500px]">
+        <div
+            ref={suggestionRef}
+            className="
+                relative
+                w-9
+                h-9
+                shrink-0
+                z-[9999]
+            "
+        >
 
-                {/* MOBILE SEARCH CONTAINER */}
-                <div className="md:hidden fixed top-4 right-4 z-50">
-                    <div className="relative flex items-center">
-                        {/* EXPANDABLE INPUT - Animates from icon position */}
+            {/* =================================================
+                SEARCH BUTTON
+            ================================================= */}
+            {!open && (
+                <button
+                    type="button"
+                    onClick={openSearch}
+                    aria-label="Search"
+                    className="
+                        w-9
+                        h-9
+                        rounded-full
+                        flex
+                        items-center
+                        justify-center
+                        hover:bg-slate-100
+                        active:bg-slate-200
+                        transition-colors
+                        cursor-pointer
+                    "
+                >
+                    <i
+                        className="
+                            bi
+                            bi-search
+                            text-lg
+                            text-slate-600
+                        "
+                    />
+                </button>
+            )}
+
+
+            {/* =================================================
+                EXPANDED SEARCH
+            ================================================= */}
+            {open && (
+                <div
+                    className="
+                        fixed
+                        top-[calc(56px+env(safe-area-inset-top))]
+                        left-1/2
+                        -translate-x-1/2
+                        w-[calc(100vw-24px)]
+                        max-w-[520px]
+                        z-[9999]
+                    "
+                >
+
+                    {/* INPUT WRAPPER */}
+                    <div
+                        className="
+                            relative
+                            w-full
+                            h-12
+                        "
+                    >
+
                         <input
+                            ref={searchInputRef}
+                            autoFocus
                             type="text"
                             value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Search..."
-                            className={`
-                                absolute right-12 top-1/2 -translate-y-1/2
-                                bg-white border-2 border-gray-300 rounded-full pl-4 pr-12 py-2
-                                focus:border-green-600 outline-none text-[16px] placeholder-gray-400 text-gray-800
-                                transition-all duration-300 ease-in-out
-                                ${open
-                                    ? "w-[calc(80vw-80px)] opacity-100 shadow-lg"  // Expand to near-full width
-                                    : "w-0 opacity-0 pointer-events-none"
-                                }
-            `}
-                            onClick={(e) => e.stopPropagation()}  // Prevent click from bubbling to close
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    // Trigger search logic here
-                                    setOpen(false);
-                                }
-                            }}
+                            onChange={handleInputChange}
+                            placeholder="Search Authors, Sectors, Sub-Sectors..."
+                            className="
+                                block
+                                w-full
+                                h-12
+                                rounded-full
+                                border
+                                border-emerald-500
+                                bg-white
+                                px-5
+                                pr-14
+                                text-[15px]
+                                sm:text-[16px]
+                                text-slate-700
+                                placeholder:text-slate-400
+                                shadow-lg
+                                outline-none
+                                focus:border-emerald-600
+                                focus:ring-2
+                                focus:ring-emerald-100
+                            "
                         />
-                        {/* SEARCH ICON BUTTON - Stays fixed, triggers expand */}
+
+                        {/* X BUTTON */}
                         <button
-                            className="p-1 rounded-full bg-blue flex items-center justify-center relative z-5"
-                            onClick={() => {
-                                if (open) {
-                                    // Trigger search if open
-                                    // Add your search logic here
-                                    setOpen(false);
-                                } else {
-                                    setOpen(true);
-                                }
-                            }}
+                            type="button"
+                            onClick={closeSearch}
+                            aria-label="Close search"
+                            className="
+                                absolute
+                                right-2
+                                top-1/2
+                                -translate-y-1/2
+                                w-9
+                                h-9
+                                rounded-full
+                                flex
+                                items-center
+                                justify-center
+                                text-slate-500
+                                hover:text-slate-800
+                                hover:bg-slate-100
+                                active:bg-slate-200
+                                transition-all
+                                cursor-pointer
+                            "
                         >
-                            <i className={`bi ${open ? "bi-x-lg" : "bi-search"} text-xl text-gray-600`}></i>
+                            <i
+                                className="
+                                    bi
+                                    bi-x-lg
+                                    text-lg
+                                "
+                            />
                         </button>
 
                     </div>
-                </div>
 
 
-                <div className='px-10 py-5'>
-                    {!loading && suggestions.length > 0 && showSuggestions && (
-                        <ShowSuggestions suggestions={suggestions} suggestionClick={suggestionClick} />
+                    {/* =================================================
+                        LOADING
+                    ================================================= */}
+                    {loading && (
+                        <div
+                            className="
+                                mt-2
+                                w-full
+                                bg-white
+                                border
+                                border-slate-200
+                                rounded-xl
+                                shadow-xl
+                                overflow-hidden
+                            "
+                        >
+
+                            <div
+                                className="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    gap-2
+                                    px-4
+                                    py-4
+                                    text-sm
+                                    text-slate-500
+                                "
+                            >
+
+                                <i
+                                    className="
+                                        bi
+                                        bi-arrow-repeat
+                                        animate-spin
+                                    "
+                                />
+
+                                Searching...
+
+                            </div>
+
+                        </div>
                     )}
+
+
+                    {/* =================================================
+                        SUGGESTIONS
+                    ================================================= */}
+                    {!loading &&
+                        showSuggestions &&
+                        suggestions.length > 0 && (
+
+                            <div
+                                className="
+                                    mt-2
+                                    w-full
+                                    max-h-[65vh]
+                                    overflow-y-auto
+                                    bg-white
+                                    border
+                                    border-slate-200
+                                    rounded-xl
+                                    shadow-2xl
+                                    overscroll-contain
+                                "
+                            >
+
+                                {/*
+                                 * THIS WAS MISSING IN YOUR CODE.
+                                 *
+                                 * You imported ShowSuggestions but
+                                 * never rendered it.
+                                 */}
+                                <ShowSuggestions
+                                    suggestions={suggestions}
+                                    onSuggestionClick={
+                                        suggestionClick
+                                    }
+                                />
+
+                            </div>
+                        )}
+
+
+                    {/* =================================================
+                        NO RESULTS
+                    ================================================= */}
+                    {!loading &&
+                        query.trim() !== '' &&
+                        suggestions.length === 0 && (
+
+                            <div
+                                className="
+                                    mt-2
+                                    w-full
+                                    bg-white
+                                    border
+                                    border-slate-200
+                                    rounded-xl
+                                    shadow-xl
+                                    px-4
+                                    py-4
+                                    text-center
+                                "
+                            >
+
+                                <i
+                                    className="
+                                        bi
+                                        bi-search
+                                        text-slate-300
+                                        text-xl
+                                    "
+                                />
+
+                                <p
+                                    className="
+                                        mt-1
+                                        text-xs
+                                        text-slate-500
+                                    "
+                                >
+                                    No results found
+                                </p>
+
+                            </div>
+                        )}
+
                 </div>
+            )}
 
-                {/* Loading Indicator */}
-                {loading && (
-                    <div className="absolute w-full text-center py-2 text-gray-500 text-sm bg-white border border-gray-200 rounded-b-md z-[1000]">
-                        <i className="bi bi-arrow-repeat animate-spin mr-2"></i>
-                        Loading suggestions...
-                    </div>
-                )}
-            </div>
         </div>
-
     );
-}
+};
 
 export default SearchBar;

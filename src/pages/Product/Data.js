@@ -1,74 +1,38 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import NavBar from "../../components/Functionalities/NavBar";
 import Footer from "../../components/Website/Footer";
 import ReportResultsComp from "../../components/Functionalities/ReportResultsComp";
-import SearchFilters from '../../components/Functionalities/SearchFilters';
 import SearchFilters_v1 from '../../components/Functionalities/Research/SearchFilters_v1';
-import FilterTags from '../../components/UtilityComponents/FilterTags';
-import ToggleLeftPanel from '../../components/UtilityComponents/ToggleLeftPanel';
-import { checkAuthentication } from '../api/UtilFunctions';
-import { useRouter } from 'next/router';
-import SearchBar from '../../components/Functionalities/SearchBar';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import styles from '../../styles/Pages/reports.module.css';
 
 export default function Data() {
-  const hasMounted = useRef(false);
-  const [loading, setLoading] = useState(true);
   const [appliedFilters, setAppliedFilters] = useState({});
-  const [isToggled, setIsToggled] = useState(true);
 
   const getAppliedFiltersFromChild = (filters) => {
-    console.log("Received filters from SearchFilters:", filters);
-    setAppliedFilters({ ...filters }); // creates a new object
-  }
-
-  // Function to handle button click
-  const handleToggle = () => {
-    setIsToggled(prevState => !prevState); // Toggle the state
+    setAppliedFilters({ ...filters });
   };
 
-
   return (
-    <div className={styles.resultBodyContainer}>
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <NavBar />
-      <div className={styles.searchRow}>
-        <div className={styles.searchToggle}></div>
+      <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
 
-        <button
-          onClick={handleToggle}
-          className={`${styles.toggleButton} ${isToggled ? styles.filter : styles.search}`}
-        >
-          <div className={styles.toggleImg}>
-            {isToggled ? (
-              <i className="bi bi-search"></i>
-            ) : (
-              <i className="bi bi-funnel"></i>
-            )}
-          </div>
-        </button>
-        {isToggled && appliedFilters !== null && (
-          // <SearchFilters onDataSend={getAppliedFiltersFromChild} />
-          <SearchFilters_v1 onDataSend={getAppliedFiltersFromChild} />
-        )}
-        {!isToggled &&
-          <div className={styles.searchContainerRpts}>
-            <div className={styles.searchWrapperRpts}>
-              <SearchBar />
+        <section className="bg-white border border-slate-200/80 rounded-3xl shadow-sm p-5 sm:p-6">
+          <div className="mb-6 sm:flex sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold text-slate-900">Research Data</h1>
+              <p className="mt-2 text-sm text-slate-500 max-w-2xl">
+                Filter and explore high-frequency research datasets with a responsive and professional layout.
+              </p>
             </div>
           </div>
-        }
+          <SearchFilters_v1 onDataSend={getAppliedFiltersFromChild} />
+        </section>
 
-      </div>
-      {/* <div className={styles.filterTags}>
-        <FilterTags applied_filters={appliedFilters} />
-      </div> */}
-      <div className={styles.resultContainer}>
-        <div className={styles.toggleLeftPanel}>
-          <ToggleLeftPanel />
-        </div>       
+        <section className="bg-white border border-slate-200/80 rounded-3xl shadow-sm p-5 sm:p-6">
           <ReportResultsComp researchType="Data" result={appliedFilters} />
-      </div>
+        </section>
+
+      </main>
       <Footer />
     </div>
   );

@@ -117,30 +117,30 @@ const options = {
       {/* Toolbar */}
       <div className="flex flex-wrap sm:flex-nowrap justify-end gap-2 mb-3">
         <button
-          className={`px-3 py-1 text-sm border border-gray-300 rounded-md transition ${
+          className={`px-3 py-1 text-sm border rounded-md transition ${
             chartType === "line"
-              ? "bg-blue-500 text-white hover:bg-blue-600"
-              : "bg-gray-100 hover:bg-gray-200"
+              ? "bg-slate-900 text-white border-slate-900 hover:bg-slate-800"
+              : "bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-200"
           }`}
           onClick={() => setChartType("line")}
         >
          <i className={`bi bi-graph-up mr-1`}></i> Line
         </button>
         <button
-          className={`px-3 py-1 text-sm border border-gray-300 rounded-md transition ${
+          className={`px-3 py-1 text-sm border rounded-md transition ${
             chartType === "column"
-              ? "bg-blue-500 text-white hover:bg-blue-600"
-              : "bg-gray-100 hover:bg-gray-200"
+              ? "bg-slate-900 text-white border-slate-900 hover:bg-slate-800"
+              : "bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-200"
           }`}
           onClick={() => setChartType("column")}
         >
           <i className={`bi bi-columns-gap mr-1`}></i> Bar
         </button>
         <button
-          className={`px-3 py-1 text-sm border border-gray-300 rounded-md transition ${
+          className={`px-3 py-1 text-sm border rounded-md transition ${
             isStacked
-              ? "bg-blue-500 text-white hover:bg-blue-600"
-              : "bg-gray-100 hover:bg-gray-200"
+              ? "bg-slate-900 text-white border-slate-900 hover:bg-slate-800"
+              : "bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-200"
           }`}
           onClick={() => setIsStacked((prev) => !prev)}
         >
