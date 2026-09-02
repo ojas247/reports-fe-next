@@ -32,6 +32,10 @@ export default function IndexPage() {
   const [correlationTable, setCorrelationTable] = useState([]);
   const [tableLoading, setTableLoading] = useState(true);
 
+  const [feedData, setFeedData] = useState([]);
+  const [feedLoading, setFeedLoading] = useState(true);
+  const [expandedFeed, setExpandedFeed] = useState([]);
+
   const carouselSlides = [
     {
       url: "https://storage.googleapis.com/marketreports/Brand/Logo/Logo.ico",
@@ -53,141 +57,140 @@ export default function IndexPage() {
     }
   ];
 
- useEffect(() => {
-  const getTickertapeData = async () => {
-    setTickertapeLoading(true);
+  useEffect(() => {
+    const getTickertapeData = async () => {
+      setTickertapeLoading(true);
 
-    try {
-      const response = await fetchDataFromGetApi("tickertape");
+      try {
+        const response = await fetchDataFromGetApi("tickertape");
 
-      const data = Array.isArray(response)
-        ? response
-        : Array.isArray(response?.data)
-          ? response.data
-          : [];
+        const data = Array.isArray(response)
+          ? response
+          : Array.isArray(response?.data)
+            ? response.data
+            : [];
 
-      const formattedData = data.map((item, index) => {
-        const change = Number(
-          item.perChange ??
-          item.percentChange ??
-          item.changePercent ??
-          item.percentageChange ??
-          0
-        );
+        const formattedData = data.map((item, index) => {
+          const change = Number(
+            item.perChange ??
+            item.percentChange ??
+            item.changePercent ??
+            item.percentageChange ??
+            0
+          );
 
-        const value =
-          item.value ??
-          item.price ??
-          item.currentValue ??
-          item.lastPrice ??
-          item.currentPrice ??
-          item.val ??
-          null;
+          const value =
+            item.value ??
+            item.price ??
+            item.currentValue ??
+            item.lastPrice ??
+            item.currentPrice ??
+            item.val ??
+            null;
 
-        return {
-          id: item.id ?? index + 1,
-          name:
-            item.displayName ??
-            item.item ??
-            item.name ??
-            "Market Indicator",
-          val:
-            value !== null && value !== undefined
-              ? String(value)
-              : null,
-          chg: `${change >= 0 ? "▲" : "▼"} ${Math.abs(change)}%`,
-          type: change >= 0 ? "up" : "down",
-          raw: item
-        };
-      });
+          return {
+            id: item.id ?? index + 1,
+            name:
+              item.displayName ??
+              item.item ??
+              item.name ??
+              "Market Indicator",
+            val:
+              value !== null && value !== undefined
+                ? String(value)
+                : null,
+            chg: `${change >= 0 ? "▲" : "▼"} ${Math.abs(change)}%`,
+            type: change >= 0 ? "up" : "down",
+            raw: item
+          };
+        });
 
-      setTickertapeData(formattedData);
-      console.log("Tickertape data:", formattedData);
-    } catch (error) {
-      console.error("Error fetching Tickertape data:", error);
-      setTickertapeData([]);
-    } finally {
-      setTickertapeLoading(false);
-    }
-  };
+        setTickertapeData(formattedData);
+      } catch (error) {
+        console.error("Error fetching Tickertape data:", error);
+        setTickertapeData([]);
+      } finally {
+        setTickertapeLoading(false);
+      }
+    };
 
-  getTickertapeData();
+    getTickertapeData();
 
-  // REMOVED: fetchDataFromGetApi("_ah/warmup");
-  // This call was causing CORS errors
+    const getFeedData = async () => {
+      setFeedLoading(true);
+      try {
+        const response = await fetchDataFromGetApi("latestFeed");
+        const data = Array.isArray(response)
+          ? response
+          : Array.isArray(response?.data)
+            ? response.data
+            : [];
 
-  // const getCorrelationMatrixData = async () => {
-  //   setTableLoading(true);
+        setFeedData(data);
+        setExpandedFeed(new Array(data.length).fill(false));
+      } catch (error) {
+        console.error("Error fetching latest feed:", error);
+        setFeedData([]);
+      } finally {
+        setFeedLoading(false);
+      }
+    };
 
-  //   try {
-  //     const payload = {
-  //       limit: 10,
-  //       category: "macro_indicators"
-  //     };
+    getFeedData();
 
-  //     const response = await fetchDataFromPostApi(
-  //       payload,
-  //       "getTSdata"
-  //     );
+    setCorrelationTable([
+      {
+        id: 1,
+        metric: "Rail Freight Volumes",
+        targetSector: "Logistics & Supply Chain",
+        correlation: "0.94",
+        status: "Strong Positive",
+        trend: "Up"
+      },
+      {
+        id: 2,
+        metric: "Cement Dispatches",
+        targetSector: "Real Estate & Infrastructure",
+        correlation: "0.89",
+        status: "Strong Positive",
+        trend: "Up"
+      },
+      {
+        id: 3,
+        metric: "Air Passenger Traffic",
+        targetSector: "Aviation & Tourism",
+        correlation: "0.88",
+        status: "Strong Positive",
+        trend: "Up"
+      },
+      {
+        id: 4,
+        metric: "GST E-way Bills",
+        targetSector: "Broad Market (NIFTY50)",
+        correlation: "0.69",
+        status: "Moderate Positive",
+        trend: "Stable"
+      },
+      {
+        id: 5,
+        metric: "Diesel Consumption",
+        targetSector: "Logistics & OMCs",
+        correlation: "0.76",
+        status: "Moderate Positive",
+        trend: "Up"
+      },
+      {
+        id: 6,
+        metric: "Power Demand (Peak)",
+        targetSector: "Power & Utilities",
+        correlation: "0.82",
+        status: "Strong Positive",
+        trend: "Up"
+      }
+    ]);
+    setTableLoading(false);
 
-  //     if (Array.isArray(response) && response.length > 0) {
-  //       const formattedData = response.map((item, idx) => ({
-  //         id: item.id || idx + 1,
-  //         metric:
-  //           item.metric ||
-  //           item.item ||
-  //           item.indicatorName ||
-  //           "Macro Indicator",
-  //         targetSector:
-  //           item.targetSector ||
-  //           item.sector ||
-  //           item.sub1 ||
-  //           "General Economy",
-  //         correlation:
-  //           item.correlation ||
-  //           item.value ||
-  //           (0.75 + (idx % 3) * 0.08).toFixed(2),
-  //         status:
-  //           item.status ||
-  //           (parseFloat(item.correlation || 0.8) > 0.5
-  //             ? "Strong Positive"
-  //             : "Moderate"),
-  //         trend:
-  //           item.trend ||
-  //           (idx % 2 === 0 ? "Up" : "Down")
-  //       }));
-
-  //       setCorrelationTable(formattedData);
-  //     } else {
-  //       // Fallback data
-  //       setCorrelationTable([
-  //         {
-  //           id: 1,
-  //           metric: "Rail Freight Volumes",
-  //           targetSector: "Logistics & Supply Chain",
-  //           correlation: "0.94",
-  //           status: "Strong Positive",
-  //           trend: "Up"
-  //         },
-  //         // ... rest of fallback data
-  //       ]);
-  //     }
-  //   } catch (error) {
-  //     console.error(
-  //       "Error fetching correlation table dynamic data:",
-  //       error
-  //     );
-  //     // Set fallback data on error
-  //     setCorrelationTable([
-  //       // ... fallback data
-  //     ]);
-  //   } finally {
-  //     setTableLoading(false);
-  //   }
-  // };
-
-  // getCorrelationMatrixData();
-}, []);
+  }, []);
 
   const nextSlide = () => {
     setCurrentSlide(
@@ -210,6 +213,17 @@ export default function IndexPage() {
       return nextState;
     });
   };
+
+  const toggleFeedExpand = (index) => {
+    setExpandedFeed((prev) => {
+      const newState = [...prev];
+      newState[index] = !newState[index];
+      return newState;
+    });
+  };
+
+  // Show only the first 4 items
+  const visibleFeed = feedData.slice(0, 4);
 
   const websiteSchema = {
     "@context": "http://schema.org",
@@ -574,6 +588,117 @@ export default function IndexPage() {
             </div>
 
             <MarketUpdate />
+          </div>
+        </section>
+
+        {/* Today's data releases section */}
+        <section className="py-12 sm:py-16 max-w-[1240px] mx-auto px-4 sm:px-8">
+          <div className="flex flex-wrap items-center justify-between mb-6 gap-2">
+            <div>
+              <span className="font-mono text-xs tracking-widest uppercase text-[#C7912F] font-semibold">
+                Live feed
+              </span>
+              <h2 className="text-xl sm:text-3xl font-bold text-[#152238]">
+                Today's data releases
+              </h2>
+            </div>
+            <Link href="/all-releases" className="text-[#C7912F] font-semibold hover:underline text-sm whitespace-nowrap">
+              See all releases →
+            </Link>
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-6 items-start">
+            {/* Left column: feed list (only 4 items) */}
+            <div className="md:w-2/3 w-full">
+              <div className="border border-[#DDE3DE] rounded-2xl overflow-hidden">
+                {feedLoading ? (
+                  <div className="p-8 text-center text-[#4A5568]">Loading feed...</div>
+                ) : feedData.length === 0 ? (
+                  <div className="p-8 text-center text-[#4A5568]">No releases available.</div>
+                ) : (
+                  visibleFeed.map((item, idx) => {
+                    const isExpanded = expandedFeed[idx] || false;
+                    const desc = item.dataDesc || '';
+                    const shouldTruncate = desc.length > 120;
+                    const displayDesc = shouldTruncate && !isExpanded
+                      ? desc.slice(0, 120) + '…'
+                      : desc;
+
+                    const initials = item.dataName
+                      ? item.dataName.split(' ').map(w => w[0]).join('').slice(0, 3).toUpperCase()
+                      : 'N/A';
+
+                    return (
+                      <a
+                        key={idx}
+                        href={item.url || '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block border-b border-[#DDE3DE] last:border-0 p-4 hover:bg-[#F2F5F2] transition-colors"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-12 h-12 rounded-lg bg-[#F2F5F2] flex items-center justify-center font-mono text-xs font-bold text-[#152238] shrink-0 border border-[#DDE3DE]">
+                            {initials}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h5 className="font-semibold text-[#152238] text-sm sm:text-base">
+                              {item.dataName || 'Untitled'}
+                            </h5>
+                            <p className="text-sm text-[#4A5568] leading-relaxed mt-1">
+                              {displayDesc}
+                              {shouldTruncate && (
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    toggleFeedExpand(idx);
+                                  }}
+                                  className="ml-1 text-[#C7912F] font-medium hover:underline focus:outline-none"
+                                >
+                                  {isExpanded ? 'Show less' : 'Show more'}
+                                </button>
+                              )}
+                            </p>
+                            <div className="text-xs font-mono text-[#96A0B2] mt-1 flex items-center gap-2">
+                              <span>{item.sub1 || 'General'}</span>
+                              <span>·</span>
+                              <span>{item.age || 'Just now'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
+            {/* Right column: Correlation spotlight with fixed height */}
+            <div className="md:w-1/3 w-full md:self-start">
+              <div className="bg-[#152238] rounded-2xl p-6 text-white flex flex-col h-[340px] overflow-y-auto">
+                <h4 className="text-lg font-bold text-white">Correlation spotlight</h4>
+                <p className="text-sm text-[#B7C1D6] mt-1 mb-4">
+                  How today's leading indicators have historically tracked equity sectors, 24 months out.
+                </p>
+                <div className="space-y-3 flex-1">
+                  {[
+                    { label: 'Cement Dispatch → Infra stocks', score: '0.81' },
+                    { label: 'Diesel Consumption → Logistics', score: '0.76' },
+                    { label: 'Air Pax Traffic → Aviation', score: '0.88' },
+                    { label: 'E-way Bills → Broad market', score: '0.69' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex justify-between items-center border-b border-white/10 pb-2 text-sm">
+                      <span>{item.label}</span>
+                      <span className="font-mono font-bold text-[#C7912F]">{item.score}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link href="/correlations">
+                  <span className="mt-4 block w-full text-center bg-[#C7912F] text-[#231602] font-semibold py-2.5 rounded-full hover:shadow-lg transition-transform hover:-translate-y-0.5 cursor-pointer">
+                    Explore correlations →
+                  </span>
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
 

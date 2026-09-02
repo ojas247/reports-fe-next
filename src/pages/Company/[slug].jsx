@@ -15,7 +15,12 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
-
+import {
+  TrendingUp,
+  Boxes,
+  PackageOpen,
+  Activity,
+} from 'lucide-react';
 import NavBar from '../../components/Functionalities/NavBar';
 import Footer from '../../components/Website/Footer';
 
@@ -757,92 +762,177 @@ export default function CompanyDashboard() {
 
     loadData();
   }, [slug]);
+const stageConfig = {
+  leadingIndicator: {
+    label: 'Leading Signals',
+    icon: TrendingUp,
+    iconBg: 'bg-blue-50',
+    iconColor: 'text-blue-600',
+  },
+  rawMaterial: {
+    label: 'Input Resources',
+    icon: Boxes,
+    iconBg: 'bg-amber-50',
+    iconColor: 'text-amber-600',
+  },
+  outputProduct: {
+    label: 'Output Resources',
+    icon: PackageOpen,
+    iconBg: 'bg-emerald-50',
+    iconColor: 'text-emerald-600',
+  },
+  laggingIndicator: {
+    label: 'Lagging Signals',
+    icon: Activity,
+    iconBg: 'bg-purple-50',
+    iconColor: 'text-purple-600',
+  },
+};
+ const renderStage = (type) => {
+  const groups = indicatorGroups.filter(
+    (g) => g.indicatorType === type
+  );
 
-  const renderStage = (type, label) => {
-    const groups = indicatorGroups.filter((g) => g.indicatorType === type);
-    const style = categoryStyles[type];
-    const stepIndex = ['leadingIndicator', 'rawMaterial', 'outputProduct', 'laggingIndicator'].indexOf(type);
+  const style = categoryStyles[type];
+  const config = stageConfig[type];
 
-    if (groups.length === 0) {
-      return (
-        <div className="bg-white border border-[#DDE3DE] rounded-xl p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-3 border-b border-[#DDE3DE] pb-2">
-            <span className="text-[10px] font-black uppercase tracking-widest bg-[#F2F5F2] text-slate-600 px-2 py-0.5 rounded">
-              Stage {stepIndex + 1}
-            </span>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">{label}</h3>
-          </div>
-          <p className="text-xs text-slate-400">No indicators available.</p>
-        </div>
-      );
-    }
+  if (!config) return null;
 
+  const Icon = config.icon;
+
+  if (groups.length === 0) {
     return (
-      <div className="bg-white border border-[#DDE3DE] rounded-xl p-4 shadow-sm hover:shadow-md transition relative">
-        <div className="flex items-center justify-between mb-3 border-b border-[#DDE3DE] pb-2">
-          <span className="text-[10px] font-black uppercase tracking-widest bg-[#F2F5F2] text-slate-600 px-2 py-0.5 rounded">
-            Stage {stepIndex + 1}
-          </span>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">{label}</h3>
+      <div className="bg-white border border-[#DDE3DE] rounded-xl p-4 shadow-sm">
+        {/* Prominent Stage Header */}
+        <div className="flex items-center gap-3 mb-4 pb-3 border-b border-[#DDE3DE]">
+          <div
+            className={`w-9 h-9 rounded-lg ${config.iconBg} flex items-center justify-center shrink-0`}
+          >
+            <Icon
+              size={18}
+              strokeWidth={2}
+              className={config.iconColor}
+            />
+          </div>
+
+          <div>
+            <h3 className="text-sm font-bold tracking-tight text-[#152238]">
+              {config.label}
+            </h3>
+            <p className="text-[9px] uppercase tracking-widest text-slate-400 font-semibold mt-0.5">
+              Macro Flow Stage
+            </p>
+          </div>
         </div>
 
-        {groups.map((group, groupIndex) => (
-          <div
-            key={`${type}-${group.sector || 'sector'}-${group.subSector || 'subsector'}-${groupIndex}`}
-            className="mb-3 last:mb-0"
-          >
-            <div className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1.5 truncate">
-              {group.sector} <span className="text-slate-300"> › </span> {group.subSector}
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {(group.indicators || []).map((ind, indIndex) => {
-                const isActive =
-                  activeIndicator?.dataItem === ind.dataItem &&
-                  activeIndicator?.dataName === ind.dataName &&
-                  activeIndicator?.dataSet === ind.dataSet;
-                const uniqueKey = `${type}-${group.sector || 'sector'}-${group.subSector || 'subsector'}-${ind.dataItem || 'indicator'}-${ind.dataSet || 'dataset'}-${indIndex}`;
-                return (
-                  <button
-                    key={uniqueKey}
-                    onClick={() => handleIndicatorSelect(ind, group)}
-                    className={`w-full text-left border rounded-xl px-3 py-2 transition-all duration-200 text-sm ${
-                      isActive
-                        ? `${style.activeBg} font-medium shadow-sm`
-                        : `${style.inactiveBg} hover:border-slate-300`
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-1">
-                      <p
-                        className={`text-xs font-semibold leading-tight truncate ${
-                          isActive ? style.activeText : 'text-slate-800'
-                        }`}
-                      >
-                        {ind.dataItem}
-                      </p>
-                      {isActive && <span className="text-[10px] text-[#B7C1D6]">✓</span>}
-                    </div>
-                    <p
-                      className={`text-[10px] leading-tight truncate mt-1 ${
-                        isActive ? style.activeSub : 'text-slate-500'
-                      }`}
-                    >
-                      {ind.dataSet}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-
-        {type !== 'laggingIndicator' && (
-          <div className="hidden lg:flex absolute -right-2.5 top-1/2 -translate-y-1/2 z-10 bg-white border border-[#DDE3DE] text-slate-400 rounded-full w-5 h-5 items-center justify-center text-xs font-bold shadow-sm">
-            →
-          </div>
-        )}
+        <p className="text-xs text-slate-400">
+          No indicators available.
+        </p>
       </div>
     );
-  };
+  }
+
+  return (
+    <div className="bg-white border border-[#DDE3DE] rounded-xl p-4 shadow-sm hover:shadow-md transition relative">
+      
+      {/* Prominent Stage Header */}
+      <div className="flex items-center gap-3 mb-4 pb-3 border-b border-[#DDE3DE]">
+        <div
+          className={`w-10 h-10 rounded-xl ${config.iconBg} flex items-center justify-center shrink-0`}
+        >
+          <Icon
+            size={19}
+            strokeWidth={2.2}
+            className={config.iconColor}
+          />
+        </div>
+
+        <div className="min-w-0">
+          <h3 className="text-sm font-bold tracking-tight text-[#152238]">
+            {config.label}
+          </h3>
+
+          <p className="text-[9px] uppercase tracking-widest text-slate-400 font-semibold mt-0.5">
+            Macro Flow Stage
+          </p>
+        </div>
+      </div>
+
+      {groups.map((group, groupIndex) => (
+        <div
+          key={`${type}-${group.sector || 'sector'}-${group.subSector || 'subsector'}-${groupIndex}`}
+          className="mb-3 last:mb-0"
+        >
+          <div className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-1.5 truncate">
+            {group.sector}
+            <span className="text-slate-300"> › </span>
+            {group.subSector}
+          </div>
+
+          <div className="flex flex-wrap gap-1.5">
+            {(group.indicators || []).map((ind, indIndex) => {
+              const isActive =
+                activeIndicator?.dataItem === ind.dataItem &&
+                activeIndicator?.dataName === ind.dataName &&
+                activeIndicator?.dataSet === ind.dataSet;
+
+              const uniqueKey = `${type}-${group.sector || 'sector'}-${group.subSector || 'subsector'}-${ind.dataItem || 'indicator'}-${ind.dataSet || 'dataset'}-${indIndex}`;
+
+              return (
+                <button
+                  key={uniqueKey}
+                  onClick={() =>
+                    handleIndicatorSelect(ind, group)
+                  }
+                  className={`w-full text-left border rounded-xl px-3 py-2 transition-all duration-200 text-sm ${
+                    isActive
+                      ? `${style.activeBg} font-medium shadow-sm`
+                      : `${style.inactiveBg} hover:border-slate-300`
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <p
+                      className={`text-xs font-semibold leading-tight truncate ${
+                        isActive
+                          ? style.activeText
+                          : 'text-slate-800'
+                      }`}
+                    >
+                      {ind.dataItem}
+                    </p>
+
+                    {isActive && (
+                      <span className="text-[10px] text-[#B7C1D6]">
+                        ✓
+                      </span>
+                    )}
+                  </div>
+
+                  <p
+                    className={`text-[10px] leading-tight truncate mt-1 ${
+                      isActive
+                        ? style.activeSub
+                        : 'text-slate-500'
+                    }`}
+                  >
+                    {ind.dataSet}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      {/* Flow Arrow */}
+      {type !== 'laggingIndicator' && (
+        <div className="hidden lg:flex absolute -right-2.5 top-1/2 -translate-y-1/2 z-10 bg-white border border-[#DDE3DE] text-slate-400 rounded-full w-5 h-5 items-center justify-center text-xs font-bold shadow-sm">
+          →
+        </div>
+      )}
+    </div>
+  );
+};
 
   const hasIndicatorData = activeIndicatorData.some((v) => v !== null && v !== undefined && Number.isFinite(Number(v)));
   const hasStockData = stockPriceData.some((v) => v !== null && v !== undefined && Number.isFinite(Number(v)));
@@ -1111,10 +1201,10 @@ export default function CompanyDashboard() {
               </span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative">
-              {renderStage('leadingIndicator', 'Leading Signals')}
-              {renderStage('rawMaterial', 'Raw Materials (Costs)')}
-              {renderStage('outputProduct', 'Output (Revenue)')}
-              {renderStage('laggingIndicator', 'Lagging (Financials)')}
+{renderStage('leadingIndicator')}
+{renderStage('rawMaterial')}
+{renderStage('outputProduct')}
+{renderStage('laggingIndicator')}
             </div>
           </section>
 
